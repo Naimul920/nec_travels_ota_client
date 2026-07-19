@@ -33,7 +33,7 @@ function getMockJwt(role: string): string {
   const signature = "mock_secure_signature_hash";
   return `${header}.${payload}.${signature}`;
 }
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Read both HTTP cookies automatically forwarded by the browser
