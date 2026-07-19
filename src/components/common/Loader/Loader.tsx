@@ -1,4 +1,5 @@
 import Image from "next/image";
+import withImage from "../../../../public/assets/images/with.png"; 
 
 const Loader = () => {
   return (
@@ -15,7 +16,7 @@ const Loader = () => {
       <div className="flex flex-col justify-center items-center mt-5">
         <p className="text-xs font-semibold">YOUR TRAVEL BE SAFER</p>
         <Image
-          src="/assets/images/with.png"
+          src={withImage}
           alt="Logo"
           className="mx-auto w-9"
           width={200}

@@ -9,6 +9,7 @@ import { Button, Input } from "@/components/ui";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import Swal from "sweetalert2";
 import Image from "next/image";
+import withImage from "../../../public/assets/images/with.png"; 
 
 const SigninForm: React.FC = () => {
   const [login, { isLoading, isError, error }] = useLoginMutation();
@@ -40,7 +41,7 @@ const SigninForm: React.FC = () => {
         <div className="flex flex-col justify-center items-center mb-5">
           <p className="text-xs font-semibold">YOUR TRAVEL BE SAFER</p>
           <Image
-            src="/assets/images/with.png"
+            src={withImage}
             alt="Logo"
             width={200}
             height={200}

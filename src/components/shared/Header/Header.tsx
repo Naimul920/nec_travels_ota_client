@@ -19,6 +19,7 @@ import decodeToken from "../../../utils/decode/decode";
 
 // Next.js 16 Image component layout tool for optimal asset parsing performance
 import Image from "next/image";
+import Logo from "../../../../public/assets/images/logo.png"; // 7. Importing logo as a module for Next.js Image optimization
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -68,7 +69,7 @@ const Header: React.FC = () => {
           <Link href={dashboardLink} className="relative block">
             {/* 6. Utilized standard Next.js Image optimization configuration properties */}
             <Image
-              src="/assets/images/logo.png"
+              src={Logo}
               alt="Logo"
               width={150} // Adjust exact layout measurements to suit mock dimensions
               height={40}
@@ -83,7 +84,7 @@ const Header: React.FC = () => {
         <div className="md:invisible visible relative -ml-36">
           <Link href={dashboardLink} className="relative block">
             <Image
-              src="/assets/images/logo.png"
+              src={Logo}
               alt="Logo"
               width={120}
               height={32}

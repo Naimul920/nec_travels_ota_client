@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import HomeTabs from "@/app/(agent)/home/_components/HomeTabs";
+import withImage from "../../../public/assets/images/with.png"; 
 
 export default function HomePage() {
   return (
@@ -12,7 +13,7 @@ export default function HomePage() {
         </p>
         <div className="mx-auto md:w-12 w-8 h-auto relative">
           <Image
-            src="/assets/images/with.png"
+            src={withImage}
             alt="Logo"
             width={48}
             height={48}

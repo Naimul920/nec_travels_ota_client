@@ -9,6 +9,7 @@ import { FiMail } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
 import { useLoginMutation } from "@/redux/api/auth/authApiSlice";
 import Image from "next/image";
+import withImage from "../../../public/assets/images/with.png"; 
 
 const ForgotPasswordForm: React.FC = () => {
   const [login, { isLoading, isError, error }] = useLoginMutation();
@@ -32,7 +33,7 @@ const ForgotPasswordForm: React.FC = () => {
         <div className="flex flex-col justify-center items-center mb-5">
           <p className="text-xs font-semibold">YOUR TRAVEL BE SAFER</p>
           <Image
-            src="/assets/images/with.png"
+            src={withImage}
             alt="Logo"
             width={200}
             height={200}
