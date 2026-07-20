@@ -9,7 +9,8 @@ import Loader from "@/components/common/Loader/Loader";
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
-      <PersistGate loading={<Loader />} persistor={persistor}>
+      <PersistGate persistor={persistor}>
+      {/* <PersistGate loading={<Loader />} persistor={persistor}> */}
         {children}
       </PersistGate>
     </Provider>

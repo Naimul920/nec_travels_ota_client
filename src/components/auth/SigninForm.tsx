@@ -9,7 +9,7 @@ import { Button, Input } from "@/components/ui";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import Swal from "sweetalert2";
 import Image from "next/image";
-import withImage from "../../../public/assets/images/with.png"; 
+import withImage from "../../../public/assets/images/with.png";
 
 const SigninForm: React.FC = () => {
   const [login, { isLoading, isError, error }] = useLoginMutation();
@@ -144,7 +144,7 @@ const SigninForm: React.FC = () => {
 
         <p className="mt-4 text-center text-sm">
           Dont have an account?{" "}
-          <Link href="/auth/signup" className="text-blue-600 hover:underline">
+          <Link href="/signup" className="text-blue-600 hover:underline">
             Sign Up
           </Link>
         </p>
