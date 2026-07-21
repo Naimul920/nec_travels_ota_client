@@ -17,7 +17,6 @@ interface TabsProps {
   className?: string;
   containerClassName?: string;
 }
- 
 
 const Tabs: React.FC<TabsProps> = ({
   activeKey,
@@ -31,7 +30,7 @@ const Tabs: React.FC<TabsProps> = ({
       <div
         className={clsx(
           "flex items-center bg-white border border-gray-100 rounded-lg md:rounded-xl overflow-x-auto flex-nowrap no-scrollbar shadow-xs p-1",
-          containerClassName
+          containerClassName,
         )}
       >
         {React.Children.map(children, (child) => {
@@ -49,7 +48,7 @@ const Tabs: React.FC<TabsProps> = ({
                   ? "bg-secondary border-primary text-white shadow-sm"
                   : "bg-transparent text-gray-600! hover:text-gray-900 hover:bg-gray-50",
                 isDisabled &&
-                  "opacity-40 cursor-not-allowed pointer-events-none grayscale"
+                  "opacity-40 cursor-not-allowed pointer-events-none grayscale",
               )}
               disabled={isDisabled}
             >
@@ -57,7 +56,7 @@ const Tabs: React.FC<TabsProps> = ({
                 <span
                   className={clsx(
                     "text-lg md:text-xl",
-                    isActive ? "text-white" : "text-green-600"
+                    isActive ? "text-white" : "text-green-600",
                   )}
                 >
                   {child.props.icon}

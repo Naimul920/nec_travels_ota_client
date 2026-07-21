@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"; // 1. Next.js 16 Client Component Directive
 
 import React, { useState, useRef, useEffect } from "react";

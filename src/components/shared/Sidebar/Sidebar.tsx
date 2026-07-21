@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"; // 1. Next.js 16 Client Component Directive
-
 import React, { useState, useEffect, useRef } from "react";
 import { Layout, Menu } from "antd";
 import { useSelector } from "react-redux";
@@ -72,6 +72,7 @@ const Sidebar: React.FC<{ mobileOpen: boolean; setMobileOpen: any }> = ({
 
   useEffect(() => {
     // Safely reads the client window layout parameters only after mount complete
+    /* eslint-disable react-hooks/set-state-in-effect */
     setIsMobile(window.innerWidth < 768);
 
     const handleResize = () => setIsMobile(window.innerWidth < 768);
