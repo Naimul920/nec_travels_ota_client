@@ -1,6 +1,6 @@
 import React from "react";
 import { bankAccounts, mobileBankingAccounts } from "@/data/bankAccounts";
-import { BankInfoCard } from "@/app/(dashboard)/b2b/_components/Bank";
+import BankInfoCard from "./BankInfoCard";
 
 const Bank: React.FC = () => {
   return (

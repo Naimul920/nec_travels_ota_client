@@ -1,13 +1,11 @@
-"use client"; // 1. Next.js 16 Client Component Directive
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import {
   useLogoutMutation,
   useUserInfoQuery,
 } from "../../../redux/api/auth/authApiSlice";
-// 2. Swapped Link from 'react-router-dom' to Next.js native Link optimized compiler
 import Link from "next/link";
-// 3. Import standard router push hook if you need clean redirects after client logout
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { logout as logoutAction } from "../../../redux/features/authSlice";
@@ -17,9 +15,9 @@ import { LuBellDot } from "react-icons/lu";
 import NoticeMarquee from "@/components/common/NoticeMarquee/NoticeMarquee";
 import decodeToken from "../../../utils/decode/decode";
 
-// Next.js 16 Image component layout tool for optimal asset parsing performance
 import Image from "next/image";
-import Logo from "../../../../public/assets/images/logo.png"; // 7. Importing logo as a module for Next.js Image optimization
+import Logo from "../../../../public/assets/images/logo.png";
+import { Role } from "@/helper/navigation";
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -31,8 +29,8 @@ const Header: React.FC = () => {
   const { data, isLoading, isError } = useUserInfoQuery({});
 
   const userInfo: any = decodeToken(user?.accessToken);
-  const role = String(userInfo?.role).toLowerCase();
-  const dashboardLink = role === "agent" ? "/" : `/${role}/dashboard`;
+  const role: Role = Role.B2B;
+  const dashboardLink = `/console/${role}`;
 
   const profileName = data?.data?.profile?.fullName || "User";
   const profileEmail = data?.data?.email || "";
@@ -41,7 +39,6 @@ const Header: React.FC = () => {
   const handleLogout = async () => {
     dispatch(logoutAction());
     await logoutApi(undefined);
-    // 4. Forces layout to safely redirect users to the authentication panel post-logout
     router.push("/auth/signin");
   };
 
@@ -65,17 +62,14 @@ const Header: React.FC = () => {
       <header className="w-full md:h-18 h-16 bg-white flex items-center justify-between px-4 md:px-14 shrink-0 py-3">
         {/* Logo - Desktop */}
         <div className="invisible md:visible relative">
-          {/* 5. Swapped 'to' parameter to Next.js compliant 'href' parameter layout targeting */}
           <Link href={dashboardLink} className="relative block">
-            {/* 6. Utilized standard Next.js Image optimization configuration properties */}
             <Image
               src={Logo}
               alt="Logo"
-              width={150} // Adjust exact layout measurements to suit mock dimensions
-              height={40}
+              style={{ width: "150px", height: "auto" }}
               className="mx-auto"
               draggable={false}
-              priority // Prioritizes loading critical ATF asset files
+              priority
             />
           </Link>
         </div>
@@ -86,9 +80,8 @@ const Header: React.FC = () => {
             <Image
               src={Logo}
               alt="Logo"
-              width={120}
-              height={32}
-              className="mx-auto w-4.5/5"
+              style={{ width: "120px", height: "auto" }}
+              className="mx-auto"
               draggable={false}
               priority
             />
@@ -171,7 +164,7 @@ const Header: React.FC = () => {
         </div>
       </header>
 
-      <div className="mx-4 md:mx-0 z-[99] px-0 md:px-14">
+      <div className="mx-4 md:mx-0 z-99 px-0 md:px-14">
         <NoticeMarquee />
       </div>
     </>

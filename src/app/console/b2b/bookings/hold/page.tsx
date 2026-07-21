@@ -1,4 +1,4 @@
-import HoldTickets from "@/app/(dashboard)/b2b/_components/AirTickets/HoldTickets";
+import HoldTickets from "../../_components/AirTickets/HoldTickets";
 
 function page() {
   return (

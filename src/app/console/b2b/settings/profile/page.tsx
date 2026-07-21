@@ -1,5 +1,6 @@
 import React from "react";
-import { EditProfile, Fare, Otp, Password } from "@/app/(dashboard)/b2b/_components/Profile";
+import { EditProfile, Fare, Otp, Password } from "../../_components/Profile";
+// import { EditProfile, Fare, Otp, Password } from "@/app/(dashboard)/b2b/_components/Profile";
 
 const Profile: React.FC = () => {
   return (
