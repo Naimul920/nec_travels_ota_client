@@ -1,4 +1,4 @@
-import Void from "@/app/(dashboard)/b2b/_components/Support/Void";
+import Void from "../../_components/Support/Void";
 
 function page() {
   return (

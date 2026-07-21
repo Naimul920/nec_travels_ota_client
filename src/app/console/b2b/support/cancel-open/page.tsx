@@ -1,4 +1,4 @@
-import Cancel from "@/app/(dashboard)/b2b/_components/Support/Cancel";
+import Cancel from "../../_components/Support/Cancel";
 
 function page() {
   return (

@@ -1,4 +1,4 @@
-import CreditRequest from "@/app/(dashboard)/b2b/_components/Transaction/CreditRequest";
+import CreditRequest from "../../_components/Transaction/CreditRequest";
 
 function page() {
   return (
