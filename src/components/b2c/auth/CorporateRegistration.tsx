@@ -109,10 +109,10 @@ export default function CorporateRegistration() {
         }
       });
 
-      console.log("Submitting Corporate Registration Payload:");
-      for (let [k, v] of formData.entries()) {
-        console.log(`${k}:`, v);
-      }
+      //   console.log("Submitting Corporate Registration Payload:");
+      //   for (let [k, v] of formData.entries()) {
+      //     console.log(`${k}:`, v);
+      //   }
     },
   });
 
