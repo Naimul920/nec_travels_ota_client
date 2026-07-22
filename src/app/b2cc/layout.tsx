@@ -1,5 +1,6 @@
 "use client";
 
+import Footer from "@/components/shared/B2cFooter/Footer";
 import B2cNavbar from "@/components/shared/B2cNavbar/B2cNavbar";
 import B2cSidebar from "@/components/shared/B2cSidebar/B2cSidebar";
 import React, { useState, useEffect } from "react";
@@ -31,13 +32,14 @@ export default function B2cLayout({ children }: { children: React.ReactNode }) {
       {/* Main Container Core */}
       <div className="flex flex-1 relative overflow-hidden">
         {/* Main Content moves to the left */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 transition-all duration-300">
+        <main className="flex-1 overflow-y-auto    transition-all duration-300">
           {children}
         </main>
 
         {/* Sidebar component moves here to layout natively on the right */}
         <B2cSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
+      <Footer />
     </div>
   );
 }

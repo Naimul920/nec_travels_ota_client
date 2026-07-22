@@ -20,11 +20,11 @@ export default function HeroContent() {
       <div className="absolute inset-0 bg-black/60 z-20 rounded-xl" />
 
       {/* Hero Typography Text Layer */}
-      <div className="absolute inset-0 z-30 flex flex-col items-center pt-20 text-center text-white">
-        <h1 className="font-['var(--font-belanosima)'] font-bold text-[64px] leading-tight tracking-wide drop-shadow-md">
+      <div className="absolute inset-0 z-30 flex flex-col items-center pt-20 text-center text-white font-belanosima ">
+        <h1 className=" font-bold text-[64px] leading-tight tracking-wide drop-shadow-md font-belanosima">
           <span className="text-[#00A550]">Wonder</span> Freely
         </h1>
-        <h1 className="font-['var(--font-belanosima)'] font-bold text-[64px] leading-tight tracking-wide drop-shadow-md mt-1">
+        <h1 className=" font-bold text-[64px] leading-tight tracking-wide drop-shadow-md mt-1">
           Explore <span className="text-[#00A550]">Endlessly</span>
         </h1>
       </div>

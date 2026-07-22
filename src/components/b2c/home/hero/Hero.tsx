@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import HeroContent from "@/components/b2c/home/HeroContent";
-import FloatingTabs, { TabKey } from "@/components/b2c/home/FloatingTabs";
+import HeroContent from "@/components/b2c/home/hero/HeroContent";
+import FloatingTabs, { TabKey } from "@/components/b2c/home/hero/FloatingTabs";
 
 export default function HomeHero() {
   const [activeTab, setActiveTab] = useState<TabKey | null>(null);
