@@ -15,7 +15,7 @@ export default function HomeHero() {
   return (
     <section
       className={`relative w-full h-[450px] bg-gray-900 select-none rounded-xl transition-all duration-300 ${
-        activeKey ? "mb-[420px]" : "mb-16"
+        activeKey ? "mb-[460px]" : "mb-16"
       }`}
     >
       <HeroContent />

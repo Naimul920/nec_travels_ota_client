@@ -65,7 +65,8 @@ const Tabs: React.FC<TabsProps> = ({
                   {child.props.icon}
                 </span>
               )}
-              {child.props.tab}
+              {/* {child.props.tab} */}
+              <span className="hidden lg:inline">{child.props.tab}</span>
             </Button>
           );
         })}
