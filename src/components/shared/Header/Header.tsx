@@ -1,45 +1,52 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import {
-  useLogoutMutation,
-  useUserInfoQuery,
-} from "../../../redux/api/auth/authApiSlice";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
-import { logout as logoutAction } from "../../../redux/features/authSlice";
-import { IoMdLogOut } from "react-icons/io";
-import { FaCreditCard } from "react-icons/fa";
-import { LuBellDot } from "react-icons/lu";
-import NoticeMarquee from "@/components/common/NoticeMarquee/NoticeMarquee";
-import decodeToken from "../../../utils/decode/decode";
-
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+import { IoMdLogOut } from "react-icons/io";
+import { LuBell } from "react-icons/lu";
+
+import NoticeMarquee from "@/components/common/NoticeMarquee/NoticeMarquee";
+import { Role, useAuth } from "@/context/AuthContext";
+// import { Role } from "@/helper/navigation";
+
 import Logo from "../../../../public/assets/images/logo.png";
-import { Role } from "@/helper/navigation";
 
 const Header: React.FC = () => {
   const router = useRouter();
-  const user: any = useSelector((state: any) => state.auth.user);
-  const dispatch = useDispatch();
-  const [logoutApi] = useLogoutMutation();
+
+  const { user, loading, logout } = useAuth();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { data, isLoading, isError } = useUserInfoQuery({});
 
-  const userInfo: any = decodeToken(user?.accessToken);
-  const role: Role = Role.B2B;
-  const dashboardLink = `/console/${role}`;
+  const role: Role = (user?.role as Role) ?? Role.B2B;
 
-  const profileName = data?.data?.profile?.fullName || "User";
-  const profileEmail = data?.data?.email || "";
-  const avatarLetter = profileName ? profileName[0].toUpperCase() : "U";
+  const dashboardLink = `/console/${role.toLowerCase()}`;
+
+  const profileName = user?.profile?.full_name ?? "User";
+
+  const profileEmail = user?.email ?? "";
+
+  const balance = user?.balance ?? 0;
+
+  const creditBalance = user?.creditBalance ?? 0;
+
+  const isB2B = user?.role === Role.B2B;
+
+  const avatarLetter = profileName.charAt(0).toUpperCase();
 
   const handleLogout = async () => {
-    dispatch(logoutAction());
-    await logoutApi(undefined);
-    router.push("/auth/signin");
+    try {
+      await logout();
+
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   useEffect(() => {
@@ -51,7 +58,9 @@ const Header: React.FC = () => {
         setDropdownOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -59,112 +68,124 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="w-full md:h-18 h-16 bg-white flex items-center justify-between px-4 md:px-14 shrink-0 py-3">
-        {/* Logo - Desktop */}
-        <div className="invisible md:visible relative">
-          <Link href={dashboardLink} className="relative block">
+      <header className="w-full h-16 md:h-18 bg-white flex items-center justify-between px-4 md:px-14 py-3 shrink-0">
+        {/* Desktop Logo */}
+        <div className="hidden md:block">
+          <Link href={dashboardLink}>
             <Image
               src={Logo}
               alt="Logo"
-              style={{ width: "150px", height: "auto" }}
-              className="mx-auto"
-              draggable={false}
+              width={150}
+              height={40}
+              className="h-auto w-auto object-contain"
               priority
+              draggable={false}
             />
           </Link>
         </div>
 
-        {/* Logo - Mobile */}
-        <div className="md:invisible visible relative -ml-36">
-          <Link href={dashboardLink} className="relative block">
+        {/* Mobile Logo */}
+        <div className="block md:hidden">
+          <Link href={dashboardLink}>
             <Image
               src={Logo}
               alt="Logo"
-              style={{ width: "120px", height: "auto" }}
-              className="mx-auto"
-              draggable={false}
+              width={120}
+              className="h-auto"
               priority
+              draggable={false}
             />
           </Link>
         </div>
 
         {/* Profile */}
-        <div className="relative" ref={dropdownRef}>
-          {isLoading ? (
+        <div ref={dropdownRef} className="relative">
+          {loading ? (
             <div className="flex items-center gap-3 animate-pulse">
               <div className="w-10 h-10 rounded-full bg-gray-300" />
+
               <div className="hidden md:block space-y-1">
-                <div className="h-3 w-32 bg-gray-300 rounded" />
-                <div className="h-2 w-20 bg-gray-200 rounded" />
-              </div>
-            </div>
-          ) : isError ? (
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold mr-3">
-                U
-              </div>
-              <div className="hidden md:block">
-                <h2 className="text-gray-900 text-sm font-semibold">User</h2>
+                <div className="h-3 w-32 rounded bg-gray-300" />
+                <div className="h-2 w-20 rounded bg-gray-200" />
               </div>
             </div>
           ) : (
             <>
-              {/* Desktop User Profile Trigger */}
+              {/* Desktop Trigger */}
               <div
-                className="hidden md:flex items-center cursor-pointer"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="hidden md:flex items-center cursor-pointer select-none"
+                onClick={() => setDropdownOpen((prev) => !prev)}
               >
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold mr-3">
+                <div className="w-10 h-10 rounded-full bg-primary text-white font-bold flex items-center justify-center mr-3">
                   {avatarLetter}
                 </div>
+
                 <div>
-                  <h2 className="text-gray-900 text-sm font-semibold">
+                  <h2 className="text-sm font-semibold text-gray-900">
                     {profileName}
                   </h2>
-                  <p className="text-red-500 text-xs">{profileEmail}</p>
+
+                  <p className="text-xs text-red-500">{profileEmail}</p>
                 </div>
               </div>
 
-              {/* Mobile User Profile Trigger */}
+              {/* Mobile Trigger */}
               <div
-                className="flex md:hidden items-center cursor-pointer"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="md:hidden flex items-center cursor-pointer select-none"
+                onClick={() => setDropdownOpen((prev) => !prev)}
               >
-                <div className="md:w-10 w-8 md:h-10 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                <div className="w-8 h-8 rounded-full bg-primary text-white font-bold flex items-center justify-center">
                   {avatarLetter}
                 </div>
               </div>
             </>
           )}
 
-          {/* Dropdown Menu Container */}
+          {/* Dropdown */}
           {dropdownOpen && (
-            <ul className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded shadow text-sm z-[999]">
-              <li className="px-4 py-2 border-b border-gray-200">
-                <p className="font-semibold">{profileName}</p>
-                <p className="text-xs text-gray-500">{profileEmail}</p>
-              </li>
-              <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200">
-                <LuBellDot className="mr-2" /> Notifications
-              </li>
-              <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200">
-                <FaCreditCard className="mr-2" /> Balance: $100
-              </li>
-              <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200">
-                <FaCreditCard className="mr-2" /> Credit Balance: $100
-              </li>
-              <li
-                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={handleLogout}
-              >
-                <IoMdLogOut className="mr-2 text-secondary" /> Logout
-              </li>
-            </ul>
+            <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded shadow-md text-xs text-gray-800 z-[999] overflow-hidden">
+              <ul className="divide-y divide-gray-100">
+                {/* Notification */}
+                <li className="flex items-center justify-end gap-2 px-4 py-2.5 hover:bg-gray-50 cursor-pointer font-medium">
+                  <span>Notification</span>
+
+                  <LuBell className="text-sm text-black fill-black" />
+                </li>
+
+                {/* Balance (B2B only) */}
+                {isB2B && (
+                  <>
+                    <li className="flex items-center justify-end px-4 py-2.5 hover:bg-gray-50 cursor-pointer font-medium">
+                      <span>Balance : {balance}</span>
+                    </li>
+
+                    <li className="flex items-center justify-end px-4 py-2.5 hover:bg-gray-50 cursor-pointer font-medium">
+                      <span>
+                        Credit Balance :{" "}
+                        <span className="text-red-500 font-semibold">
+                          {creditBalance}
+                        </span>
+                      </span>
+                    </li>
+                  </>
+                )}
+
+                {/* Logout */}
+                <li
+                  className="flex items-center justify-end gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200/80 cursor-pointer text-red-500 font-semibold"
+                  onClick={handleLogout}
+                >
+                  <span>Logout</span>
+
+                  <IoMdLogOut className="text-base text-red-500" />
+                </li>
+              </ul>
+            </div>
           )}
         </div>
       </header>
 
-      <div className="mx-4 md:mx-0 z-99 px-0 md:px-14">
+      <div className="mx-4 md:mx-0 px-0 md:px-14">
         <NoticeMarquee />
       </div>
     </>

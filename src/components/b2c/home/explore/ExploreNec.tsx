@@ -1,0 +1,17 @@
+// import React from "react";
+// import ExploreNecText from "@/components/b2c/home/explore/ExploreNecText";
+// import ExploreNecCarousel from "@/components/b2c/home/explore/ExploreNecCarousel";
+
+import ExploreNecCarousel from "./ExploreNecCarousel";
+import ExploreNecText from "./ExploreNecText";
+
+function ExploreNec() {
+  return (
+    <section className="max-w-[1600px] mx-auto px-2">
+      <ExploreNecText />
+      <ExploreNecCarousel />
+    </section>
+  );
+}
+
+export default ExploreNec;

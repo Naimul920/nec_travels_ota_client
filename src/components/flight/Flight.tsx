@@ -8,8 +8,8 @@ import Roundtrip from "./TripType/Roundtrip";
 import MultiCity from "./TripType/Multicity";
 import dayjs from "dayjs";
 import { ErrorAlert } from "../common/Alert/Alert";
-import { useDispatch } from "react-redux";
-import { modifySearch } from "@/redux/features/flightSlice";
+// import { useDispatch } from "react-redux";
+// import { modifySearch } from "@/redux/features/flightSlice";
 import { decoding, encoding } from "@/utils";
 import detectDomesticType from "@/utils/domestic/detactedDomesticType";
 
@@ -21,7 +21,7 @@ interface FlightProps {
 
 const Flight: React.FC<FlightProps> = ({ useFlight }) => {
   const router = useRouter();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
   // Next.js Search Parameters extraction pipeline
@@ -316,14 +316,14 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
     return params.toString();
   };
 
-  useEffect(() => {
-    hasInitialized.current = true;
-  }, [dispatch]);
+  // useEffect(() => {
+  //   hasInitialized.current = true;
+  // }, [dispatch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (useFlight === "search") {
-      dispatch(modifySearch());
+      // dispatch(modifySearch());
     }
     const query = buildSearchQuery();
     // Replaced navigate() with Next.js router.push() API

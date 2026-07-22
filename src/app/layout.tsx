@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Poppins, Stalemate } from "next/font/google";
 import "./globals.css";
 import AppLoaderProvider from "@/provider/AppLoaderProvider";
-import { StoreProvider } from "@/redux/StoreProvider";
+
+import Providers from "@/provider/providers";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -27,11 +28,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${poppins.variable} ${stalemate.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${poppins.variable} ${stalemate.variable} h-full antialiased`}
+    >
       <body suppressHydrationWarning>
-        <StoreProvider>
+        <Providers>
           <AppLoaderProvider>{children}</AppLoaderProvider>
-        </StoreProvider>
+        </Providers>
+
+        {/* <StoreProvider>
+          <AppLoaderProvider>{children}</AppLoaderProvider>
+        </StoreProvider> */}
         {/* <AppLoaderProvider>
           <StoreProvider>{children}</StoreProvider>
         </AppLoaderProvider> */}

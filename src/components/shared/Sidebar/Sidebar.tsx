@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaBars, FaTimes } from "react-icons/fa";
 
-import { navigationConfig, Role } from "@/helper/navigation";
+import { navigationConfig, NavRole} from "@/helper/navigation";
 
 const { Sider } = Layout;
 
@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   // const role = userInfo?.role as Role;
 
-  const role: Role = Role.B2B;
+  const role: NavRole = NavRole.B2B;
 
   // =========================================================================
   // ROUTE PREFIX

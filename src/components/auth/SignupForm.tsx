@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import clsx from "clsx";
+import Swal from "sweetalert2";
+import Image from "next/image";
+
 import { Button, Input } from "@/components/ui";
+
 import {
   FiMail,
   FiLock,
@@ -14,16 +18,24 @@ import {
   FiUser,
   FiPhone,
 } from "react-icons/fi";
-import { useRegisterMutation } from "@/redux/api/auth/authApiSlice";
-import Swal from "sweetalert2";
-import Image from "next/image";
-import withImage from "../../../public/assets/images/with.png"; 
+
+import withImage from "../../../public/assets/images/with.png";
+import { publicApi } from "@/helper/api/axios";
+
+// Interface for API response
+interface RegisterResponse {
+  success: boolean;
+  message?: string;
+}
 
 const SignupForm: React.FC = () => {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
-  const [register, { isLoading, isError, error }] = useRegisterMutation();
-  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -33,39 +45,73 @@ const SignupForm: React.FC = () => {
       password: "",
       confirmPassword: "",
     },
+
     onSubmit: async (values) => {
       if (values.password !== values.confirmPassword) {
-        alert("Password not match");
+        Swal.fire({
+          icon: "error",
+          title: "Password mismatch",
+          text: "Passwords do not match",
+        });
         return;
       }
-      const payload = {
-        fullname: values.name,
-        phone: values.phone,
-        email: values.email,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-      };
 
-      const result = await register(payload);
-      if (result?.data?.success) {
+      try {
+        setIsLoading(true);
+        setApiError("");
+
+        const payload = {
+          fullname: values.name,
+          phone: values.phone,
+          email: values.email,
+          password: values.password,
+          confirmPassword: values.confirmPassword,
+        };
+
+        // Replaced direct axios call with guestHttp
+        const response = await publicApi.post<RegisterResponse>(
+          "/auth/register",
+          payload
+        );
+
+        if (response?.success) {
+          Swal.fire({
+            title: "Registration Successful",
+            text: "Please login to continue.",
+            icon: "success",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              router.push("/auth/signin");
+            }
+          });
+        }
+      } catch (error: any) {
+        const message =
+          error?.message || "Registration failed. Please try again.";
+
+        const formattedMessage = Array.isArray(message)
+          ? message.join(", ")
+          : message;
+
+        setApiError(formattedMessage);
+
         Swal.fire({
-          title: "Register successful",
-          text: "Now, you're login",
-          icon: "success",
-        }).then((res) => {
-          if (res.isConfirmed) {
-            router.push("/auth/signin");
-          }
+          icon: "error",
+          title: "Registration Failed",
+          text: formattedMessage,
         });
+      } finally {
+        setIsLoading(false);
       }
     },
   });
 
   return (
-    <div className="md:px-0 px-3">
-      <div className="bg-blue-50/50 bg-opacity-40 backdrop-blur-md md:mx-auto md:w-[400px] w-full p-6 rounded-2xl shadow-lg">
-        <div className="flex flex-col justify-center items-center mb-5">
+    <div className="px-3 md:px-0">
+      <div className="mx-auto w-full rounded-2xl bg-blue-50/50 p-6 shadow-lg backdrop-blur-md md:w-[400px]">
+        <div className="mb-5 flex flex-col items-center justify-center">
           <p className="text-xs font-semibold">YOUR TRAVEL BE SAFER</p>
+
           <Image
             src={withImage}
             alt="Logo"
@@ -74,143 +120,119 @@ const SignupForm: React.FC = () => {
             className="mx-auto w-9"
             draggable={false}
           />
-          <h1 className="font-extrabold text-3xl -mt-2.5 text-shadow-2xs">
+
+          <h1 className="-mt-2.5 text-3xl font-extrabold text-shadow-2xs">
             <span className="text-primary">NEC</span>{" "}
             <span className="text-secondary">TRAVELS</span>
           </h1>
         </div>
 
-        <h1 className="text-3xl font-bold text-center text-gray-950 mb-6">
+        <h1 className="mb-6 text-center text-3xl font-bold text-gray-950">
           Register
         </h1>
 
         <form onSubmit={formik.handleSubmit} className="space-y-4">
           <Input
-            type="text"
             id="name"
+            type="text"
             placeholder="Enter your name"
             iconLeft={<FiUser />}
             className={clsx(
-              "w-full bg-white border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-1 focus:ring-primary",
-              formik.touched.name && formik.errors.name ? "border-red-500" : "",
+              "w-full rounded-full border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
             )}
-            error={formik.touched.name && !!formik.errors.name}
-            errorMessage={formik.errors.name}
             {...formik.getFieldProps("name")}
           />
 
           <Input
-            type="email"
             id="email"
+            type="email"
             placeholder="Enter your email"
             iconLeft={<FiMail />}
             className={clsx(
-              "w-full bg-white border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-1 focus:ring-primary",
-              formik.touched.email && formik.errors.email
-                ? "border-red-500"
-                : "",
+              "w-full rounded-full border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
             )}
-            error={formik.touched.email && !!formik.errors.email}
-            errorMessage={formik.errors.email}
             {...formik.getFieldProps("email")}
           />
 
           <Input
-            type="text"
             id="phone"
+            type="text"
             placeholder="Enter your phone number"
             iconLeft={<FiPhone />}
             className={clsx(
-              "w-full bg-white border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-1 focus:ring-primary",
-              formik.touched.phone && formik.errors.phone
-                ? "border-red-500"
-                : "",
+              "w-full rounded-full border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
             )}
-            error={formik.touched.phone && !!formik.errors.phone}
-            errorMessage={formik.errors.phone}
             {...formik.getFieldProps("phone")}
           />
 
           <Input
-            type={showPassword ? "text" : "password"}
             id="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
             iconLeft={<FiLock />}
             iconRight={
               showPassword ? (
                 <FiEyeOff
-                  onClick={() => setShowPassword(false)}
                   className="cursor-pointer"
+                  onClick={() => setShowPassword(false)}
                 />
               ) : (
                 <FiEye
-                  onClick={() => setShowPassword(true)}
                   className="cursor-pointer"
+                  onClick={() => setShowPassword(true)}
                 />
               )
             }
             className={clsx(
-              "w-full bg-white border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-1 focus:ring-primary",
-              formik.touched.password && formik.errors.password
-                ? "border-red-500"
-                : "",
+              "w-full rounded-full border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
             )}
-            error={formik.touched.password && !!formik.errors.password}
-            errorMessage={formik.errors.password}
             {...formik.getFieldProps("password")}
           />
 
           <Input
-            type={showPassword2 ? "text" : "password"}
             id="confirmPassword"
-            placeholder="Enter your confirm password"
+            type={showPassword2 ? "text" : "password"}
+            placeholder="Confirm your password"
             iconLeft={<FiLock />}
             iconRight={
               showPassword2 ? (
                 <FiEyeOff
-                  onClick={() => setShowPassword2(false)}
                   className="cursor-pointer"
+                  onClick={() => setShowPassword2(false)}
                 />
               ) : (
                 <FiEye
-                  onClick={() => setShowPassword2(true)}
                   className="cursor-pointer"
+                  onClick={() => setShowPassword2(true)}
                 />
               )
             }
             className={clsx(
-              "w-full bg-white border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-1 focus:ring-primary",
-              formik.touched.confirmPassword && formik.errors.confirmPassword
-                ? "border-red-500"
-                : "",
+              "w-full rounded-full border border-gray-300 bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
             )}
-            error={
-              formik.touched.confirmPassword && !!formik.errors.confirmPassword
-            }
-            errorMessage={formik.errors.confirmPassword}
             {...formik.getFieldProps("confirmPassword")}
           />
 
           <Button
-            disabled={isLoading}
             type="submit"
             variant="primary"
-            className="w-full py-3 bg-primary text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none"
+            disabled={isLoading}
+            className="w-full rounded-lg py-3 font-semibold text-white shadow-md transition duration-300 ease-in-out focus:outline-none"
           >
-            {isLoading ? "Register..." : "Register"}
+            {isLoading ? "Registering..." : "Register"}
           </Button>
 
-          {isError && error && (
-            <p className="text-red-600 text-sm text-center mt-2">
-              {(error as any).message ||
-                "Registration failed, please try again."}
-            </p>
+          {apiError && (
+            <p className="text-center text-sm text-red-600">{apiError}</p>
           )}
         </form>
 
         <p className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Link href="/signin" className="text-blue-600 hover:underline">
+          <Link
+            href="/auth/signin"
+            className="text-blue-600 hover:underline"
+          >
             Sign In
           </Link>
         </p>

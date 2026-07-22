@@ -42,19 +42,19 @@ export interface NavItem {
   children?: NavItem[];
 }
 
-export enum Role {
-  SUPER_ADMIN = "super-admin",
+export enum NavRole {
+  SUPER_ADMIN = "super_admin",
   ADMIN = "admin",
   B2B = "b2b",
   B2C = "b2c",
 }
 
-export const navigationConfig: Record<Role, NavItem[]> = {
+export const navigationConfig: Record<NavRole, NavItem[]> = {
   // =====================================================
   // SUPER ADMIN
   // =====================================================
 
-  [Role.SUPER_ADMIN]: [
+  [NavRole.SUPER_ADMIN]: [
     {
       path: "",
       label: "Home",
@@ -215,7 +215,7 @@ export const navigationConfig: Record<Role, NavItem[]> = {
   // ADMIN
   // =====================================================
 
-  [Role.ADMIN]: [
+  [NavRole.ADMIN]: [
     {
       path: "",
       label: "Home",
@@ -291,7 +291,7 @@ export const navigationConfig: Record<Role, NavItem[]> = {
   // B2B
   // =====================================================
 
-  [Role.B2B]: [
+  [NavRole.B2B]: [
     {
       path: "",
       label: "Home",
@@ -459,7 +459,7 @@ export const navigationConfig: Record<Role, NavItem[]> = {
   // B2C
   // =====================================================
 
-  [Role.B2C]: [
+  [NavRole.B2C]: [
     {
       path: "",
       label: "Home",
