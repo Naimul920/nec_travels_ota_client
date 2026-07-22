@@ -17,9 +17,10 @@ type TripType = "oneway" | "roundtrip" | "multicity";
 type TripField = "from" | "to" | "departure" | "return";
 interface FlightProps {
   useFlight?: "home" | "search";
+  route?: "agent" | "b2c";
 }
 
-const Flight: React.FC<FlightProps> = ({ useFlight }) => {
+const Flight: React.FC<FlightProps> = ({ useFlight, route = "agent" }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
@@ -388,8 +389,11 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
       {/* Form Submission Control */}
       <Button
         type="submit"
-        className="mt-6 bg-primary text-white px-10 py-3 rounded-lg font-bold 
-          absolute -bottom-14 left-1/2 -translate-x-1/2"
+        className={`bg-primary text-white px-10 py-3 rounded-lg font-bold absolute left-1/2 -translate-x-1/2 transition-all ${
+          route === "b2c"
+            ? "bottom-0 translate-y-20 shadow-lg hover:scale-105"
+            : "-bottom-14"
+        }`}
       >
         Search
       </Button>

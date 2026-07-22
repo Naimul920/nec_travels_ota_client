@@ -5,6 +5,7 @@ import { LuBuilding2 } from "react-icons/lu";
 import { FiFileText } from "react-icons/fi";
 import { MdFlight, MdHealthAndSafety, MdHolidayVillage } from "react-icons/md";
 import { FaKaaba } from "react-icons/fa";
+
 import { TabPane, Tabs } from "@/components/ui";
 import { Flight } from "@/components/flight";
 
@@ -29,7 +30,7 @@ export default function HomeTabs() {
           tab="Hotel"
           icon={<LuBuilding2 size={20} />}
         >
-          <div>Hotel Booking Content...</div>
+          <div className="p-4 text-gray-600">Hotel Booking Content...</div>
         </TabPane>
 
         <TabPane
@@ -38,7 +39,7 @@ export default function HomeTabs() {
           tab="Visa"
           icon={<FiFileText size={20} />}
         >
-          <div>Visa Information Content...</div>
+          <div className="p-4 text-gray-600">Visa Information Content...</div>
         </TabPane>
 
         <TabPane
@@ -47,7 +48,9 @@ export default function HomeTabs() {
           tab="Holiday"
           icon={<MdHolidayVillage size={20} />}
         >
-          <div>Holiday Information Content...</div>
+          <div className="p-4 text-gray-600">
+            Holiday Information Content...
+          </div>
         </TabPane>
 
         <TabPane
@@ -56,7 +59,7 @@ export default function HomeTabs() {
           tab="Umrah"
           icon={<FaKaaba size={20} />}
         >
-          <div>Umrah Information Content...</div>
+          <div className="p-4 text-gray-600">Umrah Information Content...</div>
         </TabPane>
 
         <TabPane
@@ -65,7 +68,9 @@ export default function HomeTabs() {
           tab="Insurance"
           icon={<MdHealthAndSafety size={20} />}
         >
-          <div>Insurance Information Content...</div>
+          <div className="p-4 text-gray-600">
+            Insurance Information Content...
+          </div>
         </TabPane>
       </Tabs>
     </div>

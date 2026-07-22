@@ -37,10 +37,10 @@ function PopularDestination() {
               <path
                 d="M1.50024 57.5002C37.5002 118.5 60.8527 45.4035 106 75.0002C151 104.5 130.528 52.465 213.5 75.0002C254 86 283.5 84.0005 273.5 1.50024"
                 stroke="#00A550"
-                stroke-width="3"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-dasharray="1 7"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray="1 7"
               />
             </svg>
             <svg
