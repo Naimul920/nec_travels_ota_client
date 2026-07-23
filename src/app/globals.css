@@ -11,6 +11,11 @@
   --color-tertiary: #333333;
   --color-quaternary: #201f1f;
 
+/********Custom color**********/
+
+--color-brand:#00A550;
+
+
   /* Font Families linked to Next.js font variables */
   --font-sans: var(--font-poppins), sans-serif;
   --font-stalemate: var(--font-stalemate), cursive;
