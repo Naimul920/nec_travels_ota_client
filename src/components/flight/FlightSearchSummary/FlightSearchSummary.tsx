@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import Flight from "../Flight";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { modifySearch } from "../../../redux/features/flightSlice";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { useAppSelector } from "../../../hooks";
 import { decoding } from "../../../utils";
 
 type Segment = {
@@ -28,7 +28,6 @@ const FlightSearchSummary: React.FC = () => {
     return encodedQuery ? decoding(encodedQuery) : null;
   }, [encodedQuery]);
 
-  const dispatch = useAppDispatch();
   const flight = useAppSelector((state) => state.flight);
 
   // 5. Parse the decrypted query parameters string into a query object utility
@@ -117,7 +116,7 @@ const FlightSearchSummary: React.FC = () => {
             {index === 0 && (
               <div className="col-span-1 flex justify-end">
                 <Button
-                  onClick={() => dispatch(modifySearch())}
+                  onClick={() => modifySearch()}
                   className={`flex items-center gap-1 px-3 py-1 text-xs font-medium transition-all ${
                     flight?.isModifySearch
                       ? "bg-gray-100 text-gray-700 hover:bg-gray-200"

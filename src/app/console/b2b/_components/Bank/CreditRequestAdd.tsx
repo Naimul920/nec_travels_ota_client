@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 // 2. Swapped React Router hook with Next.js App Router parameters utility
 import { useParams } from "next/navigation";
-import CreditRequest from "@/app/(dashboard)/b2b/_components/Bank/CreditRequest";
+import CreditRequest from "./CreditRequest";
 import Error from "@/components/common/Error/Error";
 import { decoding } from "@/utils";
 

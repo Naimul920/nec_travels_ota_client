@@ -1,4 +1,4 @@
-import Deposit from "@/app/(dashboard)/b2b/_components/Bank/Deposit";
+import Deposit from "../../_components/Bank/Deposit";
 import React from "react";
 
 function page() {

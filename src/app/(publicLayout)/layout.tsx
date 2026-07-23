@@ -9,6 +9,7 @@ export default function B2cLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (window.innerWidth >= 1024) {
       setSidebarOpen(true);

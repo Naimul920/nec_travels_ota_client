@@ -139,12 +139,12 @@ const B2cSidebar: React.FC<SidebarProps> = ({
         width={180}
         style={{
           backgroundColor: "#ffffff",
-          height: "max-content",
+          height: "100vh",
         }}
         className={`
-          !bg-white
-          !border !border-gray-200
-          !rounded-l-lg
+          bg-white!
+          border! border-gray-200!
+          rounded-l-lg!
           shadow-md
           transition-all duration-300
           
@@ -154,8 +154,8 @@ const B2cSidebar: React.FC<SidebarProps> = ({
 
           /* Desktop Alignment */
           lg:relative lg:top-0 lg:right-0 lg:z-auto
-          [&_.ant-layout-sider-children]:!bg-white
-          [&_.ant-layout-sider-children]:!h-max
+          [&_.ant-layout-sider-children]:bg-white!
+          [&_.ant-layout-sider-children]:h-max!
         `}
       >
         <Menu
@@ -163,7 +163,7 @@ const B2cSidebar: React.FC<SidebarProps> = ({
           mode="inline"
           selectedKeys={[pathname]}
           items={menuItems}
-          className="border-none py-2 px-1 !bg-white"
+          className="border-none py-2 px-1 bg-white!"
         />
       </Sider>
     </ConfigProvider>

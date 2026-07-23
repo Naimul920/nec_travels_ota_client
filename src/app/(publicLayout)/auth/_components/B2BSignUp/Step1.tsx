@@ -20,7 +20,6 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField
           label="First name"
-          name="first_name"
           type="text"
           placeholder="First name"
           icon={<FiUser />}
@@ -30,7 +29,6 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
 
         <FormField
           label="Last name"
-          name="last_name"
           type="text"
           placeholder="Last name"
           icon={<FiUser />}
@@ -42,7 +40,6 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField
           label="Email address"
-          name="email"
           type="email"
           placeholder="you@example.com"
           icon={<FiMail />}
@@ -52,7 +49,6 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
 
         <FormField
           label="Phone number"
-          name="phone"
           type="tel"
           placeholder="1700000000"
           icon={<FiPhone />}
@@ -65,7 +61,6 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField
           label="Password"
-          name="password"
           type={showPassword ? "text" : "password"}
           placeholder="Enter password"
           icon={<FiLock />}
@@ -85,7 +80,6 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
 
         <FormField
           label="Confirm password"
-          name="password_confirmation"
           type={showConfirmPassword ? "text" : "password"}
           placeholder="Confirm password"
           icon={<FiLock />}
