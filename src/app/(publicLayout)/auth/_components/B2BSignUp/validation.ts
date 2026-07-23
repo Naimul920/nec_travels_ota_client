@@ -69,3 +69,12 @@ export const step3Schema = Yup.object({
 export const fullSchema = step1Schema.concat(step2Schema).concat(step3Schema);
 
 export const stepSchemas = [step1Schema, step2Schema, step3Schema, null] as const;
+
+export const signInSchema = Yup.object({
+  email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
+  password: Yup.string().required("Password is required"),
+});
+
+export const forgotPasswordSchema = Yup.object({
+  email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
+});

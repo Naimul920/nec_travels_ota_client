@@ -6,7 +6,7 @@ import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 
 // import { signInSchema } from "../B2BSignUp/validation";
 import FormField from "../B2BSignUp/FormField";
-import { signInSchema } from "./Validation";
+import { signInSchema } from "../B2BSignUp/validation";
 
 interface SignInFormValues {
   email: string;
@@ -98,7 +98,7 @@ export default function SignIn() {
 
           <div className="mt-2 text-right">
             <a
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
             >
               Forgot password?
