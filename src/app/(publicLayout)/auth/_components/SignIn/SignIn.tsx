@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import { useFormik } from "formik";
-import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
+import {
+  FiEye,
+  FiEyeOff,
+  FiLock,
+  FiMail,
+} from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
 
-// import { signInSchema } from "../B2BSignUp/validation";
 import FormField from "../B2BSignUp/FormField";
 import { signInSchema } from "../B2BSignUp/validation";
 import Link from "next/link";
@@ -56,11 +61,18 @@ export default function SignIn() {
       ? formik.errors[name]
       : undefined;
 
+  const handleGoogleSignIn = () => {
+    console.log("Continue with Google");
+    // TODO: Google Sign-In
+  };
+
   return (
     <div className="mx-auto mt-10 w-full max-w-md rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
       <form onSubmit={formik.handleSubmit} className="space-y-6" noValidate>
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Welcome back
+          </h2>
           <p className="mt-1 text-sm text-slate-500">
             Sign in to your account to continue.
           </p>
@@ -68,7 +80,6 @@ export default function SignIn() {
 
         <FormField
           label="Email address"
-          //   name="email"
           type="email"
           placeholder="you@example.com"
           icon={<FiMail />}
@@ -79,7 +90,6 @@ export default function SignIn() {
         <div>
           <FormField
             label="Password"
-            // name="password"
             type={showPassword ? "text" : "password"}
             placeholder="Enter password"
             icon={<FiLock />}
@@ -89,7 +99,9 @@ export default function SignIn() {
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="text-slate-400 transition-colors hover:text-slate-600"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
               >
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </button>
@@ -120,6 +132,7 @@ export default function SignIn() {
           </div>
         )}
 
+        {/* Sign In Button */}
         <button
           type="submit"
           disabled={formik.isSubmitting}
@@ -128,17 +141,33 @@ export default function SignIn() {
           {formik.isSubmitting ? "Signing in..." : "Sign in"}
         </button>
 
+        {/* Divider */}
+        <div className="flex items-center">
+          <div className="h-px flex-1 bg-slate-200" />
+          <span className="mx-4 text-xs font-medium uppercase tracking-wider text-slate-400">
+            Or
+          </span>
+          <div className="h-px flex-1 bg-slate-200" />
+        </div>
+
+        {/* Google Sign In */}
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white font-medium text-slate-700 transition-all hover:border-slate-400 hover:bg-slate-50"
+        >
+          <FcGoogle className="text-xl" />
+          Continue with Google
+        </button>
+
         <p className="text-center text-sm text-slate-500">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/signup" className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">
-           Sign up
-          </Link>
-          {/* <a
+          <Link
             href="/auth/signup"
             className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
           >
             Sign up
-          </a> */}
+          </Link>
         </p>
       </form>
     </div>
