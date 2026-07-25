@@ -63,11 +63,8 @@ const isExpireToken = async (token: string): Promise<boolean> => {
   return remainingSeconds === 0;
 };
 
-const REFRESH_TOKEN_MAX_AGE_SECONDS = 7 * 24 * 60 * 60; // 7 days
-
 export {
   setTokenInCookies,
-  REFRESH_TOKEN_MAX_AGE_SECONDS,
   isTokenExpireRemaining,
   isExpireToken,
   isTokenExpiringSoon,

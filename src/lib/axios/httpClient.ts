@@ -3,10 +3,7 @@ import { cookies } from "next/headers";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { ApiResponse } from "@/types";
 import { jwtDecode } from "jwt-decode";
-import {
-  setTokenInCookies,
-  REFRESH_TOKEN_MAX_AGE_SECONDS,
-} from "@/utils/token";
+import { setTokenInCookies } from "@/utils/token";
 
 const API_BASE_URL = process.env.API_BASE_URL;
 if (!API_BASE_URL) {
@@ -42,11 +39,7 @@ const tryRefreshToken = async (): Promise<boolean> => {
     if (accessToken)
       await setTokenInCookies("access_token", accessToken, accessMaxAge);
     if (newRefreshToken)
-      await setTokenInCookies(
-        "refresh_token",
-        newRefreshToken,
-        REFRESH_TOKEN_MAX_AGE_SECONDS,
-      );
+      await setTokenInCookies("refresh_token", newRefreshToken, 7 * 24 * 60 * 60); // 7 days
 
     return true;
   } catch {

@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         hostname: "*.s3.ap-south-1.amazonaws.com",
       },
       {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+      {
         protocol: "http",
         hostname: "**",
       },

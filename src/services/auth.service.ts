@@ -1,5 +1,5 @@
 import { deleteCookie } from "@/utils/cookie";
-import { setTokenInCookies, REFRESH_TOKEN_MAX_AGE_SECONDS } from "@/utils/token";
+import { setTokenInCookies } from "@/utils/token";
 import { cookies } from "next/headers";
 
 const BASE_API_URL = process.env.API_BASE_URL;
@@ -27,7 +27,7 @@ export async function tryRefreshToken() {
       : undefined;
 
     if (accessToken) await setTokenInCookies("access_token", accessToken, accessMaxAge);
-    if (newRefreshToken) await setTokenInCookies("refresh_token", newRefreshToken, REFRESH_TOKEN_MAX_AGE_SECONDS);
+    if (newRefreshToken) await setTokenInCookies("refresh_token", newRefreshToken, 7 * 24 * 60 * 60); // 7 days
 
     return true;
   } catch (error) {

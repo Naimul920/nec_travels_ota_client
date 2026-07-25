@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import * as Yup from "yup";
 import { loginValidationSchema } from "@/validations/auth.validation";
 import { httpClient } from "@/lib/axios/httpClient";
-import { setTokenInCookies, REFRESH_TOKEN_MAX_AGE_SECONDS } from "@/utils/token";
+import { setTokenInCookies } from "@/utils/token";
 import {
   isValidRedirectForRole,
   getDefaultDashboardRoute,
@@ -66,7 +66,7 @@ export const loginAction = async (
 
     const accessMaxAge = expireToken - Math.floor(Date.now() / 1000);
     await setTokenInCookies("access_token", accessToken, accessMaxAge);
-    await setTokenInCookies("refresh_token", refreshToken, REFRESH_TOKEN_MAX_AGE_SECONDS);
+    await setTokenInCookies("refresh_token", refreshToken, 7 * 24 * 60 * 60); // 7 days
 
     const targetPath =
       redirectPath && isValidRedirectForRole(redirectPath, role as USER_ROLE)
