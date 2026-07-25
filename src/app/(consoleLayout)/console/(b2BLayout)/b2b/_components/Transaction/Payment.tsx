@@ -3,15 +3,11 @@
 import React from "react";
 // 2. Swapped React Router hook with Next.js App Router query utilities
 import { useSearchParams } from "next/navigation";
-import { useSearch, useSEO } from "@/hooks";
+import { useSearch } from "@/hooks";
 import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 import Table from "@/components/common/Table/Table";
 
 const Payment: React.FC = () => {
-  useSEO({
-    title: "Payments",
-  });
-
   // 3. Initialized Next.js search parameters query parser string
   const searchParams = useSearchParams();
 

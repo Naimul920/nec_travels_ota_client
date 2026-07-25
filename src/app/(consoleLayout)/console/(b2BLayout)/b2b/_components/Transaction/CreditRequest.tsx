@@ -1,15 +1,12 @@
 "use client"; // 1. Next.js 16 Client Component Boundary
 
 import React from "react";
-import { useSearch, useSEO } from "@/hooks";
+import { useSearch } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import Table from "@/components/common/Table/Table";
 import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 
 const CreditRequest: React.FC = () => {
-  useSEO({
-    title: "Credit Request",
-  });
   // 3. Initialized Next.js search parameters query parser string
   const searchParams = useSearchParams();
 
