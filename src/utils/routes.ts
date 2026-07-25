@@ -115,3 +115,34 @@ export const isValidRedirectForRole = (
 
   return routeOwner === role;
 };
+
+export const ROUTE_DEPARTMENT: { pattern: RegExp; department: string }[] = [
+  { pattern: /^\/console\/b2b\/air-tickets(\/|$)/, department: "air-tickets" },
+  { pattern: /^\/console\/b2b\/bookings(\/|$)/, department: "bookings" },
+  { pattern: /^\/console\/b2b\/finance(\/|$)/, department: "finance" },
+  { pattern: /^\/console\/b2b\/support(\/|$)/, department: "support" },
+  { pattern: /^\/console\/b2b\/banks(\/|$)/, department: "banks" },
+  { pattern: /^\/console\/b2b\/contact(\/|$)/, department: "contact" },
+  { pattern: /^\/console\/b2b\/settings(\/|$)/, department: "settings" },
+  { pattern: /^\/console\/b2b\/passengers(\/|$)/, department: "passengers" },
+  { pattern: /^\/console\/b2b\/flight-search(\/|$)/, department: "flight-search" },
+  { pattern: /^\/console\/b2b\/flight-booking(\/|$)/, department: "flight-booking" },
+  { pattern: /^\/console\/b2b\/credit-request-add(\/|$)/, department: "credit-request" },
+  { pattern: /^\/console\/admin\/users(\/|$)/, department: "users" },
+  { pattern: /^\/console\/admin\/transactions(\/|$)/, department: "transactions" },
+  { pattern: /^\/console\/super_admin\/air-tickets(\/|$)/, department: "air-tickets" },
+];
+
+export const getRequiredDepartment = (pathname: string): string | null => {
+  const match = ROUTE_DEPARTMENT.find(({ pattern }) => pattern.test(pathname));
+  return match?.department ?? null;
+};
+
+export const canAccessRoute = (
+  pathname: string,
+  departments: string[],
+): boolean => {
+  const requiredDept = getRequiredDepartment(pathname);
+  if (!requiredDept) return true;
+  return departments.includes(requiredDept);
+};

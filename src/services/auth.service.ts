@@ -1,5 +1,6 @@
 import { deleteCookie } from "@/utils/cookie";
 import { setTokenInCookies } from "@/utils/token";
+import { setUserRole, setDepartments, deleteUserRole, deleteDepartments } from "@/utils/session";
 import { cookies } from "next/headers";
 
 const BASE_API_URL = process.env.API_BASE_URL;
@@ -19,7 +20,7 @@ export async function tryRefreshToken() {
     if (!res.ok) return false;
 
     const json = await res.json();
-    const { tokens } = json.data || {};
+    const { tokens, role, departments } = json.data || {};
     const { accessToken, refreshToken: newRefreshToken, expireToken } = tokens || {};
 
     const accessMaxAge = expireToken
@@ -28,6 +29,8 @@ export async function tryRefreshToken() {
 
     if (accessToken) await setTokenInCookies("access_token", accessToken, accessMaxAge);
     if (newRefreshToken) await setTokenInCookies("refresh_token", newRefreshToken, 7 * 24 * 60 * 60); // 7 days
+    if (role) await setUserRole(role);
+    if (departments?.length) await setDepartments(departments);
 
     return true;
   } catch (error) {
@@ -51,6 +54,8 @@ export async function logout() {
 
     await deleteCookie("access_token");
     await deleteCookie("refresh_token");
+    await deleteUserRole();
+    await deleteDepartments();
   } catch (error) {
     console.error("Error during logout:", error);
   }

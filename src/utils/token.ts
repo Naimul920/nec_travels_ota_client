@@ -9,7 +9,6 @@ const getTokenSecondsRemaining = (token: string): number | undefined => {
   }
   try {
     const tokenPayload = jwtDecode<{ exp: number }>(token);
-    // console.log(tokenPayload);
     if (!tokenPayload) {
       return 0;
     }
@@ -58,6 +57,7 @@ const isTokenExpireRemaining = async (
   const remainingSeconds = getTokenSecondsRemaining(token) as number;
   return remainingSeconds > 0 && remainingSeconds <= threeShouldInSecond;
 };
+
 const isExpireToken = async (token: string): Promise<boolean> => {
   const remainingSeconds = getTokenSecondsRemaining(token) as number;
   return remainingSeconds === 0;

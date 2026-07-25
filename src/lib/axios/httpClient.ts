@@ -4,6 +4,7 @@ import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { ApiResponse } from "@/types";
 import { jwtDecode } from "jwt-decode";
 import { setTokenInCookies } from "@/utils/token";
+import { setUserRole, setDepartments } from "@/utils/session";
 
 const API_BASE_URL = process.env.API_BASE_URL;
 if (!API_BASE_URL) {
@@ -25,7 +26,7 @@ const tryRefreshToken = async (): Promise<boolean> => {
     if (!res.ok) return false;
 
     const json = await res.json();
-    const { tokens } = json.data || {};
+    const { tokens, role, departments } = json.data || {};
     const {
       accessToken,
       refreshToken: newRefreshToken,
@@ -40,6 +41,8 @@ const tryRefreshToken = async (): Promise<boolean> => {
       await setTokenInCookies("access_token", accessToken, accessMaxAge);
     if (newRefreshToken)
       await setTokenInCookies("refresh_token", newRefreshToken, 7 * 24 * 60 * 60); // 7 days
+    if (role) await setUserRole(role);
+    if (departments?.length) await setDepartments(departments);
 
     return true;
   } catch {

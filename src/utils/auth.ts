@@ -14,6 +14,9 @@ export {
   getRouteOwner,
   getDefaultDashboardRoute,
   isValidRedirectForRole,
+  ROUTE_DEPARTMENT,
+  getRequiredDepartment,
+  canAccessRoute,
 } from "./routes";
 
 export interface TokenPayload {
