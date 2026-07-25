@@ -1,5 +1,7 @@
-import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
-import { Footer } from "@/components/shared";
+// import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
+// import { Footer } from "@/components/shared";
+
+import ForgotPassword from "../_components/ForgotPassword/ForgotPassword";
 
 export const metadata = {
   title: "Forgot Password | NEC Travels",
@@ -8,11 +10,12 @@ export const metadata = {
 export default function ForgotPasswordPage() {
   return (
     <>
-      <div className="h-screen flex flex-col justify-between bg-[url('/assets/images/auth-bg.jpg')] bg-cover bg-center">
+      {/* <div className="h-screen flex flex-col justify-between bg-[url('/assets/images/auth-bg.jpg')] bg-cover bg-center">
         <div></div>
         <ForgotPasswordForm />
         <Footer />
-      </div>
+      </div> */}
+      <ForgotPassword/>
     </>
   );
 }

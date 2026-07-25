@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import { FiArrowLeft, FiMail, FiSend } from "react-icons/fi";
 
+
 import { forgotPasswordSchema } from "../B2BSignUp/validation";
 import FormField from "../B2BSignUp/FormField";
+import Link from "next/link";
 
 interface ForgotPasswordFormValues {
   email: string;
@@ -53,7 +55,7 @@ export default function ForgotPassword() {
     return (
       <div className="mx-auto w-full max-w-md rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#8c181f]/10 text-[#8c181f]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10 text-brand">
             <FiSend size={20} />
           </div>
 
@@ -74,18 +76,18 @@ export default function ForgotPassword() {
               setSubmittedEmail(null);
               formik.resetForm();
             }}
-            className="mt-6 text-sm font-medium text-[#8c181f] hover:underline"
+            className="mt-6 text-sm font-medium text-brand hover:underline"
           >
             Didn&apos;t get it? Try a different email
           </button>
 
-          <a
-            href="/sign-in"
+          <Link
+            href="/auth/signin"
             className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-700"
           >
             <FiArrowLeft />
             Back to sign in
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -126,18 +128,18 @@ export default function ForgotPassword() {
         <button
           type="submit"
           disabled={formik.isSubmitting}
-          className="h-12 w-full rounded-xl bg-[#8c181f] font-medium text-white transition-colors hover:bg-[#701319] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-12 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {formik.isSubmitting ? "Sending link..." : "Send reset link"}
         </button>
 
-        <a
-          href="/auth/sign-in"
+        <Link
+          href="/auth/signin"
           className="flex items-center justify-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-700"
         >
           <FiArrowLeft />
           Back to sign in
-        </a>
+        </Link>
       </form>
     </div>
   );
