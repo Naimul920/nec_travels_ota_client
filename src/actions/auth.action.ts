@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import * as Yup from "yup";
 import { loginValidationSchema } from "@/validations/auth.validation";
 import { httpClient } from "@/lib/axios/httpClient";
-import { setTokenInCookies } from "@/utils/token";
+import { setTokenInCookies, setTokenExpiresAt, deleteTokenExpiresAt } from "@/utils/token";
 import { deleteCookie } from "@/utils/cookie";
 import { isValidRedirectForRole, getDefaultDashboardRoute } from "@/utils/auth";
 import {
@@ -63,7 +63,7 @@ export interface ILoginStatus {
 export const loginAction = async (
   payload: ILoginPayload,
   redirectPath?: string,
-) => {
+): Promise<{ success: true; redirectTo: string } | { success: false; message: string }> => {
   try {
     loginValidationSchema.validateSync(payload, { abortEarly: true });
 
@@ -78,6 +78,7 @@ export const loginAction = async (
       tokens.refreshToken,
       7 * 24 * 60 * 60,
     );
+    await setTokenExpiresAt(tokens.expireToken);
     await setUserRole(role);
 
     const departments = deptArr?.length
@@ -134,6 +135,7 @@ export const logoutAction = async () => {
 
   await deleteCookie("access_token");
   await deleteCookie("refresh_token");
+  await deleteTokenExpiresAt();
   await deleteUserRole();
   await deleteDepartments();
 };

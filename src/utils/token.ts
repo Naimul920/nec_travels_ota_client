@@ -1,7 +1,23 @@
 "use server";
 
 import { jwtDecode } from "jwt-decode";
-import { setCookie } from "./cookie";
+import { setCookie, getCookie, deleteCookie } from "./cookie";
+
+const TOKEN_EXPIRES_AT_COOKIE = "token_expires_at";
+
+const setTokenExpiresAt = async (expireToken: number) => {
+  const maxAge = expireToken - Math.floor(Date.now() / 1000);
+  await setCookie(TOKEN_EXPIRES_AT_COOKIE, String(expireToken), maxAge > 0 ? maxAge : 0);
+};
+
+const getTokenExpiresAt = async (): Promise<number | null> => {
+  const val = await getCookie(TOKEN_EXPIRES_AT_COOKIE);
+  return val ? Number(val) : null;
+};
+
+const deleteTokenExpiresAt = async () => {
+  await deleteCookie(TOKEN_EXPIRES_AT_COOKIE);
+};
 
 const getTokenSecondsRemaining = (token: string): number | undefined => {
   if (!token) {
@@ -65,6 +81,9 @@ const isExpireToken = async (token: string): Promise<boolean> => {
 
 export {
   setTokenInCookies,
+  setTokenExpiresAt,
+  getTokenExpiresAt,
+  deleteTokenExpiresAt,
   isTokenExpireRemaining,
   isExpireToken,
   isTokenExpiringSoon,

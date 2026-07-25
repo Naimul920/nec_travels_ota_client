@@ -1,27 +1,9 @@
 import { USER_ROLE } from "@/constant";
 
-export const API_ROUTES = {
-  AUTH: {
-    LOGIN: "/api/auth/login",
-    LOGOUT: "/api/auth/logout",
-    ME: "/api/auth/me",
-    REFRESH: "/api/auth/refresh",
-  },
-} as const;
-
-export const BACKEND_ROUTES = {
-  AUTH: {
-    LOGIN: "/auth/login",
-    LOGOUT: "/auth/logout",
-    REFRESH: "/auth/refresh",
-  },
-  USERS: {
-    PROFILE: "/api/v1/users/profile",
-  },
-} as const;
-
 export const AUTH_PAGE_ROUTES = [
   "/auth/login",
+  "/auth/signin",
+  "/auth/signup",
   "/auth/register",
   "/auth/forgot-password",
   "/auth/reset-password",
@@ -116,33 +98,51 @@ export const isValidRedirectForRole = (
   return routeOwner === role;
 };
 
-export const ROUTE_DEPARTMENT: { pattern: RegExp; department: string }[] = [
-  { pattern: /^\/console\/b2b\/air-tickets(\/|$)/, department: "air-tickets" },
-  { pattern: /^\/console\/b2b\/bookings(\/|$)/, department: "bookings" },
-  { pattern: /^\/console\/b2b\/finance(\/|$)/, department: "finance" },
-  { pattern: /^\/console\/b2b\/support(\/|$)/, department: "support" },
-  { pattern: /^\/console\/b2b\/banks(\/|$)/, department: "banks" },
-  { pattern: /^\/console\/b2b\/contact(\/|$)/, department: "contact" },
-  { pattern: /^\/console\/b2b\/settings(\/|$)/, department: "settings" },
-  { pattern: /^\/console\/b2b\/passengers(\/|$)/, department: "passengers" },
-  { pattern: /^\/console\/b2b\/flight-search(\/|$)/, department: "flight-search" },
-  { pattern: /^\/console\/b2b\/flight-booking(\/|$)/, department: "flight-booking" },
-  { pattern: /^\/console\/b2b\/credit-request-add(\/|$)/, department: "credit-request" },
-  { pattern: /^\/console\/admin\/users(\/|$)/, department: "users" },
-  { pattern: /^\/console\/admin\/transactions(\/|$)/, department: "transactions" },
-  { pattern: /^\/console\/super_admin\/air-tickets(\/|$)/, department: "air-tickets" },
+export const ROUTE_DEPARTMENT: { pattern: RegExp; departments: string[] }[] = [
+  {
+    pattern: /^\/console\/b2b\/air-tickets(\/|$)/,
+    departments: ["air-tickets"],
+  },
+  { pattern: /^\/console\/b2b\/bookings(\/|$)/, departments: ["bookings"] },
+  { pattern: /^\/console\/b2b\/finance(\/|$)/, departments: ["finance"] },
+  { pattern: /^\/console\/b2b\/support(\/|$)/, departments: ["support"] },
+  { pattern: /^\/console\/b2b\/banks(\/|$)/, departments: ["banks"] },
+  { pattern: /^\/console\/b2b\/contact(\/|$)/, departments: ["contact"] },
+  { pattern: /^\/console\/b2b\/settings(\/|$)/, departments: ["settings"] },
+  { pattern: /^\/console\/b2b\/passengers(\/|$)/, departments: ["passengers"] },
+  {
+    pattern: /^\/console\/b2b\/flight-search(\/|$)/,
+    departments: ["flight-search"],
+  },
+  {
+    pattern: /^\/console\/b2b\/flight-booking(\/|$)/,
+    departments: ["flight-booking"],
+  },
+  {
+    pattern: /^\/console\/b2b\/credit-request-add(\/|$)/,
+    departments: ["credit-request"],
+  },
+  { pattern: /^\/console\/admin\/users(\/|$)/, departments: ["users"] },
+  {
+    pattern: /^\/console\/admin\/transactions(\/|$)/,
+    departments: ["transactions"],
+  },
+  {
+    pattern: /^\/console\/super_admin\/air-tickets(\/|$)/,
+    departments: ["air-tickets"],
+  },
 ];
 
-export const getRequiredDepartment = (pathname: string): string | null => {
+export const getRequiredDepartments = (pathname: string): string[] | null => {
   const match = ROUTE_DEPARTMENT.find(({ pattern }) => pattern.test(pathname));
-  return match?.department ?? null;
+  return match?.departments ?? null;
 };
 
 export const canAccessRoute = (
   pathname: string,
-  departments: string[],
+  userDepartments: string[],
 ): boolean => {
-  const requiredDept = getRequiredDepartment(pathname);
-  if (!requiredDept) return true;
-  return departments.includes(requiredDept);
+  const requiredDepts = getRequiredDepartments(pathname);
+  if (!requiredDepts || requiredDepts.length === 0) return true;
+  return requiredDepts.some((dept) => userDepartments.includes(dept));
 };

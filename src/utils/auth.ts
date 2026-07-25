@@ -1,8 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { USER_ROLE } from "@/constant";
 export {
-  API_ROUTES,
-  BACKEND_ROUTES,
   AUTH_PAGE_ROUTES,
   isAuthRoute,
   commonProtectedRoutes,
@@ -15,7 +13,7 @@ export {
   getDefaultDashboardRoute,
   isValidRedirectForRole,
   ROUTE_DEPARTMENT,
-  getRequiredDepartment,
+  getRequiredDepartments,
   canAccessRoute,
 } from "./routes";
 

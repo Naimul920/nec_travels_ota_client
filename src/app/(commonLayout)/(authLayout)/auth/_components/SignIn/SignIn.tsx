@@ -30,12 +30,10 @@ export default function SignIn() {
       setError(null);
       const result = await loginAction(values);
       if (!result.success) {
-        setError(
-          result.message ?? "Invalid email or password. Please try again.",
-        );
+        setError(result.message ?? "Invalid email or password. Please try again.");
         return;
       }
-      router.push(result.redirectTo as string);
+      router.push(result.redirectTo);
     },
   });
 

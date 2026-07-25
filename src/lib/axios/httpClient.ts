@@ -2,9 +2,7 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { ApiResponse } from "@/types";
-import { jwtDecode } from "jwt-decode";
-import { setTokenInCookies } from "@/utils/token";
-import { setUserRole, setDepartments } from "@/utils/session";
+import { setTokenInCookies, setTokenExpiresAt } from "@/utils/token";
 
 const API_BASE_URL = process.env.API_BASE_URL;
 if (!API_BASE_URL) {
@@ -26,7 +24,7 @@ const tryRefreshToken = async (): Promise<boolean> => {
     if (!res.ok) return false;
 
     const json = await res.json();
-    const { tokens, role, departments } = json.data || {};
+    const { tokens } = json.data || {};
     const {
       accessToken,
       refreshToken: newRefreshToken,
@@ -40,9 +38,9 @@ const tryRefreshToken = async (): Promise<boolean> => {
     if (accessToken)
       await setTokenInCookies("access_token", accessToken, accessMaxAge);
     if (newRefreshToken)
-      await setTokenInCookies("refresh_token", newRefreshToken, 7 * 24 * 60 * 60); // 7 days
-    if (role) await setUserRole(role);
-    if (departments?.length) await setDepartments(departments);
+      await setTokenInCookies("refresh_token", newRefreshToken, 7 * 24 * 60 * 60);
+    if (expireToken)
+      await setTokenExpiresAt(expireToken);
 
     return true;
   } catch {
@@ -54,15 +52,21 @@ const axiosInstance = async () => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
 
-  if (accessToken) {
-    try {
-      const { exp } = jwtDecode<{ exp: number }>(accessToken);
-      const isExpiring = exp && exp - Math.floor(Date.now() / 1000) < 300;
-      if (isExpiring) {
-        await tryRefreshToken();
-      }
-    } catch {
-      // invalid token — ignore, request will proceed with existing cookie
+  const lastRefresh = cookieStore.get("last_refresh")?.value;
+  const now = Date.now();
+  const shouldRefresh = accessToken && (!lastRefresh || now - Number(lastRefresh) > 5 * 60 * 1000);
+
+  if (shouldRefresh) {
+    const refreshed = await tryRefreshToken();
+    if (refreshed) {
+      const store = await cookies();
+      store.set("last_refresh", now.toString(), {
+        httpOnly: true,
+        secure: process.env.NEXT_PUBLIC_NODE_ENV === "production",
+        sameSite: process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "strict" : "lax",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60,
+      });
     }
   }
 
