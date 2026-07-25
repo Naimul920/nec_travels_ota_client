@@ -3,9 +3,9 @@
 import React from "react";
 // 2. Swapped React Router hook with Next.js App Router query utilities
 import { useSearchParams } from "next/navigation";
-import { useSearch, useSEO } from "@/hooks";
+import { useSearch } from "@/hooks";
 import Table from "@/components/common/Table/Table";
-import holdTicketsColumns from "@/helper/tableConstant/holdTickets.constant";
+import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 import ActionButton from "@/components/common/Action/ActionButton";
 
 const holdTicketsData = [
@@ -51,10 +51,6 @@ const holdTicketsData = [
 ];
 
 const HoldTickets: React.FC = () => {
-  useSEO({
-    title: "Hold Tickets",
-  });
-
   // 3. Initialized Next.js search parameters query parser string
   const searchParams = useSearchParams();
   const searchString = searchParams.toString()

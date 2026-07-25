@@ -143,7 +143,7 @@ const Header: React.FC = () => {
 
           {/* Dropdown */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded shadow-md text-xs text-gray-800 z-[999] overflow-hidden">
+            <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded shadow-md text-xs text-gray-800 z-999 overflow-hidden">
               <ul className="divide-y divide-gray-100">
                 {/* Notification */}
                 <li className="flex items-center justify-end gap-2 px-4 py-2.5 hover:bg-gray-50 cursor-pointer font-medium">

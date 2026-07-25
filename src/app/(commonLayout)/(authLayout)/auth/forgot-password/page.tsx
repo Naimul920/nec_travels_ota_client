@@ -1,4 +1,4 @@
-import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
+import ForgotPasswordForm from "../_components/ForgotPassword/ForgotPassword";
 import { Footer } from "@/components/shared";
 
 export const metadata = {

@@ -5,7 +5,7 @@ import React from "react";
 import { useSearchParams } from "next/navigation";
 import { useSearch, useSEO } from "@/hooks";
 import Table from "@/components/common/Table/Table";
-import holdTicketsColumns from "@/helper/tableConstant/holdTickets.constant";
+import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 
 const Refund: React.FC = () => {
   useSEO({

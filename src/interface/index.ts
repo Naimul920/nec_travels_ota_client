@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import type { AlertVariant, BankType } from "@/types/types";
+import type { AlertVariant, BankType } from "@/types";
 
 export interface AppRoute {
   path?: string;

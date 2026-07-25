@@ -6,8 +6,6 @@ import Image from "next/image";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { SiAppstore } from "react-icons/si";
 import { IoLogoGooglePlaystore } from "react-icons/io5";
-import USAflag from "@/assets/flags/usa.svg";
-import Logo from "../../../../public/assets/images/logo.png";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -16,13 +14,13 @@ interface NavbarProps {
 
 const B2cNavbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   return (
-    <header className="sticky top-0 z-40 w-full h-16 bg-white border-b border-gray-100 shadow-xs relative">
+    <header className="sticky top-0 z-40 w-full h-16 bg-white border-b border-gray-100 shadow-xs">
       {/* 1. Main Content Container (Max 1600px, Centered) */}
       <div className="max-w-[1600px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
         {/* Left Platform Brand Logo Space */}
         <Link href="/b2c" className="flex items-center">
           <Image
-            src={Logo}
+            src="/assets/images/logo.png"
             alt="NEC Fly"
             width={130}
             height={40}
@@ -55,10 +53,10 @@ const B2cNavbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           </button>
 
           {/* Country Selector with Flag */}
-          <button className="hidden sm:inline-flex items-center justify-center w-[50px] h-7 bg-white border border-[#00875A] rounded-full hover:bg-green-50/40 transition-colors cursor-pointer p-0 select-none">
+          <button className="hidden sm:inline-flex items-center justify-center w-12.5 h-7 bg-white border border-[#00875A] rounded-full hover:bg-green-50/40 transition-colors cursor-pointer p-0 select-none">
             <div className="py-1 px-2 w-9/10 h-6 relative rounded-full overflow-hidden border border-gray-100/50 compact-flag">
               <Image
-                src={USAflag}
+                src="/assets/flags/ussa.svg"
                 alt="Selected flag"
                 fill
                 sizes="48px"

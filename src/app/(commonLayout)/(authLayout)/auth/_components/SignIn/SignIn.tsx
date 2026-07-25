@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
-
-// import { signInSchema } from "../B2BSignUp/validation";
 import FormField from "../B2BSignUp/FormField";
 import { signInSchema } from "./Validation";
+import { loginAction } from "@/actions/auth.action";
 
 interface SignInFormValues {
   email: string;
@@ -18,35 +18,22 @@ const initialValues: SignInFormValues = {
   password: "",
 };
 
-type SubmitStatus = { type: "success" | "error"; message: string } | null;
-
 export default function SignIn() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const formik = useFormik<SignInFormValues>({
     initialValues,
     validationSchema: signInSchema,
-    onSubmit: async (values, { setSubmitting }) => {
-      setSubmitStatus(null);
-
-      try {
-        console.log("Signing in with:", values);
-        // await post("/auth/login", values);
-
-        setSubmitStatus({
-          type: "success",
-          message: "Signed in successfully.",
-        });
-      } catch (error) {
-        console.error("Sign-in failed:", error);
-        setSubmitStatus({
-          type: "error",
-          message: "Invalid email or password. Please try again.",
-        });
-      } finally {
-        setSubmitting(false);
+    onSubmit: async (values) => {
+      setError(null);
+      const result = await loginAction(values);
+      if (!result.success) {
+        setError(result.message ?? "Invalid email or password. Please try again.");
+        return;
       }
+      router.push(result.redirectTo!);
     },
   });
 
@@ -67,7 +54,6 @@ export default function SignIn() {
 
         <FormField
           label="Email address"
-          //   name="email"
           type="email"
           placeholder="you@example.com"
           icon={<FiMail />}
@@ -78,7 +64,6 @@ export default function SignIn() {
         <div>
           <FormField
             label="Password"
-            // name="password"
             type={showPassword ? "text" : "password"}
             placeholder="Enter password"
             icon={<FiLock />}
@@ -98,7 +83,7 @@ export default function SignIn() {
 
           <div className="mt-2 text-right">
             <a
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
             >
               Forgot password?
@@ -106,16 +91,12 @@ export default function SignIn() {
           </div>
         </div>
 
-        {submitStatus && (
+        {error && (
           <div
             role="alert"
-            className={`rounded-xl border p-4 text-sm ${
-              submitStatus.type === "success"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                : "border-rose-200 bg-rose-50 text-rose-700"
-            }`}
+            className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
           >
-            {submitStatus.message}
+            {error}
           </div>
         )}
 

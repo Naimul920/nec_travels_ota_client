@@ -4,17 +4,13 @@ import { DatePicker, Card, Row, Col } from "antd";
 import { FileSearchOutlined, DownloadOutlined } from "@ant-design/icons";
 import { Dayjs } from "dayjs";
 import Table from "@/components/common/Table/Table";
-import holdTicketsColumns from "@/helper/tableConstant/holdTickets.constant";
+import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 import { Button } from "@/components/ui";
 import clsx from "clsx";
-import { useSEO } from "@/hooks";
 
 const { RangePicker } = DatePicker;
 
 const Statement: React.FC = () => {
-  useSEO({
-    title: "Statement",
-  });
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [showTable, setShowTable] = useState(false);

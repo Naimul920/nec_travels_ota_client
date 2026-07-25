@@ -5,12 +5,11 @@ import { Button } from "@/components/ui";
 import { Divider } from "antd";
 // 2. Swapped React Router hook with Next.js App Router navigation utility
 import { useRouter } from "next/navigation";
-import type { BankAccountInfo } from "@/interface";
 import { encoding } from "@/utils";
 import Image from "next/image";
 
 interface Props {
-  data: BankAccountInfo;
+  data: any;
 }
 
 const BankInfoCard: React.FC<Props> = ({ data }) => {

@@ -4,7 +4,7 @@ import React from "react";
 // 2. Swapped React Router hook with Next.js App Router query utilities
 import { useSearchParams } from "next/navigation";
 import { useSearch, useSEO } from "@/hooks";
-import holdTicketsColumns from "@/helper/tableConstant/holdTickets.constant";
+import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 import Table from "@/components/common/Table/Table";
 
 const Payment: React.FC = () => {

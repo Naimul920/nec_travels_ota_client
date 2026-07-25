@@ -1,4 +1,4 @@
-import FlightBooking from "@/components/flight/FlightBooking/FlightBooking";
+import FlightBooking from "@/components/modules/flight/FlightBooking/FlightBooking";
 
 function page() {
   return (

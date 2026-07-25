@@ -3,10 +3,9 @@ import React from "react";
 import { DatePicker } from "antd";
 import { useFormik } from "formik";
 import { Button, Input, UploadFile } from "@/components/ui";
-import type { BankAccountInfo } from "@/interface";
 
 interface Props {
-  data: BankAccountInfo;
+  data: any;
 }
 
 const BankDeposit: React.FC<Props> = ({ data }) => {

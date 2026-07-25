@@ -7,7 +7,7 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import SalesSummaryCard from "./SalesSummeryCard";
-import { Select } from "../../../../../components/ui";
+import { Select } from "@/components/ui";
 
 const salesSummaryData = [
   {

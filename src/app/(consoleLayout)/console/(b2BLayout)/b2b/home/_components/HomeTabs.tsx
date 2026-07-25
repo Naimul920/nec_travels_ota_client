@@ -6,7 +6,7 @@ import { FiFileText } from "react-icons/fi";
 import { MdFlight, MdHealthAndSafety, MdHolidayVillage } from "react-icons/md";
 import { FaKaaba } from "react-icons/fa";
 import { TabPane, Tabs } from "@/components/ui";
-import { Flight } from "@/components/flight";
+import { Flight } from "@/components/modules/flight";
 
 export default function HomeTabs() {
   const [activeKey, setActiveKey] = useState("1");
