@@ -5,7 +5,11 @@ import { cookies } from "next/headers";
 import * as Yup from "yup";
 import { loginValidationSchema } from "@/validations/auth.validation";
 import { httpClient } from "@/lib/axios/httpClient";
-import { setTokenInCookies, setTokenExpiresAt, deleteTokenExpiresAt } from "@/utils/token";
+import {
+  setTokenInCookies,
+  setTokenExpiresAt,
+  deleteTokenExpiresAt,
+} from "@/utils/token";
 import { deleteCookie } from "@/utils/cookie";
 import { isValidRedirectForRole, getDefaultDashboardRoute } from "@/utils/auth";
 import {
@@ -64,14 +68,22 @@ export const loginAction = async (
   payload: ILoginPayload,
   redirectPath?: string,
   userAgent?: string,
-): Promise<{ success: true; redirectTo: string } | { success: false; message: string }> => {
+): Promise<
+  { success: true; redirectTo: string } | { success: false; message: string }
+> => {
   try {
     loginValidationSchema.validateSync(payload, { abortEarly: true });
 
     const res = await httpClient.post<LoginData>("/auth/login", payload, {
       headers: userAgent ? { "User-Agent": userAgent } : undefined,
     });
-    const { user, tokens, departments: deptArr } = res.data;
+    const {
+      user,
+      tokens,
+      departments: deptArr,
+      email_verified,
+      need_password_change,
+    } = res.data;
     const role = user.role;
 
     const accessMaxAge = tokens.expireToken - Math.floor(Date.now() / 1000);
