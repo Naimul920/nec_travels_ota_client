@@ -4,8 +4,8 @@ import React, { useMemo } from "react";
 // 2. Swapped React Router hook with Next.js App Router parameters utility
 import { useParams } from "next/navigation";
 import { bankAccounts, mobileBankingAccounts } from "@/data/bankAccounts";
-import BankDeposit from "@/app/(dashboard)/b2b/_components/Bank/BankDeposit";
-import MobileDeposit from "@/app/(dashboard)/b2b/_components/Bank/MobileDeposit";
+import BankDeposit from "./BankDeposit";
+import MobileDeposit from "./MobileDeposit";
 import Error from "@/components/common/Error/Error";
 import { decoding } from "@/utils";
 
