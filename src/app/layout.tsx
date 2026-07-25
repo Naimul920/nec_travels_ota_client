@@ -1,7 +1,6 @@
-import type { Metadata } from "next";
 import { Poppins, Stalemate } from "next/font/google";
-import "./globals.css";
 import AppLoaderProvider from "@/provider/AppLoaderProvider";
+import "./globals.css";
 
 import Providers from "@/provider/providers";
 

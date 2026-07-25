@@ -1,6 +1,6 @@
 // import HomeTabs from "./home/_components/HomeTabs";
 
-import HomeTabs from "../b2b/home/_components/HomeTabs";
+import HomeTabs from "../../(b2BLayout)/b2b/home/_components/HomeTabs";
 
 export default function HomePage() {
   return (

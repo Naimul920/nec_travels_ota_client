@@ -1,5 +1,8 @@
 "use client";
-import { PaymentHistory, SalesSummery } from "../../b2b/_components/Dashboard";
+import {
+  PaymentHistory,
+  SalesSummery,
+} from "../../../(b2BLayout)/b2b/_components/Dashboard";
 
 const Dashboard = () => {
   return (
