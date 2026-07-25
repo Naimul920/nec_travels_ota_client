@@ -63,11 +63,14 @@ export interface ILoginStatus {
 export const loginAction = async (
   payload: ILoginPayload,
   redirectPath?: string,
+  userAgent?: string,
 ): Promise<{ success: true; redirectTo: string } | { success: false; message: string }> => {
   try {
     loginValidationSchema.validateSync(payload, { abortEarly: true });
 
-    const res = await httpClient.post<LoginData>("/auth/login", payload);
+    const res = await httpClient.post<LoginData>("/auth/login", payload, {
+      headers: userAgent ? { "User-Agent": userAgent } : undefined,
+    });
     const { user, tokens, departments: deptArr } = res.data;
     const role = user.role;
 
