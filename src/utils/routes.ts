@@ -1,0 +1,117 @@
+import { USER_ROLE } from "@/constant";
+
+export const API_ROUTES = {
+  AUTH: {
+    LOGIN: "/api/auth/login",
+    LOGOUT: "/api/auth/logout",
+    ME: "/api/auth/me",
+    REFRESH: "/api/auth/refresh",
+  },
+} as const;
+
+export const BACKEND_ROUTES = {
+  AUTH: {
+    LOGIN: "/auth/login",
+    LOGOUT: "/auth/logout",
+    REFRESH: "/auth/refresh",
+  },
+  USERS: {
+    PROFILE: "/api/v1/users/profile",
+  },
+} as const;
+
+export const AUTH_PAGE_ROUTES = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+  "/auth/verify-email",
+] as const;
+
+export type RouteConfig = {
+  exact: string[];
+  pattern: RegExp[];
+};
+
+export const isAuthRoute = (pathname: string) =>
+  AUTH_PAGE_ROUTES.some((route) => route === pathname);
+
+export const commonProtectedRoutes: RouteConfig = {
+  exact: ["/console/change-password"],
+  pattern: [],
+};
+
+export const superadminProtectedRoutes: RouteConfig = {
+  exact: [],
+  pattern: [/^\/console\/super_admin(\/|$)/],
+};
+export const adminProtectedRoutes: RouteConfig = {
+  exact: [],
+  pattern: [/^\/console\/admin(\/|$)/],
+};
+export const b2bProtectedRoutes: RouteConfig = {
+  exact: [],
+  pattern: [/^\/console\/b2b(\/|$)/],
+};
+export const b2cProtectedRoutes: RouteConfig = {
+  exact: [],
+  pattern: [/^\/console\/b2c(\/|$)/],
+};
+
+export const isRouteMatches = (pathname: string, routes: RouteConfig) => {
+  if (routes.exact.includes(pathname)) {
+    return true;
+  }
+  return routes.pattern.some((pattern) => pattern.test(pathname));
+};
+
+export const getRouteOwner = (
+  pathname: string,
+): USER_ROLE | "COMMON" | null => {
+  if (isRouteMatches(pathname, superadminProtectedRoutes)) {
+    return "SUPER_ADMIN";
+  }
+  if (isRouteMatches(pathname, adminProtectedRoutes)) {
+    return "ADMIN";
+  }
+  if (isRouteMatches(pathname, b2bProtectedRoutes)) {
+    return "B2B";
+  }
+  if (isRouteMatches(pathname, b2cProtectedRoutes)) {
+    return "B2C";
+  }
+  if (isRouteMatches(pathname, commonProtectedRoutes)) {
+    return "COMMON";
+  }
+  return null;
+};
+
+export const getDefaultDashboardRoute = (role: USER_ROLE) => {
+  if (role === "SUPER_ADMIN") {
+    return "/console/super_admin/dashboard";
+  }
+  if (role === "ADMIN") {
+    return "/console/admin/dashboard";
+  }
+  if (role === "B2B") {
+    return "/console/b2b/dashboard";
+  }
+  if (role === "B2C") {
+    return "/console/b2c/dashboard";
+  }
+  return "/";
+};
+
+export const isValidRedirectForRole = (
+  redirectPath: string,
+  role: USER_ROLE,
+) => {
+  const sanitizedPath = redirectPath.split("?")[0] || redirectPath;
+  const routeOwner = getRouteOwner(sanitizedPath);
+
+  if (routeOwner === null || routeOwner === "COMMON") {
+    return true;
+  }
+
+  return routeOwner === role;
+};

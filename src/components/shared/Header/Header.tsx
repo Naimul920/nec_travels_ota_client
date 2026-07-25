@@ -12,8 +12,6 @@ import NoticeMarquee from "@/components/common/NoticeMarquee/NoticeMarquee";
 import { Role, useAuth } from "@/context/AuthContext";
 // import { Role } from "@/helper/navigation";
 
-import Logo from "../../../../public/assets/images/logo.png";
-
 const Header: React.FC = () => {
   const router = useRouter();
 
@@ -73,7 +71,7 @@ const Header: React.FC = () => {
         <div className="hidden md:block">
           <Link href={dashboardLink}>
             <Image
-              src={Logo}
+              src={"/assets/images/logo.png"}
               alt="Logo"
               width={150}
               height={40}
@@ -88,7 +86,7 @@ const Header: React.FC = () => {
         <div className="block md:hidden">
           <Link href={dashboardLink}>
             <Image
-              src={Logo}
+              src={"/assets/images/logo.png"}
               alt="Logo"
               width={120}
               className="h-auto"

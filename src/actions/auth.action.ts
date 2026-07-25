@@ -29,7 +29,6 @@ interface LoginUser {
   profile: {
     first_name: string;
     last_name: string;
-    full_name: string;
     image_key: string | null;
     department: string | null;
     agency_name: string | null;
@@ -62,11 +61,10 @@ export const loginAction = async (
 
     const res = await httpClient.post<LoginData>("/auth/login", payload);
     const { role, tokens } = res.data;
-    const { accessToken, refreshToken, expireToken } = tokens;
 
-    const accessMaxAge = expireToken - Math.floor(Date.now() / 1000);
-    await setTokenInCookies("access_token", accessToken, accessMaxAge);
-    await setTokenInCookies("refresh_token", refreshToken, 7 * 24 * 60 * 60); // 7 days
+    const accessMaxAge = tokens.expireToken - Math.floor(Date.now() / 1000);
+    await setTokenInCookies("access_token", tokens.accessToken, accessMaxAge);
+    await setTokenInCookies("refresh_token", tokens.refreshToken, 7 * 24 * 60 * 60);
 
     const targetPath =
       redirectPath && isValidRedirectForRole(redirectPath, role as USER_ROLE)

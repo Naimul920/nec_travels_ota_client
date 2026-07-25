@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 import FormField from "../B2BSignUp/FormField";
-import { signInSchema } from "./Validation";
+import { loginValidationSchema } from "@/validations/auth.validation";
 import { loginAction } from "@/actions/auth.action";
 
 interface SignInFormValues {
@@ -25,15 +25,17 @@ export default function SignIn() {
 
   const formik = useFormik<SignInFormValues>({
     initialValues,
-    validationSchema: signInSchema,
+    validationSchema: loginValidationSchema,
     onSubmit: async (values) => {
       setError(null);
       const result = await loginAction(values);
       if (!result.success) {
-        setError(result.message ?? "Invalid email or password. Please try again.");
+        setError(
+          result.message ?? "Invalid email or password. Please try again.",
+        );
         return;
       }
-      router.push(result.redirectTo!);
+      router.push(result.redirectTo as string);
     },
   });
 

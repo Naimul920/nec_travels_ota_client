@@ -56,7 +56,7 @@ const B2cNavbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           <button className="hidden sm:inline-flex items-center justify-center w-12.5 h-7 bg-white border border-[#00875A] rounded-full hover:bg-green-50/40 transition-colors cursor-pointer p-0 select-none">
             <div className="py-1 px-2 w-9/10 h-6 relative rounded-full overflow-hidden border border-gray-100/50 compact-flag">
               <Image
-                src="/assets/flags/ussa.svg"
+                src="/assets/flags/usa.svg"
                 alt="Selected flag"
                 fill
                 sizes="48px"
