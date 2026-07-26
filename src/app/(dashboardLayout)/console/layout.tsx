@@ -19,11 +19,14 @@ export default function B2cLayout({ children }: { children: React.ReactNode }) {
   if (!mounted) {
     return <div className="min-h-screen bg-gray-50 animate-pulse" />;
   }
- 
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
       {/* Universal B2C Header */}
-      <CommonLayoutNavbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <CommonLayoutNavbar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
       {/* Main Body Container */}
       <div className="relative flex-1 w-full min-h-screen">

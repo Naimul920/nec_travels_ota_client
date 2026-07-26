@@ -1,3 +1,5 @@
+'use server'
+
 import { deleteCookie } from "@/utils/cookie";
 import { setTokenInCookies } from "@/utils/token";
 import { deleteUserRole, deleteDepartments } from "@/utils/session";

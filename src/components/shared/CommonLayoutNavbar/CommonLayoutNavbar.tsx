@@ -6,19 +6,20 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
-import { useAuth, Role } from "@/context/AuthContext";
 import { FaUser } from "react-icons/fa";
+import { useAuthStore } from "@/store/auth.store";
 
 interface NavbarProps {
   sidebarOpen: boolean;
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CommonLayoutNavbar({
+export default function CommonLayoutNavbar ({
   sidebarOpen,
   setSidebarOpen,
 }: NavbarProps) {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { user,isLoggedIn, isLoading, clearUser } = useAuthStore();
+  console.log('User => ', user)
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,10 +39,11 @@ export default function CommonLayoutNavbar({
 
   const handleLogout = async () => {
     setDropdownOpen(false);
-    await logout();
+    // await logout();
     router.push("/auth/signin");
   };
-
+  return <> <h1>Joy Bangla</h1></>
+  
   const profileName = user?.profile?.full_name ?? "User";
   const avatarLetter = profileName.charAt(0).toUpperCase();
   const roleLower = user?.role?.toLowerCase() ?? "b2c";
@@ -115,15 +117,17 @@ export default function CommonLayoutNavbar({
         </div>
       </div>
 
-      <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 flex items-center h-full">
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-all active:scale-95 cursor-pointer"
-          aria-label="Toggle Sidebar Display"
-        >
-          <HiMenuAlt3 size={24} color="#747474" />
-        </button>
-      </div>
+      {isAuthenticated && user && (
+        <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 flex items-center h-full">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 text-gray-700 hover:text-primary hover:bg-gray-100 rounded-md transition-all active:scale-95 cursor-pointer"
+            aria-label="Toggle Sidebar Display"
+          >
+            <HiMenuAlt3 size={24} color="#747474" />
+          </button>
+        </div>
+      )}
     </header>
   );
 }

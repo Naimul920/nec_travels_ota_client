@@ -77,12 +77,13 @@ export const loginAction = async (
     const res = await httpClient.post<LoginData>("/auth/login", payload, {
       headers: userAgent ? { "User-Agent": userAgent } : undefined,
     });
+    
     const {
       user,
       tokens,
       departments: deptArr,
-      email_verified,
-      need_password_change,
+      // _email_verified,
+      // _need_password_change,
     } = res.data;
     const role = user.role;
 

@@ -2,8 +2,9 @@ import { Poppins, Stalemate } from "next/font/google";
 import AppLoaderProvider from "@/providers/AppLoaderProvider";
 import "./globals.css";
 
-import Providers from "@/providers/providers";
+import Providers from "@/providers/AuthProvider";
 import QueryProviders from "@/providers/QueryProvider";
+import AuthProvider from "@/providers/AuthProvider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -34,9 +35,9 @@ export default function RootLayout({
     >
       <body suppressHydrationWarning>
         <QueryProviders>
-          <Providers>
+          <AuthProvider>
             <AppLoaderProvider>{children}</AppLoaderProvider>
-          </Providers>
+          </AuthProvider>
         </QueryProviders>
       </body>
     </html>

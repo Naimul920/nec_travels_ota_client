@@ -10,8 +10,8 @@ import { RiCalendarScheduleFill } from "react-icons/ri";
 import { MdOutlineFlightTakeoff } from "react-icons/md";
 import { FaHotel, FaBookJournalWhills } from "react-icons/fa6";
 import { BsFillPassportFill } from "react-icons/bs";
-import { useAuth, Role } from "@/context/AuthContext";
 import { navigationConfig, NavRole } from "@/helper/navigation";
+import { useAuthStore } from "@/store/auth.store";
 
 const { Sider } = Layout;
 
@@ -21,10 +21,10 @@ interface SidebarProps {
 }
 
 const roleToNavRole: Record<string, NavRole> = {
-  [Role.SUPER_ADMIN]: NavRole.SUPER_ADMIN,
-  [Role.ADMIN]: NavRole.ADMIN,
-  [Role.B2B]: NavRole.B2B,
-  [Role.B2C]: NavRole.B2C,
+  // [Role.SUPER_ADMIN]: NavRole.SUPER_ADMIN,
+  // [Role.ADMIN]: NavRole.ADMIN,
+  // [Role.B2B]: NavRole.B2B,
+  // [Role.B2C]: NavRole.B2C,
 };
 
 const publicMenuItems = [
@@ -42,8 +42,11 @@ export default function CommonLayoutSidebar ({
   setSidebarOpen,
 }:SidebarProps) {
   const pathname = usePathname();
-  const { user, isAuthenticated, loading } = useAuth();
-
+  // const { user, isAuthenticated, loading } = useAuth();
+  const {user} = useAuthStore()
+  return <>
+  <h1>{JSON.stringify(user)}</h1>
+  </>
   const { menuItems, defaultOpenKeys } = useMemo(() => {
     if (loading) return { menuItems: [], defaultOpenKeys: [] };
 
