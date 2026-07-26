@@ -44,7 +44,7 @@ export default function CommonLayoutNavbar ({
   };
   return <> <h1>Joy Bangla</h1></>
   
-  const profileName = user?.profile?.full_name ?? "User";
+  const profileName = "User";
   const avatarLetter = profileName.charAt(0).toUpperCase();
   const roleLower = user?.role?.toLowerCase() ?? "b2c";
   const profileLink = user?.role === Role.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;

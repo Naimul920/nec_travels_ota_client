@@ -1,11 +1,9 @@
 import { create } from "zustand";
 
 export interface AuthUser {
-  userId: string;
-  deviceId: string;
-  role?: string;
-  email: string;
-  phone: string;
+  id: string;
+  role: string;
+  departments: string;
 }
 
 interface AuthState {

@@ -20,6 +20,7 @@ import {
   deleteDepartments,
 } from "@/utils/session";
 import type { USER_ROLE } from "@/constant";
+import { LoginResponse } from "@/types/login.type";
 
 export type LoginFormValues = Yup.InferType<typeof loginValidationSchema>;
 
@@ -55,6 +56,8 @@ interface LoginTokens {
 
 interface LoginData {
   user: LoginUser;
+  email_verified: boolean;
+  need_password_change: boolean;
   departments?: string[];
   tokens: LoginTokens;
 }
@@ -68,22 +71,20 @@ export const loginAction = async (
   payload: ILoginPayload,
   redirectPath?: string,
   userAgent?: string,
-): Promise<
-  { success: true; redirectTo: string } | { success: false; message: string }
-> => {
+): Promise<LoginResponse> => {
   try {
     loginValidationSchema.validateSync(payload, { abortEarly: true });
 
     const res = await httpClient.post<LoginData>("/auth/login", payload, {
       headers: userAgent ? { "User-Agent": userAgent } : undefined,
     });
-    
+
     const {
       user,
       tokens,
       departments: deptArr,
-      // _email_verified,
-      // _need_password_change,
+      email_verified,
+      need_password_change,
     } = res.data;
     const role = user.role;
 
@@ -95,14 +96,16 @@ export const loginAction = async (
       7 * 24 * 60 * 60,
     );
     await setTokenExpiresAt(tokens.expireToken);
-    await setUserRole(role);
+
+    // await setUserRole(role);
 
     const departments = deptArr?.length
       ? deptArr
       : user.admin?.department
         ? [user.admin.department]
         : [];
-    await setDepartments(departments);
+
+    // await setDepartments(departments);
 
     const targetPath =
       redirectPath && isValidRedirectForRole(redirectPath, role as USER_ROLE)
@@ -112,6 +115,13 @@ export const loginAction = async (
     return {
       success: true,
       redirectTo: targetPath,
+      email_verified,
+      need_password_change,
+      data: {
+        id: user.id,
+        role,
+        departments: departments.join(","),
+      },
     };
   } catch (error: any) {
     if (error instanceof Yup.ValidationError) {
@@ -152,8 +162,8 @@ export const logoutAction = async () => {
   await deleteCookie("access_token");
   await deleteCookie("refresh_token");
   await deleteTokenExpiresAt();
-  await deleteUserRole();
-  await deleteDepartments();
+  // await deleteUserRole();
+  // await deleteDepartments();
 };
 
 export const isLoginAction = async (): Promise<ILoginStatus> => {

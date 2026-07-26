@@ -1,10 +1,8 @@
-import { Poppins, Stalemate } from "next/font/google";
 import AppLoaderProvider from "@/providers/AppLoaderProvider";
-import "./globals.css";
-
-import Providers from "@/providers/AuthProvider";
 import QueryProviders from "@/providers/QueryProvider";
+import { Poppins, Stalemate } from "next/font/google";
 import AuthProvider from "@/providers/AuthProvider";
+import "./globals.css";
 
 const poppins = Poppins({
   variable: "--font-poppins",

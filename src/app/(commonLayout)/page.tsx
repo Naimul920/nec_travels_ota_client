@@ -6,14 +6,14 @@ import PopularDestination from "@/components/modules/b2c/home/popularDestination
 import { useState, useEffect } from "react";
 
 export default function HomePage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (window.innerWidth >= 1024) {
-      setSidebarOpen(true);
+      // setSidebarOpen(true);
     }
   }, []);
 

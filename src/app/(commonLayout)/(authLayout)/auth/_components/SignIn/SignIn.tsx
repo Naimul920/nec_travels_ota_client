@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useFormik } from "formik";
-import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
-import FormField from "../B2BSignUp/FormField";
-import { loginValidationSchema } from "@/validations/auth.validation";
-import { loginAction } from "@/actions/auth.action";
 import Link from "next/link";
-
+import { useState } from "react";
+import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
+import FormField from "../B2BSignUp/FormField";
+import { useAuthStore, AuthUser } from "@/store/auth.store";
+import { loginAction } from "@/actions/auth.action";
+import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
+import { loginValidationSchema } from "@/validations/auth.validation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LoginResponse } from "@/types/login.type";
 interface SignInFormValues {
   email: string;
   password: string;
@@ -19,22 +21,37 @@ const initialValues: SignInFormValues = {
   password: "",
 };
 
-export default function SignIn() {
+interface LoginProps {
+  redirectPath?: string;
+}
+
+export default function SignIn({ redirectPath }: LoginProps) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setUser } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: loginMutated, isPending: isLoggingIn } = useMutation({
+    mutationFn: async (payload: SignInFormValues) =>
+      await loginAction(payload, redirectPath),
+    onSuccess: (result: LoginResponse) => {
+      if (result.success && result.data) {
+        setUser(result.data as AuthUser);
+      }
+      queryClient.invalidateQueries({ queryKey: ["userInfo"] });
+    },
+  });
 
   const formik = useFormik<SignInFormValues>({
     initialValues,
     validationSchema: loginValidationSchema,
     onSubmit: async (values) => {
       setError(null);
-      const result = await loginAction(values, undefined, navigator.userAgent);
-      if (!result.success) {
-        setError(result.message ?? "Invalid email or password. Please try again.");
-        return;
+      const result = await loginMutated(values);
+      if (result?.redirectTo) {
+        router.push(result.redirectTo);
       }
-      router.push(result.redirectTo);
     },
   });
 
@@ -103,10 +120,10 @@ export default function SignIn() {
 
         <button
           type="submit"
-          disabled={formik.isSubmitting}
+          disabled={formik.isSubmitting || isLoggingIn}
           className="h-12 w-full rounded-xl bg-emerald-600 font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {formik.isSubmitting ? "Signing in..." : "Sign in"}
+          {formik.isSubmitting || isLoggingIn ? "Signing in..." : "Sign in"}
         </button>
 
         <p className="text-center text-sm text-slate-500">

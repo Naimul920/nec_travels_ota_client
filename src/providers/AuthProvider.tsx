@@ -13,17 +13,19 @@ export default function AuthProvider({
 
   useEffect(() => {
     setLoading(true);
-     getUserInfo()
-      .then((user) => {
-        console.log("Auth Provider", user)
+    getUserInfo()
+      .then((user: Record<string, any>) => {
         if (user) {
-          setUser(user);
+          setUser({
+            id: user.id,
+            role: user.role,
+            departments: user.admin?.department ?? "",
+          });
         } else {
           clearUser();
         }
       })
       .catch(() => clearUser());
-    
   }, [clearUser, setLoading, setUser]);
 
   return <>{children}</>;

@@ -1,11 +1,10 @@
-"use client";
+import React from "react";
 import Footer from "@/components/shared/B2cFooter/B2cFooter";
-import CommonLayoutNavbar from "@/components/shared/CommonLayoutNavbar/CommonLayoutNavbar";
-import CommonLayoutSidebar from "@/components/shared/CommonLayoutSidebar/CommonLayoutSidebar";
-import React, { useState, useEffect } from "react";
+/* import CommonLayoutNavbar from "@/components/shared/CommonLayoutNavbar/CommonLayoutNavbar";
+import CommonLayoutSidebar from "@/components/shared/CommonLayoutSidebar/CommonLayoutSidebar"; */
 
 export default function B2cLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  /* const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -14,16 +13,19 @@ export default function B2cLayout({ children }: { children: React.ReactNode }) {
     if (window.innerWidth >= 1024) {
       setSidebarOpen(true);
     }
-  }, []);
+  }, []); */
 
-  if (!mounted) {
+  /*  if (!mounted) {
     return <div className="min-h-screen bg-gray-50 animate-pulse" />;
-  }
- 
+  } */
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
       {/* Universal B2C Header */}
-      <CommonLayoutNavbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      {/* <CommonLayoutNavbar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      /> */}
 
       {/* Main Body Container */}
       <div className="relative flex-1 w-full min-h-screen">
@@ -31,12 +33,12 @@ export default function B2cLayout({ children }: { children: React.ReactNode }) {
         <main className="w-full min-w-0">{children}</main>
 
         {/* Sidebar floats absolutely on the right without blocking children width */}
-        <aside className="fixed right-0 top-15 z-30 pointer-events-auto">
+        {/*  <aside className="fixed right-0 top-15 z-30 pointer-events-auto">
           <CommonLayoutSidebar
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
           />
-        </aside>
+        </aside> */}
       </div>
 
       {/* Footer */}
