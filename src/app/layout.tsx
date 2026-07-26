@@ -38,15 +38,6 @@ export default function RootLayout({
             <AppLoaderProvider>{children}</AppLoaderProvider>
           </Providers>
         </QueryProviders>
-
-        {/* <StoreProvider>
-          <AppLoaderProvider>{children}</AppLoaderProvider>
-        </StoreProvider> */}
-        {/* <AppLoaderProvider>
-          <StoreProvider>{children}</StoreProvider>
-        </AppLoaderProvider> */}
-        {/* {children} */}
-        {/* <StoreProvider>{children}</StoreProvider> */}
       </body>
     </html>
   );
