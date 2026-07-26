@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { useFormik } from "formik";
-import { FiEye, FiEyeOff, FiLock, FiMail, FiPhone, FiUser } from "react-icons/fi";
+import {
+  FiEye,
+  FiEyeOff,
+  FiLock,
+  FiMail,
+  FiPhone,
+  FiUser,
+} from "react-icons/fi";
 
 import { step1Schema } from "../B2BSignUp/validation";
 import FormField from "../B2BSignUp/FormField";
@@ -44,7 +51,8 @@ export default function B2CSignUp() {
 
         setSubmitStatus({
           type: "success",
-          message: "Your account has been created. Check your email to verify it.",
+          message:
+            "Your account has been created. Check your email to verify it.",
         });
       } catch (error) {
         console.error("Submission failed:", error);
@@ -59,13 +67,19 @@ export default function B2CSignUp() {
   });
 
   const getError = (name: keyof B2CSignUpFormValues) =>
-    formik.touched[name] && formik.errors[name] ? formik.errors[name] : undefined;
+    formik.touched[name] && formik.errors[name]
+      ? formik.errors[name]
+      : undefined;
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6" noValidate>
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Customer registration</h2>
-        <p className="mt-1 text-sm text-slate-500">Create your customer account.</p>
+        <h2 className="text-2xl font-bold text-slate-900">
+          Customer registration
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Create your customer account.
+        </p>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
@@ -146,7 +160,9 @@ export default function B2CSignUp() {
               type="button"
               onClick={() => setShowConfirmPassword((prev) => !prev)}
               className="text-slate-400 transition-colors hover:text-slate-600"
-              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              aria-label={
+                showConfirmPassword ? "Hide password" : "Show password"
+              }
             >
               {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
             </button>
@@ -156,7 +172,8 @@ export default function B2CSignUp() {
       </div>
 
       <p className="text-xs text-slate-400">
-        Use at least 8 characters, including one uppercase letter and one number.
+        Use at least 8 characters, including one uppercase letter and one
+        number.
       </p>
 
       {submitStatus && (

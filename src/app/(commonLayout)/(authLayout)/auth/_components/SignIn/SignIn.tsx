@@ -7,6 +7,7 @@ import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 import FormField from "../B2BSignUp/FormField";
 import { loginValidationSchema } from "@/validations/auth.validation";
 import { loginAction } from "@/actions/auth.action";
+import Link from "next/link";
 
 interface SignInFormValues {
   email: string;
@@ -82,12 +83,12 @@ export default function SignIn() {
           />
 
           <div className="mt-2 text-right">
-            <a
+            <Link
               href="/auth/forgot-password"
               className="text-xs font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
             >
               Forgot password?
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -110,12 +111,12 @@ export default function SignIn() {
 
         <p className="text-center text-sm text-slate-500">
           Don&apos;t have an account?{" "}
-          <a
+          <Link
             href="/auth/signup"
             className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
           >
             Sign up
-          </a>
+          </Link>
         </p>
       </form>
     </div>
