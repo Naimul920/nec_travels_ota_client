@@ -16,12 +16,12 @@ interface NavbarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function CommonLayoutNavbar ({
+export default function CommonLayoutNavbar({
   sidebarOpen,
   setSidebarOpen,
 }: NavbarProps) {
-  const { user,isLoggedIn, isLoading, clearUser } = useAuthStore();
-  console.log('User => ', user)
+  const { user, isLoggedIn, isLoading, clearUser } = useAuthStore();
+  console.log("User => ", user);
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -46,16 +46,21 @@ export default function CommonLayoutNavbar ({
     router.push("/auth/signin");
   };
   // return <> <h1>Joy Bangla</h1></>
-  
+
+  const showSidebarToggle = isLoggedIn && user && user.role !== ROLE.B2C;
   const profileName = user?.full_name ?? "User";
   const avatarLetter = profileName.charAt(0).toUpperCase();
   const roleLower = user?.role?.toLowerCase() ?? "b2c";
-  const profileLink = user?.role === ROLE.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
+  const profileLink = `/console/${roleLower}/profile`;
+  // const profileLink = user?.role === ROLE.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
 
   return (
     <header className="sticky top-0 z-40 w-full h-16 bg-white border-b border-gray-100 shadow-xs">
-      <div className="max-w-[1600px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
-        <Link href={isLoggedIn ? `/console/${roleLower}` : "/"} className="flex items-center">
+      <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+        <Link
+          href={isLoggedIn ? `/console/${roleLower}` : "/"}
+          className="flex items-center"
+        >
           <Image
             src="/assets/images/logo.png"
             alt="NEC Fly"
@@ -120,7 +125,7 @@ export default function CommonLayoutNavbar ({
         </div>
       </div>
 
-      {isLoggedIn && user && (
+      {showSidebarToggle && (
         <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 flex items-center h-full">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}

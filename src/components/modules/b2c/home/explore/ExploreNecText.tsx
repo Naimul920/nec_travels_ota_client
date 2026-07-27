@@ -23,8 +23,8 @@ function ExploreNecText() {
 
         <div className="relative flex flex-col items-start pt-8">
           <div className="relative flex items-baseline">
-            <span className=" font-extralight text-3xl text-[#00A550] leading-none absolute -top-[30px] italic right-60 z-10 pointer-events-none select-none tracking-normal">
-              with
+            <span className=" font-normal font-stalemate text-5xl text-[#00A550] leading-none absolute -top-[45px] italic right-60 z-10 pointer-events-none select-none tracking-normal">
+              With
             </span>
 
             <h2 className="font-poppins font-extrabold text-[50px] text-black leading-[37.5px] tracking-tight relative z-0">

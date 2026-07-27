@@ -16,7 +16,7 @@ export default function HomeHero() {
 
   return (
     <section
-      className={`relative w-full h-[450px] max-w-[1600px] mx-auto px-2 bg-gray-900 select-none rounded-xl transition-all duration-300 ${
+      className={`relative w-full h-[450px]  bg-gray-900 select-none rounded-xl transition-all duration-300 ${
         activeTab ? "mb-[305px]" : "mb-12"
       }`}
     >

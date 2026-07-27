@@ -23,48 +23,23 @@ export default function HomeTabs() {
           <Flight />
         </TabPane>
 
-        <TabPane
-          disabled={true}
-          key="2"
-          tab="Hotel"
-          icon={<LuBuilding2 size={20} />}
-        >
+        <TabPane key="2" tab="Hotel" icon={<LuBuilding2 size={20} />}>
           <div>Hotel Booking Content...</div>
         </TabPane>
 
-        <TabPane
-          disabled={true}
-          key="3"
-          tab="Visa"
-          icon={<FiFileText size={20} />}
-        >
+        <TabPane key="3" tab="Visa" icon={<FiFileText size={20} />}>
           <div>Visa Information Content...</div>
         </TabPane>
 
-        <TabPane
-          disabled={true}
-          key="4"
-          tab="Holiday"
-          icon={<MdHolidayVillage size={20} />}
-        >
+        <TabPane key="4" tab="Holiday" icon={<MdHolidayVillage size={20} />}>
           <div>Holiday Information Content...</div>
         </TabPane>
 
-        <TabPane
-          disabled={true}
-          key="5"
-          tab="Umrah"
-          icon={<FaKaaba size={20} />}
-        >
+        <TabPane key="5" tab="Umrah" icon={<FaKaaba size={20} />}>
           <div>Umrah Information Content...</div>
         </TabPane>
 
-        <TabPane
-          disabled={true}
-          key="6"
-          tab="Insurance"
-          icon={<MdHealthAndSafety size={20} />}
-        >
+        <TabPane key="6" tab="Insurance" icon={<MdHealthAndSafety size={20} />}>
           <div>Insurance Information Content...</div>
         </TabPane>
       </Tabs>

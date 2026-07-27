@@ -1,7 +1,7 @@
-import React from "react";
-
-function page() {
-  return <div>Profile</div>;
+export default function AdminProfilePage() {
+  return (
+    <div>
+      this is admin profile page
+    </div>
+  )
 }
-
-export default page;

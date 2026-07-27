@@ -3,36 +3,27 @@ import ExclusiveOffer from "@/components/modules/b2c/home/exclusiveOffer/Exclusi
 import ExploreNec from "@/components/modules/b2c/home/explore/ExploreNec";
 import HomeHero from "@/components/modules/b2c/home/hero/Hero";
 import PopularDestination from "@/components/modules/b2c/home/popularDestination/PopularDestination";
-import { useState, useEffect } from "react";
+import FlightBooking from "@/components/modules/flight/FlightBooking/FlightBooking";
+import FlightSearch from "@/components/modules/flight/FlightSearch/FlightSearch";
+import { useEffect } from "react";
+import HomeTabs from "../(dashboardLayout)/console/(b2BLayout)/b2b/home/_components/HomeTabs";
 
 export default function HomePage() {
-  // const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
     if (window.innerWidth >= 1024) {
       // setSidebarOpen(true);
     }
   }, []);
 
-  if (!mounted) {
-    return <div className="min-h-screen bg-gray-50 animate-pulse" />;
-  }
-
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-800 font-sans">
-      {/* <B2cNavbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} /> */}
-
-      <div className="relative flex-1 w-full min-h-screen">
-        <main className="w-full min-w-0">
-          <HomeHero />
-          <ExploreNec />
-          <ExclusiveOffer />
-          <PopularDestination />
-        </main>
+    <>
+      <div className="max-w-[1600px] mx-auto px-10">
+        {/* <HomeHero /> */}
+        <HomeTabs/>
+        <ExploreNec />
+        <ExclusiveOffer />
       </div>
-    </div>
+      <PopularDestination />
+    </>
   );
 }

@@ -263,7 +263,7 @@ const FlightSearch: React.FC = () => {
 
   return (
     <div className="mx-4 md:mx-0" id="mainScrollContainer">
-      <FlightSearchSummary />
+      {/* <FlightSearchSummary /> */}
 
       <div className="flex items-center justify-between mb-2">
         <Button
