@@ -8,6 +8,7 @@ import { HiMenuAlt3 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
 import { FaUser } from "react-icons/fa";
 import { useAuthStore } from "@/store/auth.store";
+import { ROLE } from "@/constant";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -42,17 +43,17 @@ export default function CommonLayoutNavbar ({
     // await logout();
     router.push("/auth/signin");
   };
-  return <> <h1>Joy Bangla</h1></>
+  // return <> <h1>Joy Bangla</h1></>
   
   const profileName = "User";
   const avatarLetter = profileName.charAt(0).toUpperCase();
   const roleLower = user?.role?.toLowerCase() ?? "b2c";
-  const profileLink = user?.role === Role.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
+  const profileLink = user?.role === ROLE.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
 
   return (
     <header className="sticky top-0 z-40 w-full h-16 bg-white border-b border-gray-100 shadow-xs">
       <div className="max-w-[1600px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
-        <Link href={isAuthenticated ? `/console/${roleLower}` : "/"} className="flex items-center">
+        <Link href={isLoggedIn ? `/console/${roleLower}` : "/"} className="flex items-center">
           <Image
             src="/assets/images/logo.png"
             alt="NEC Fly"
@@ -64,9 +65,9 @@ export default function CommonLayoutNavbar ({
         </Link>
 
         <div className="flex items-center gap-4 pr-12 lg:pr-14">
-          {loading ? (
+          {isLoading ? (
             <div className="w-20 h-9 rounded-full bg-gray-100 animate-pulse" />
-          ) : !isAuthenticated || !user ? (
+          ) : !isLoggedIn || !user ? (
             <Link
               href="/auth/signin"
               className="flex items-center justify-center px-5 h-9 bg-[#00875A] rounded-full text-white text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
@@ -117,7 +118,7 @@ export default function CommonLayoutNavbar ({
         </div>
       </div>
 
-      {isAuthenticated && user && (
+      {isLoggedIn && user && (
         <div className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 flex items-center h-full">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}

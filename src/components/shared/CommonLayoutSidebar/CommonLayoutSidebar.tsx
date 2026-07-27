@@ -43,14 +43,14 @@ export default function CommonLayoutSidebar ({
 }:SidebarProps) {
   const pathname = usePathname();
   // const { user, isAuthenticated, loading } = useAuth();
-  const {user} = useAuthStore()
-  return <>
-  <h1>{JSON.stringify(user)}</h1>
-  </>
+  const { user,isLoggedIn, isLoading, clearUser } = useAuthStore();
+  // return <>
+  // <h1>{JSON.stringify(user)}</h1>
+  // </>
   const { menuItems, defaultOpenKeys } = useMemo(() => {
-    if (loading) return { menuItems: [], defaultOpenKeys: [] };
+    if (isLoading) return { menuItems: [], defaultOpenKeys: [] };
 
-    if (!isAuthenticated || !user) {
+    if (!isLoggedIn || !user) {
       return {
         menuItems: publicMenuItems.map((item) => ({
           key: item.key,
@@ -124,7 +124,7 @@ export default function CommonLayoutSidebar ({
     }
 
     return { menuItems: items, defaultOpenKeys: openKeys };
-  }, [user, isAuthenticated, loading, pathname, setSidebarOpen]);
+  }, [user, isLoggedIn, isLoading, pathname, setSidebarOpen]);
 
   return (
     <ConfigProvider
