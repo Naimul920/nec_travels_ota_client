@@ -7,21 +7,22 @@ import clsx from "clsx";
 import { Button, Input } from "@/components/ui";
 import { FiMail } from "react-icons/fi";
 import { IoArrowBack } from "react-icons/io5";
-import { useLogin } from "@/hooks/useAuthApi";
+import { useMutation } from "@tanstack/react-query";
+import { loginAction } from "@/actions/auth.action";
 import Image from "next/image";
 
 const ForgotPasswordForm: React.FC = () => {
-  const loginMutation = useLogin();
+  const loginMutation = useMutation({
+    mutationFn: async (values: { email: string; password: string }) =>
+      loginAction(values),
+  });
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
     onSubmit: async (values) => {
-      await loginMutation.mutateAsync({
-        email: values.email,
-        password: values.password,
-      });
+      await loginMutation.mutateAsync(values);
     },
   });
 

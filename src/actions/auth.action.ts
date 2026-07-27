@@ -97,7 +97,7 @@ export const loginAction = async (
     );
     await setTokenExpiresAt(tokens.expireToken);
 
-    // await setUserRole(role);
+    await setUserRole(role);
 
     const departments = deptArr?.length
       ? deptArr
@@ -105,7 +105,7 @@ export const loginAction = async (
         ? [user.admin.department]
         : [];
 
-    // await setDepartments(departments);
+    await setDepartments(departments);
 
     const targetPath =
       redirectPath && isValidRedirectForRole(redirectPath, role as USER_ROLE)
@@ -121,6 +121,10 @@ export const loginAction = async (
         id: user.id,
         role,
         departments: departments.join(","),
+        full_name: user.profile.full_name,
+        email: user.email,
+        agency_name: user.profile.agency_name,
+        image_key: user.profile.image_key,
       },
     };
   } catch (error: any) {
@@ -162,8 +166,8 @@ export const logoutAction = async () => {
   await deleteCookie("access_token");
   await deleteCookie("refresh_token");
   await deleteTokenExpiresAt();
-  // await deleteUserRole();
-  // await deleteDepartments();
+  await deleteUserRole();
+  await deleteDepartments();
 };
 
 export const isLoginAction = async (): Promise<ILoginStatus> => {

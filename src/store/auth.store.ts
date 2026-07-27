@@ -4,6 +4,12 @@ export interface AuthUser {
   id: string;
   role: string;
   departments: string;
+  full_name: string;
+  email: string;
+  agency_name: string | null;
+  image_key: string | null;
+  balance?: number;
+  creditBalance?: number;
 }
 
 interface AuthState {

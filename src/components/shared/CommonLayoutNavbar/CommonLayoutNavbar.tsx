@@ -8,6 +8,7 @@ import { HiMenuAlt3 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
 import { FaUser } from "react-icons/fa";
 import { useAuthStore } from "@/store/auth.store";
+import { logoutAction } from "@/actions/auth.action";
 import { ROLE } from "@/constant";
 
 interface NavbarProps {
@@ -40,12 +41,13 @@ export default function CommonLayoutNavbar ({
 
   const handleLogout = async () => {
     setDropdownOpen(false);
-    // await logout();
+    await logoutAction();
+    clearUser();
     router.push("/auth/signin");
   };
   // return <> <h1>Joy Bangla</h1></>
   
-  const profileName = "User";
+  const profileName = user?.full_name ?? "User";
   const avatarLetter = profileName.charAt(0).toUpperCase();
   const roleLower = user?.role?.toLowerCase() ?? "b2c";
   const profileLink = user?.role === ROLE.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
