@@ -1,4 +1,4 @@
-import HomeTabs from "./home/_components/HomeTabs";
+import HomeTabs from "../../../../../components/common/Home/HomeTabs";
 
 export default function HomePage() {
   return (

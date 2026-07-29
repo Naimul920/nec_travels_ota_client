@@ -19,18 +19,18 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField
-          label="First name"
+          label="Given name"
           type="text"
-          placeholder="First name"
+          placeholder="Given name"
           icon={<FiUser />}
           error={formik.errors.first_name}
           {...formik.getFieldProps("first_name")}
         />
 
         <FormField
-          label="Last name"
+          label="Surname"
           type="text"
-          placeholder="Last name"
+          placeholder="Surname"
           icon={<FiUser />}
           error={formik.errors.last_name}
           {...formik.getFieldProps("last_name")}

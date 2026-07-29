@@ -52,11 +52,12 @@ export default function CommonLayoutNavbar({
   const avatarLetter = profileName.charAt(0).toUpperCase();
   const roleLower = user?.role?.toLowerCase() ?? "b2c";
   const profileLink = `/console/${roleLower}/profile`;
+  const bookingsLink = `/console/${roleLower}/bookings`;
   // const profileLink = user?.role === ROLE.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
 
   return (
     <header className="sticky top-0 z-40 w-full h-16 bg-white border-b border-gray-100 shadow-xs">
-      <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
         <Link
           href={isLoggedIn ? `/console/${roleLower}` : "/"}
           className="flex items-center"
@@ -83,7 +84,7 @@ export default function CommonLayoutNavbar({
             </Link>
           ) : (
             <div className="relative" ref={dropdownRef}>
-              <button
+              {/* <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2 h-9 pl-1 pr-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
                 aria-haspopup="true"
@@ -101,6 +102,33 @@ export default function CommonLayoutNavbar({
                     dropdownOpen ? "rotate-180" : ""
                   }`}
                 />
+              </button> */}
+              <button
+                onClick={() => setDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-2 h-9 px-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                aria-haspopup="true"
+                aria-expanded={dropdownOpen}
+              >
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                  {user?.image_key ? (
+                    <Image
+                      src={user.image_key}
+                      alt="Profile"
+                      width={32}
+                      height={32}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FaUser className="text-gray-500 text-sm" />
+                  )}
+                </div>
+
+                <HiChevronDown
+                  size={14}
+                  className={`text-gray-500 transition-transform ${
+                    dropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {dropdownOpen && (
@@ -111,6 +139,13 @@ export default function CommonLayoutNavbar({
                     onClick={() => setDropdownOpen(false)}
                   >
                     My Profile
+                  </Link>
+                  <Link
+                    href={bookingsLink}
+                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Bookings
                   </Link>
                   <button
                     onClick={handleLogout}

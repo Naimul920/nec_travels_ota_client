@@ -21,6 +21,7 @@ import {
 } from "@/utils/session";
 import type { USER_ROLE } from "@/constant";
 import { LoginResponse } from "@/types/login.type";
+import type { UserProfileResponse } from "@/types/user.type";
 
 export type LoginFormValues = Yup.InferType<typeof loginValidationSchema>;
 
@@ -74,11 +75,9 @@ export const loginAction = async (
 ): Promise<LoginResponse> => {
   try {
     loginValidationSchema.validateSync(payload, { abortEarly: true });
-
     const res = await httpClient.post<LoginData>("/auth/login", payload, {
       headers: userAgent ? { "User-Agent": userAgent } : undefined,
     });
-
     const {
       user,
       tokens,
@@ -121,10 +120,10 @@ export const loginAction = async (
         id: user.id,
         role,
         departments: departments.join(","),
-        full_name: user.profile.full_name,
+        full_name: user?.profile?.full_name,
         email: user.email,
-        agency_name: user.profile.agency_name,
-        image_key: user.profile.image_key,
+        agency_name: user?.profile?.agency_name,
+        image_key: user?.profile?.image_key,
       },
     };
   } catch (error: any) {
@@ -188,3 +187,20 @@ export const isLoginAction = async (): Promise<ILoginStatus> => {
     };
   }
 };
+
+// export async function getUserInfo() {
+//   try {
+//     const cookieStore = await cookies();
+//     const accessToken = cookieStore.get("access_token")?.value;
+
+//     if (!accessToken) {
+//       return null;
+//     }
+
+//     const res = await httpClient.get<UserProfileResponse>("/api/v1/users/profile");
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error fetching user info:", error);
+//     return null;
+//   }
+// }

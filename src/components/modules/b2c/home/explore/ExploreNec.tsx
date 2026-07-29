@@ -7,7 +7,7 @@ import ExploreNecText from "./ExploreNecText";
 
 function ExploreNec() {
   return (
-    <section className="max-w-[1600px] mx-auto px-2">
+    <section className="max-w-[1600px] mx-auto ">
       <ExploreNecText />
       <ExploreNecCarousel />
     </section>

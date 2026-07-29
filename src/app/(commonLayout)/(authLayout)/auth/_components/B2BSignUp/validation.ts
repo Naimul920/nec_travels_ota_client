@@ -2,7 +2,6 @@ import * as Yup from "yup";
 import {
   ACCEPTED_FILE_TYPES,
   MAX_FILE_SIZE_MB,
-  REQUIRED_FILE_FIELDS,
 } from "./types";
 
 const PHONE_REGEX = /^1[3-9]\d{8}$/; // BD mobile number without the +880 prefix
@@ -44,8 +43,8 @@ export const step1Schema = Yup.object({
 
 export const step2Schema = Yup.object({
   agency_name: Yup.string().trim().min(2, "Too short").required("Agency name is required"),
-  business_type: Yup.string().required("Select a business type"),
-  currency_id: Yup.string().required("Select a currency"),
+  business_type: Yup.string(),
+  currency_id: Yup.string(),
   trade_license_number: Yup.string().trim().required("Trade license number is required"),
   trade_license_expiry: Yup.string().required("Trade license expiry date is required"),
   caab_certificate_number: Yup.string().trim(),
@@ -57,12 +56,12 @@ export const step2Schema = Yup.object({
 });
 
 export const step3Schema = Yup.object({
-  logo: fileSchema(REQUIRED_FILE_FIELDS.includes("logo")),
-  trade_license: fileSchema(REQUIRED_FILE_FIELDS.includes("trade_license")),
-  caab_certificate: fileSchema(REQUIRED_FILE_FIELDS.includes("caab_certificate")),
-  nid_front: fileSchema(REQUIRED_FILE_FIELDS.includes("nid_front")),
-  nid_back: fileSchema(REQUIRED_FILE_FIELDS.includes("nid_back")),
-  address_proof: fileSchema(REQUIRED_FILE_FIELDS.includes("address_proof")),
+  logo: fileSchema(false),
+  trade_license: fileSchema(false),
+  caab_certificate: fileSchema(false),
+  full_nid: fileSchema(false),
+  business_card: fileSchema(false),
+  address_proof: fileSchema(false),
 });
 
 // Full schema, used as a final safety check before submit on step 4

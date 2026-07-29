@@ -321,7 +321,7 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
     }
     const query = buildSearchQuery();
     // Replaced navigate() with Next.js router.push() API
-    if (query) router.push(`/flight-search?q=${encoding(query)}`);
+    if (query) router.push(`/console/b2b/flight-search?q=${encoding(query)}`);
   };
 
   return (

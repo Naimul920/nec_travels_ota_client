@@ -9,8 +9,8 @@ export interface B2BSignUpFormValues {
 
   // Step 2 — Company
   agency_name: string;
-  business_type: string;
-  currency_id: string;
+  // business_type: string;
+  currency: string;
   trade_license_number: string;
   trade_license_expiry: string;
   caab_certificate_number: string;
@@ -18,14 +18,14 @@ export interface B2BSignUpFormValues {
   city: string;
   postcode: string;
   address: string;
-  hear_about_us: string;
+  // hear_about_us: string;
 
   // Step 3 — Documents
   logo: File | null;
   trade_license: File | null;
   caab_certificate: File | null;
-  nid_front: File | null;
-  nid_back: File | null;
+  full_nid: File | null;
+  business_card: File | null;
   address_proof: File | null;
 }
 
@@ -33,20 +33,16 @@ export const FILE_FIELDS = [
   "logo",
   "trade_license",
   "caab_certificate",
-  "nid_front",
-  "nid_back",
+  "full_nid",
+  "business_card",
   "address_proof",
 ] as const;
 
 export type FileFieldName = (typeof FILE_FIELDS)[number];
 
-export const REQUIRED_FILE_FIELDS: FileFieldName[] = [
-  "trade_license",
-  "nid_front",
-  "nid_back",
-];
+export const REQUIRED_FILE_FIELDS: FileFieldName[] = [];
 
-export const MAX_FILE_SIZE_MB = 5;
+export const MAX_FILE_SIZE_MB = 1;
 export const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"];
 
 export const TOTAL_STEPS = 4;

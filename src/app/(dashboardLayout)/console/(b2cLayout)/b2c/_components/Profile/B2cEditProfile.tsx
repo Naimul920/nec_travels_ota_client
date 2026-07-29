@@ -1,0 +1,210 @@
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import { Card } from "antd";
+import Image from "next/image";
+import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose, AiOutlineUser, AiOutlineCamera } from "react-icons/ai";
+import clsx from "clsx";
+import { Input } from "@/components/ui";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useAuthStore } from "@/store/auth.store";
+
+interface ProfileData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+}
+
+const B2cEditProfile: React.FC = () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const { data: userProfile, refetch } = useUserInfo();
+  const { user, setUser } = useAuthStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [profile, setProfile] = useState<ProfileData>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (userProfile) {
+      setProfile({
+        first_name: userProfile.profile?.first_name || "",
+        last_name: userProfile.profile?.last_name || "",
+        email: userProfile.email || "",
+        phone: userProfile.phone || "",
+      });
+    } else if (user) {
+      const names = user.full_name?.split(" ") || ["", ""];
+      setProfile({
+        first_name: names[0] || "",
+        last_name: names.slice(1).join(" ") || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      });
+    }
+  }, [userProfile, user]);
+
+  const handleChange = (key: keyof ProfileData, value: string) => {
+    setProfile((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpdate = async () => {
+    setIsEditing(false);
+    console.log("Updated Profile:", { ...profile, image: selectedFile });
+    if (user) {
+      setUser({
+        ...user,
+        full_name: `${profile.first_name} ${profile.last_name}`.trim(),
+        phone: profile.phone,
+      });
+    }
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    await refetch();
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (userProfile) {
+      setProfile({
+        first_name: userProfile.profile?.first_name || "",
+        last_name: userProfile.profile?.last_name || "",
+        email: userProfile.email || "",
+        phone: userProfile.phone || "",
+      });
+    }
+  };
+
+  const imageKey = userProfile?.profile?.image_key || user?.image_key;
+  const displayImage = previewUrl || imageKey;
+
+  const renderRow = (
+    label: string,
+    value: string,
+    field: keyof ProfileData,
+    type: string = "text",
+    readOnly?: boolean,
+  ) => (
+    <tr className="border-b border-b-tertiary/10 last:border-b-0">
+      <td className="w-1/3 px-4 py-3 font-medium text-gray-600">{label}</td>
+      <td className="px-4 py-3">
+        <Input
+          type={type}
+          value={value}
+          disabled={!isEditing || readOnly}
+          onChange={(e) => handleChange(field, e.target.value)}
+          className={clsx(
+            "w-full rounded border px-3 py-2 transition",
+            isEditing && !readOnly
+              ? "border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+              : "cursor-not-allowed border-transparent bg-gray-100",
+          )}
+        />
+      </td>
+    </tr>
+  );
+
+  return (
+    <Card className="w-full border! border-primary! rounded-lg md:max-w-5/6">
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="line-clamp-1 text-lg font-semibold text-gray-800">
+          Profile Information
+        </h1>
+
+        {!isEditing ? (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
+          >
+            <AiOutlineEdit /> Edit
+          </button>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={handleUpdate}
+              className="flex items-center gap-1 text-primary hover:opacity-65"
+            >
+              <AiOutlineCheck /> Update
+            </button>
+            <button
+              onClick={handleCancel}
+              className="flex items-center gap-1 text-secondary hover:opacity-65"
+            >
+              <AiOutlineClose /> Cancel
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="mb-6 flex items-center gap-5">
+        <div className="relative">
+          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gray-100">
+            {displayImage ? (
+              <Image
+                src={displayImage}
+                alt="Profile"
+                width={80}
+                height={80}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <AiOutlineUser className="text-3xl text-gray-400" />
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm hover:text-gray-800"
+          >
+            {displayImage ? <AiOutlineCamera size={14} /> : <AiOutlineEdit size={14} />}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+        </div>
+        <div>
+          <p className="font-medium text-gray-800">
+            {profile.first_name} {profile.last_name}
+          </p>
+          <p className="text-sm text-gray-500">{profile.email}</p>
+          {selectedFile && (
+            <p className="mt-1 text-xs text-primary">{selectedFile.name}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full rounded-lg border border-tertiary/10">
+          <tbody>
+            {renderRow("First Name", profile.first_name, "first_name")}
+            {renderRow("Last Name", profile.last_name, "last_name")}
+            {renderRow("Email", profile.email, "email", "email", true)}
+            {renderRow("Phone", profile.phone, "phone", "tel")}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+};
+
+export default B2cEditProfile;

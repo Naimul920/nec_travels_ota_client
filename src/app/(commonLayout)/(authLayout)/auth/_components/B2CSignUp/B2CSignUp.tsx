@@ -73,7 +73,7 @@ export default function B2CSignUp() {
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6" noValidate>
-      <div>
+      <div className="text-center">
         <h2 className="text-2xl font-bold text-slate-900">
           Customer registration
         </h2>
@@ -83,7 +83,7 @@ export default function B2CSignUp() {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <FormField
+        {/* <FormField
           label="First name"
           // name="first_name"
           type="text"
@@ -91,9 +91,9 @@ export default function B2CSignUp() {
           icon={<FiUser />}
           error={getError("first_name")}
           {...formik.getFieldProps("first_name")}
-        />
+        /> */}
 
-        <FormField
+        {/* <FormField
           label="Last name"
           // name="last_name"
           type="text"
@@ -101,7 +101,7 @@ export default function B2CSignUp() {
           icon={<FiUser />}
           error={getError("last_name")}
           {...formik.getFieldProps("last_name")}
-        />
+        /> */}
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">

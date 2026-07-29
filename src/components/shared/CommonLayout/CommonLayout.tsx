@@ -30,8 +30,8 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
         setSidebarOpen={setSidebarOpen}
       />
 
-      <div className="relative flex-1 w-full min-h-screen">
-        <main className="w-full min-w-0">{children}</main>
+      <div className="relative flex-1 w-full">
+        <main className="">{children}</main>
         {showSidebar && (
           <aside className="fixed right-0 top-15 z-30 pointer-events-auto">
             <CommonLayoutSidebar

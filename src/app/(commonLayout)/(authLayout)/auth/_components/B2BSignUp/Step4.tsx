@@ -66,15 +66,15 @@ export default function Step4({ values }: { values: B2BSignUpFormValues }) {
 
         <div className="grid gap-4 md:grid-cols-2">
           <Item icon={<FiBriefcase />} label="Agency" value={values.agency_name} />
-          <Item icon={<FiBriefcase />} label="Business type" value={values.business_type} />
-          <Item icon={<FiBriefcase />} label="Currency" value={values.currency_id} />
+          {/* <Item icon={<FiBriefcase />} label="Business type" value={values.business_type} /> */}
+          <Item icon={<FiBriefcase />} label="Currency" value={values.currency} />
           <Item icon={<FiBriefcase />} label="Trade license" value={values.trade_license_number} />
           <Item icon={<FiBriefcase />} label="Trade license expiry" value={values.trade_license_expiry} />
           <Item icon={<FiBriefcase />} label="CAAB certificate" value={values.caab_certificate_number} />
           <Item icon={<FiMapPin />} label="City" value={values.city} />
           <Item icon={<FiMapPin />} label="Postcode" value={values.postcode} />
           <Item icon={<FiMapPin />} label="Address" value={values.address} />
-          <Item icon={<FiMapPin />} label="Hear about us" value={values.hear_about_us} />
+          {/* <Item icon={<FiMapPin />} label="Hear about us" value={values.hear_about_us} /> */}
         </div>
       </div>
 
@@ -85,8 +85,8 @@ export default function Step4({ values }: { values: B2BSignUpFormValues }) {
           <FileItem label="Company logo" file={values.logo} />
           <FileItem label="Trade license" file={values.trade_license} />
           <FileItem label="CAAB certificate" file={values.caab_certificate} />
-          <FileItem label="NID front" file={values.nid_front} />
-          <FileItem label="NID back" file={values.nid_back} />
+          <FileItem label="NID" file={values.full_nid} />
+          <FileItem label="Business card" file={values.business_card} />
           <FileItem label="Address proof" file={values.address_proof} />
         </div>
       </div>

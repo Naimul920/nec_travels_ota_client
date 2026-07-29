@@ -229,7 +229,7 @@ export default function DealsCarouselSection() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center gap-8 py-6 select-none overflow-hidden">
+    <div className="w-full flex flex-col items-center gap-8 pt-6 select-none overflow-hidden">
       {/* ==========================================
           1. TOP TAB NAVIGATION BAR (814px Wide)
           ========================================== */}

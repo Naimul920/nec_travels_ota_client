@@ -21,8 +21,8 @@ const initialValues: B2BSignUpFormValues = {
   password_confirmation: "",
 
   agency_name: "",
-  business_type: "",
-  currency_id: "BDT",
+  // business_type: "",
+  currency: "BDT",
   trade_license_number: "",
   trade_license_expiry: "",
   caab_certificate_number: "",
@@ -30,13 +30,13 @@ const initialValues: B2BSignUpFormValues = {
   city: "",
   postcode: "",
   address: "",
-  hear_about_us: "",
+  // hear_about_us: "",
 
   logo: null,
   trade_license: null,
   caab_certificate: null,
-  nid_front: null,
-  nid_back: null,
+  full_nid: null,
+  business_card: null,
   address_proof: null,
 };
 
@@ -86,10 +86,10 @@ export default function B2BSignUp() {
         // await axios.post("/api/b2b-signup", formData);
         console.log("Form submitted successfully");
 
-        setSubmitStatus({
-          type: "success",
-          message: "Your application has been submitted. We'll email you once it's reviewed.",
-        });
+        // setSubmitStatus({
+        //   type: "success",
+        //   message: "Your application has been submitted. We'll email you once it's reviewed.",
+        // });
       } catch (error) {
         console.error("Submission failed:", error);
         setSubmitStatus({

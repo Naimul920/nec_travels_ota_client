@@ -5,7 +5,10 @@ export interface AuthUser {
   role: string;
   departments: string;
   full_name: string;
+  first_name:string;
+  last_name:string;
   email: string;
+  phone:string;
   agency_name: string | null;
   image_key: string | null;
   balance?: number;

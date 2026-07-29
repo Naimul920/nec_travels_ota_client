@@ -1,13 +1,24 @@
 import AppLoaderProvider from "@/providers/AppLoaderProvider";
 import QueryProviders from "@/providers/QueryProvider";
-import { Poppins, Stalemate } from "next/font/google";
+import { Inter, Space_Grotesk, IBM_Plex_Mono, Stalemate } from "next/font/google";
 import AuthProvider from "@/providers/AuthProvider";
 import "./globals.css";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-grotesk",
+  subsets: ["latin"],
+  weight: ["500", "600"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 const stalemate = Stalemate({
@@ -29,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${stalemate.variable} h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${stalemate.variable} h-full antialiased`}
     >
       <body suppressHydrationWarning>
         <QueryProviders>

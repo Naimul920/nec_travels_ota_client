@@ -2,7 +2,7 @@
 
 import { FormikProps } from "formik";
 import { FiFileText, FiUploadCloud, FiX } from "react-icons/fi";
-import { B2BSignUpFormValues, FileFieldName, REQUIRED_FILE_FIELDS } from "./types";
+import { B2BSignUpFormValues, FileFieldName } from "./types";
 import ErrorText from "./ErrorText";
 
 interface UploadFieldProps {
@@ -14,7 +14,7 @@ interface UploadFieldProps {
 function UploadField({ label, name, formik }: UploadFieldProps) {
   const file = formik.values[name];
   const error = formik.errors[name] as string | undefined;
-  const required = REQUIRED_FILE_FIELDS.includes(name);
+  const required = false;
   const errorId = `${name}-error`;
 
   const handleChange = (selected: File | null) => {
@@ -73,8 +73,8 @@ const UPLOAD_FIELDS: { label: string; name: FileFieldName }[] = [
   { label: "Company logo", name: "logo" },
   { label: "Trade license", name: "trade_license" },
   { label: "CAAB certificate", name: "caab_certificate" },
-  { label: "NID front", name: "nid_front" },
-  { label: "NID back", name: "nid_back" },
+  { label: "NID", name: "full_nid" },
+  { label: "Business card", name: "business_card" },
   { label: "Address proof", name: "address_proof" },
 ];
 
@@ -100,7 +100,7 @@ export default function Step3({ formik }: { formik: FormikProps<B2BSignUpFormVal
             <h4 className="font-semibold text-blue-700">Document requirements</h4>
 
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-blue-600">
-              <li>Maximum file size: 5 MB.</li>
+              <li>Maximum file size: 1 MB.</li>
               <li>Supported formats: JPG, PNG, PDF.</li>
               <li>Trade license must be valid and unexpired.</li>
               <li>Documents should be clear and readable.</li>

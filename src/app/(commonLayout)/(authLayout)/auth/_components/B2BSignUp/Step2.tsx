@@ -39,8 +39,8 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Company information</h2>
-        <p className="mt-1 text-sm text-slate-500">Enter your company details.</p>
+        <h2 className="text-2xl font-bold text-slate-900">Business Information</h2>
+        <p className="mt-1 text-sm text-slate-500">Enter your Business details.</p>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
@@ -52,8 +52,21 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
           error={formik.errors.agency_name}
           {...formik.getFieldProps("agency_name")}
         />
+        <FormField
+          label="Trade / Business license number"
+          // name="trade_license_number"
+          type="text"
+          placeholder="License number"
+          error={formik.errors.trade_license_number}
+          {...formik.getFieldProps("trade_license_number")}
+        />
 
-        <div>
+      
+      </div>
+
+      {/* <div className="grid md:grid-cols-2"> */}
+        {/** Remove for Akib vai requirments */}
+        {/* <div>
           <label htmlFor="business_type" className="mb-1.5 block text-sm font-medium text-slate-700">
             Business type
           </label>
@@ -68,11 +81,12 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
             onChange={(value) => setField("business_type", value)}
           />
           <ErrorText id="business_type-error" message={formik.errors.business_type} />
-        </div>
-      </div>
+        </div> */}
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <div>
+
+
+        {/** No need this input field it will handle in developer  */}
+        {/* <div>
           <label htmlFor="currency_id" className="mb-1.5 block text-sm font-medium text-slate-700">
             Currency
           </label>
@@ -85,17 +99,10 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
             onChange={(value) => setField("currency_id", value)}
           />
           <ErrorText id="currency_id-error" message={formik.errors.currency_id} />
-        </div>
+        </div> */}
 
-        <FormField
-          label="Trade license number"
-          // name="trade_license_number"
-          type="text"
-          placeholder="License number"
-          error={formik.errors.trade_license_number}
-          {...formik.getFieldProps("trade_license_number")}
-        />
-      </div>
+        
+      {/* </div> */}
 
       <div className="grid gap-5 md:grid-cols-2">
         <div>
@@ -152,7 +159,19 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
             message={formik.errors.caab_certificate_expiry}
           />
         </div>
+<FormField
+          label="Business address"
+          // name="address"
+          type="text"
+          placeholder="Business address"
+          error={formik.errors.address}
+          {...formik.getFieldProps("address")}
+        />
 
+        
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-2">
         <FormField
           label="City"
           // name="city"
@@ -161,9 +180,6 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
           error={formik.errors.city}
           {...formik.getFieldProps("city")}
         />
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-2">
         <FormField
           label="Postcode"
           // name="postcode"
@@ -173,17 +189,12 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
           {...formik.getFieldProps("postcode")}
         />
 
-        <FormField
-          label="Address"
-          // name="address"
-          type="text"
-          placeholder="Address"
-          error={formik.errors.address}
-          {...formik.getFieldProps("address")}
-        />
+        
       </div>
 
-      <div>
+{/*remove @Akib vai*/}
+
+      {/* <div>
         <label htmlFor="hear_about_us" className="mb-1.5 block text-sm font-medium text-slate-700">
           How did you hear about us?
         </label>
@@ -197,7 +208,8 @@ export default function Step2({ formik }: { formik: FormikProps<B2BSignUpFormVal
           onChange={(value) => setField("hear_about_us", value)}
         />
         <ErrorText id="hear_about_us-error" message={formik.errors.hear_about_us} />
-      </div>
+      </div> */}
+
     </div>
   );
 }

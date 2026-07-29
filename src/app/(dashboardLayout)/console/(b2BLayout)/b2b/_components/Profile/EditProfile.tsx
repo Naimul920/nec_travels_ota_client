@@ -5,6 +5,7 @@ import { Card } from "antd";
 import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import clsx from "clsx";
 import { Input } from "@/components/ui";
+import { useAuthStore } from "@/store/auth.store";
 
 interface ProfileData {
   username: string;
@@ -17,12 +18,13 @@ interface ProfileData {
 
 const EditProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const { user } = useAuthStore();
 
   const [profile, setProfile] = useState<ProfileData>({
-    username: "john_doe",
-    email: "john@example.com",
+    username: user?.full_name || "",
+    email: user?.email || "",
     companyName: "ABC Travels Ltd.",
-    mobileNumber: "+880 1712345678",
+    mobileNumber: user?.phone || "",
     companyAddress: "Dhaka, Bangladesh",
     memberSince: "12 March 2022",
   });
