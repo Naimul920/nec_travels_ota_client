@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} ${stalemate.variable} h-full antialiased`}
+      className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} ${stalemate.variable} h-full antialiased  font-plex-mono`}
     >
       <body suppressHydrationWarning>
         <QueryProviders>

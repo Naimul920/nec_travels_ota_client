@@ -56,8 +56,8 @@ export default function CommonLayoutNavbar({
   // const profileLink = user?.role === ROLE.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
 
   return (
-    <header className="sticky top-0 z-40 w-full h-16 bg-white border-b border-gray-100 shadow-xs">
-      <div className="max-w-[1600px] mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full h-16  bg-white border-b border-gray-100 shadow-xs ">
+      <div className="max-w-[1600px] mx-auto h-full px-5 sm:px-10 flex items-center justify-between">
         <Link
           href={isLoggedIn ? `/console/${roleLower}` : "/"}
           className="flex items-center"
@@ -78,7 +78,7 @@ export default function CommonLayoutNavbar({
           ) : !isLoggedIn || !user ? (
             <Link
               href="/auth/signin"
-              className="flex items-center justify-center px-5 h-9 bg-[#00875A] rounded-full text-white text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
+              className="flex items-center justify-center px-5 h-9 bg-brand rounded-full text-white text-xs font-semibold hover:opacity-90 transition-opacity cursor-pointer"
             >
               Sign In
             </Link>
@@ -110,6 +110,7 @@ export default function CommonLayoutNavbar({
                 aria-expanded={dropdownOpen}
               >
                 <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                  
                   {user?.image_key ? (
                     <Image
                       src={user.image_key}

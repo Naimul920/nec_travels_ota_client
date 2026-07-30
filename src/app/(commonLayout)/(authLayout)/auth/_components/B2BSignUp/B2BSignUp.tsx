@@ -174,7 +174,7 @@ export default function B2BSignUp() {
             <button
               type="button"
               onClick={goToNextStep}
-              className="flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#701319]"
+              className="flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand"
             >
               Continue
               <FiArrowRight />

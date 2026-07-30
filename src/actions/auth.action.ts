@@ -75,9 +75,11 @@ export const loginAction = async (
 ): Promise<LoginResponse> => {
   try {
     loginValidationSchema.validateSync(payload, { abortEarly: true });
+
     const res = await httpClient.post<LoginData>("/auth/login", payload, {
       headers: userAgent ? { "User-Agent": userAgent } : undefined,
     });
+
     const {
       user,
       tokens,
@@ -133,15 +135,18 @@ export const loginAction = async (
         message: error.message,
       };
     }
+    const backendData = error?.response?.data;
+    const backendMessage = backendData?.message;
 
-    const backendMessage = error?.response?.data?.message || "";
-    if (backendMessage === "Email not verified") {
-      redirect(`/auth/verify-email?email=${payload.email}`);
-    }
+    const errorMessage = Array.isArray(backendMessage)
+      ? backendMessage.join(", ")
+      : backendMessage ||
+        error?.message ||
+        "Something went wrong. Please try again.";
 
     return {
       success: false,
-      message: `Login failed: ${error?.message || "Unknown error"}`,
+      message: errorMessage,
     };
   }
 };
@@ -150,17 +155,29 @@ export const logoutAction = async () => {
   try {
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.toString();
-
-    await fetch(`${process.env.API_BASE_URL}/auth/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: cookieHeader,
+    await httpClient.post(
+      "/auth/logout",
+      {},
+      {
+        headers: {
+          Cookie: cookieHeader,
+        },
       },
-    });
+    );
   } catch {
     // ignore backend errors, clear cookies anyway
   }
+
+  //   await fetch(`${process.env.API_BASE_URL}/auth/logout`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Cookie: cookieHeader,
+  //     },
+  //   });
+  // } catch {
+  //   // ignore backend errors, clear cookies anyway
+  // }
 
   await deleteCookie("access_token");
   await deleteCookie("refresh_token");
@@ -188,19 +205,24 @@ export const isLoginAction = async (): Promise<ILoginStatus> => {
   }
 };
 
-// export async function getUserInfo() {
-//   try {
-//     const cookieStore = await cookies();
-//     const accessToken = cookieStore.get("access_token")?.value;
-
-//     if (!accessToken) {
-//       return null;
-//     }
-
-//     const res = await httpClient.get<UserProfileResponse>("/api/v1/users/profile");
-//     return res.data;
-//   } catch (error) {
-//     console.error("Error fetching user info:", error);
-//     return null;
-//   }
-// }
+export const forgotPasswordAction = async (email: string) => {
+  try {
+    const res = await httpClient.post<{ message: string }>(
+      "/auth/forgot-password",
+      { email },
+    );
+    console.log("res***********************",res)
+    return {
+      success: true,
+      message: res.data?.message || "OTP sent to your email",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to send OTP",
+    };
+  }
+};

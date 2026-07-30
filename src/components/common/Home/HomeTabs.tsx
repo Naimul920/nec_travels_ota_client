@@ -39,19 +39,19 @@ export default function HomeTabs() {
           </TabPane>
 
           <TabPane key="2" tab="Hotel" icon={<LuBuilding2 size={20} />}>
-            <div>Hotel Booking Content...</div>
+            <div className="text-amber-700" >Hotel Booking coming soon...</div>
           </TabPane>
 
           <TabPane key="3" tab="Visa" icon={<FiFileText size={20} />}>
-            <div>Visa Information Content...</div>
+            <div className="text-amber-700" >Visa Information coming soon...</div>
           </TabPane>
 
           <TabPane key="4" tab="Holiday" icon={<MdHolidayVillage size={20} />}>
-            <div>Holiday Information Content...</div>
+            <div className="text-amber-700" >Holiday Information coming soon...</div>
           </TabPane>
 
           <TabPane key="5" tab="Umrah" icon={<FaKaaba size={20} />}>
-            <div>Umrah Information Content...</div>
+            <div className="text-amber-700">Umrah Information coming soon...</div>
           </TabPane>
 
           <TabPane
@@ -59,7 +59,7 @@ export default function HomeTabs() {
             tab="Insurance"
             icon={<MdHealthAndSafety size={20} />}
           >
-            <div>Insurance Information Content...</div>
+            <div className="text-amber-700">Insurance Information coming soon...</div>
           </TabPane>
         </Tabs>
       </div>

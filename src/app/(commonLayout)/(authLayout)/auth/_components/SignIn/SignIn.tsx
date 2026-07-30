@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,32 @@ interface SignInFormValues {
   email: string;
   password: string;
   rememberMe: boolean;
+}
+
+const REMEMBER_KEY = "remember_me";
+
+function loadSavedEmail(): { email: string; rememberMe: boolean } {
+  if (typeof window === "undefined") return { email: "", rememberMe: false };
+  try {
+    const saved = localStorage.getItem(REMEMBER_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { email: parsed.email || "", rememberMe: true };
+    }
+  } catch {}
+  return { email: "", rememberMe: false };
+}
+
+function saveEmail(email: string) {
+  try {
+    localStorage.setItem(REMEMBER_KEY, JSON.stringify({ email }));
+  } catch {}
+}
+
+function clearSavedEmail() {
+  try {
+    localStorage.removeItem(REMEMBER_KEY);
+  } catch {}
 }
 
 const initialValues: SignInFormValues = {
@@ -58,6 +84,11 @@ export default function SignIn({ redirectPath }: LoginProps) {
       setError("");
       try {
         const result: LoginResponse = await login(values);
+        if (result.success && values.rememberMe) {
+          saveEmail(values.email);
+        } else if (result.success) {
+          clearSavedEmail();
+        }
 
         if (!result.success) {
           setError(result.message || "Invalid email or password");
@@ -82,17 +113,25 @@ export default function SignIn({ redirectPath }: LoginProps) {
     },
   });
 
+  useEffect(() => {
+    const saved = loadSavedEmail();
+    if (saved.rememberMe) {
+      formik.setFieldValue("email", saved.email);
+      formik.setFieldValue("rememberMe", true);
+    }
+  }, []);
+
   const getError = (name: keyof SignInFormValues) =>
     formik.touched[name] ? formik.errors[name] : undefined;
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center bg-[#F7F4EC] px-4 py-10 font-[family-name:var(--font-inter)]">
+    <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center  px-4 py-10">
       <div className="relative grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-2xl md:grid-cols-5">
         {/* Left ticket stub */}
-        <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-[#12233D] p-10 md:flex">
+        <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-brand p-10 md:flex">
           <div className="relative z-10 flex items-center gap-2">
-            <FiSend className="rotate-45 text-[#E2703A]" size={18} />
-            <p className="font-[family-name:var(--font-plex-mono)] text-xs tracking-[0.25em] text-[#9FB4C7]">
+            <FiSend className="rotate-45 text-white" size={18} />
+            <p className="font-plex-mono text-xs tracking-[0.25em] text-white">
               NEC TRAVELS
             </p>
           </div>
@@ -101,10 +140,10 @@ export default function SignIn({ redirectPath }: LoginProps) {
           <div className="relative z-10 space-y-4">
             <div className="flex items-center gap-3">
               <div className="text-left">
-                <p className="font-[family-name:var(--font-grotesk)] text-lg font-medium text-[#F7F4EC]">
+                <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
                   DAC
                 </p>
-                <p className="font-[family-name:var(--font-plex-mono)] text-[10px] tracking-widest text-[#9FB4C7]">
+                <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
                   DHAKA
                 </p>
               </div>
@@ -112,22 +151,22 @@ export default function SignIn({ redirectPath }: LoginProps) {
               <div className="relative flex-1">
                 <div className="border-t border-dashed border-[#9FB4C7]/50" />
                 <FiSend
-                  className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 text-[#E2703A]"
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 text-white"
                   size={14}
                 />
               </div>
 
               <div className="text-right">
-                <p className="font-[family-name:var(--font-grotesk)] text-lg font-medium text-[#F7F4EC]">
+                <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
                   LHR
                 </p>
-                <p className="font-[family-name:var(--font-plex-mono)] text-[10px] tracking-widest text-[#9FB4C7]">
+                <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
                   LONDON
                 </p>
               </div>
             </div>
 
-            <p className="font-[family-name:var(--font-grotesk)] text-2xl font-medium leading-snug text-[#F7F4EC]">
+            <p className="font-grotesk text-2xl font-medium leading-snug text-[#F7F4EC]">
               Track every booking,
               <br />
               from check-in to landing.
@@ -140,12 +179,12 @@ export default function SignIn({ redirectPath }: LoginProps) {
               {BARCODE_BARS.map((w, i) => (
                 <div
                   key={i}
-                  className="bg-[#9FB4C7]/70"
+                  className="bg-white/70"
                   style={{ width: `${w}px`, height: "100%" }}
                 />
               ))}
             </div>
-            <p className="mt-2 font-[family-name:var(--font-plex-mono)] text-[10px] tracking-[0.2em] text-[#9FB4C7]">
+            <p className="mt-2 font-plex-mono text-[10px] tracking-[0.2em] text-white">
               SECURE SIGN-IN · PASS NO. 048
             </p>
           </div>
@@ -166,13 +205,13 @@ export default function SignIn({ redirectPath }: LoginProps) {
           >
             <div>
               <div className="mb-6 flex items-center gap-2 md:hidden">
-                <FiSend className="rotate-45 text-[#E2703A]" size={18} />
-                <p className="font-[family-name:var(--font-plex-mono)] text-xs tracking-[0.25em] text-[#12233D]">
-                  SKYLINE AIR
+                <FiSend className="rotate-45 text-white" size={18} />
+                <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
+                  NEC TRAVELS
                 </p>
               </div>
 
-              <h2 className="font-[family-name:var(--font-grotesk)] text-3xl font-medium text-[#12233D]">
+              <h2 className="font-grotesk text-3xl font-medium text-[#12233D]">
                 Welcome back
               </h2>
 
@@ -216,21 +255,21 @@ export default function SignIn({ redirectPath }: LoginProps) {
               />
 
               <div className="mt-3 flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm text-[#3D4C59]">
+                <label className="flex items-center gap-2 text-sm text-brand">
                   <input
                     type="checkbox"
                     name="rememberMe"
                     checked={formik.values.rememberMe}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className="h-4 w-4 rounded border-[#9FB4C7]/60 text-[#E2703A] focus:ring-[#E2703A]/40"
+                    className="h-4 w-4 rounded border-[#9FB4C7]/60! accent-red-600 focus:ring-red-600/40!"
                   />
                   Remember me
                 </label>
 
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs font-medium text-[#E2703A] hover:underline"
+                  className="text-xs font-medium text-brand hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -240,7 +279,7 @@ export default function SignIn({ redirectPath }: LoginProps) {
             <button
               type="submit"
               disabled={formik.isSubmitting || isPending}
-              className="h-12 w-full rounded-xl bg-[#E2703A] text-white transition-colors duration-200 hover:bg-[#CB5F2C] disabled:opacity-50"
+              className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
             >
               {formik.isSubmitting || isPending ? "Signing in..." : "Sign in"}
             </button>
@@ -249,7 +288,7 @@ export default function SignIn({ redirectPath }: LoginProps) {
               Don&apos;t have an account?{" "}
               <Link
                 href="/auth/signup"
-                className="font-semibold text-[#E2703A] hover:underline"
+                className="font-semibold text-brand hover:underline"
               >
                 Sign up
               </Link>

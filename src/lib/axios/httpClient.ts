@@ -121,6 +121,7 @@ const httpPost = async <TData>(
       params: options?.params,
       headers: options?.headers,
     });
+    console.log("response.data*****************",response.data)
     return response.data;
   } catch (error) {
     console.error(`POST request to ${endpoint} failed:`, error);
