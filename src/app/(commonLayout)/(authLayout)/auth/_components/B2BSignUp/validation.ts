@@ -7,7 +7,7 @@ import {
 const PHONE_REGEX = /^1[3-9]\d{8}$/; // BD mobile number without the +880 prefix
 
 const fileSchema = (required: boolean) => {
-  let schema = Yup.mixed<File>()
+  const schema = Yup.mixed<File>()
     .nullable()
     .test(
       "file-size",
@@ -45,14 +45,14 @@ export const step2Schema = Yup.object({
   agency_name: Yup.string().trim().min(2, "Too short").required("Agency name is required"),
   business_type: Yup.string(),
   currency_id: Yup.string(),
-  trade_license_number: Yup.string().trim().required("Trade license number is required"),
-  trade_license_expiry: Yup.string().required("Trade license expiry date is required"),
+  // trade_license_number: Yup.string().trim().required("Trade license number is required"),
+  // trade_license_expiry: Yup.string().required("Trade license expiry date is required"),
   caab_certificate_number: Yup.string().trim(),
   caab_certificate_expiry: Yup.string().nullable(),
   city: Yup.string().trim().required("City is required"),
   postcode: Yup.string().trim().required("Postcode is required"),
   address: Yup.string().trim().required("Address is required"),
-  hear_about_us: Yup.string(),
+  // hear_about_us: Yup.string(),
 });
 
 export const step3Schema = Yup.object({
@@ -61,7 +61,7 @@ export const step3Schema = Yup.object({
   caab_certificate: fileSchema(false),
   full_nid: fileSchema(false),
   business_card: fileSchema(false),
-  address_proof: fileSchema(false),
+  // address_proof: fileSchema(false),
 });
 
 // Full schema, used as a final safety check before submit on step 4

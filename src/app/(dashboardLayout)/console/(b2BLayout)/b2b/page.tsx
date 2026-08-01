@@ -3,7 +3,7 @@ import HomeTabs from "../../../../../components/common/Home/HomeTabs";
 export default function HomePage() {
   return (
     <>
-      <section className="mb-5 mt-3 flex flex-col items-center justify-center md:mt-0">
+      {/* <section className="mb-5 mt-3 flex flex-col items-center justify-center md:mt-0">
         <p className="text-xs font-semibold tracking-[0.3em] text-gray-800 md:text-2xl">
           YOUR TRAVEL BE SAFER
         </p>
@@ -14,7 +14,7 @@ export default function HomePage() {
           <span className="text-primary">NEC</span>{" "}
           <span className="text-secondary">TRAVELS</span>
         </h1>
-      </section>
+      </section> */}
       <HomeTabs />
     </>
   );

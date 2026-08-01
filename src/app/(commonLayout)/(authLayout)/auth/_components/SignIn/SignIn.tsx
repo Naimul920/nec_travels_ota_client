@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail, FiSend } from "react-icons/fi";
 
@@ -65,6 +65,10 @@ export default function SignIn({ redirectPath }: LoginProps) {
   const queryClient = useQueryClient();
   const { setUser, clearUser } = useAuthStore();
 
+  const searchParams = useSearchParams();
+  const urlRedirect = searchParams.get("redirect");
+  const effectiveRedirectPath = redirectPath || urlRedirect || undefined;
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
@@ -72,7 +76,7 @@ export default function SignIn({ redirectPath }: LoginProps) {
     mutationFn: (payload: SignInFormValues) =>
       loginAction(
         { email: payload.email, password: payload.password },
-        redirectPath,
+        effectiveRedirectPath,
       ),
   });
 

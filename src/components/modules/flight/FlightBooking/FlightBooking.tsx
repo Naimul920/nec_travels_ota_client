@@ -22,6 +22,7 @@ import {
   revalidateItineraryAction,
   bookFlightAction,
 } from "@/actions/flight.action";
+import { useAuthStore } from "@/store/auth.store";
 
 const PASSENGER_TYPE_MAP: Record<string, string> = {
   adult: "ADT",
@@ -92,6 +93,7 @@ const FlightBooking: React.FC = () => {
   // 3. Read search parameters natively
   const searchParamsHook = useSearchParams();
   const [isBooking, setIsBooking] = useState(false);
+  const { user } = useAuthStore();
 
   // Re-creates the URLSearchParams instance dynamically from Next.js searchParams hook
   const searchParams = useMemo(() => {
@@ -121,14 +123,27 @@ const FlightBooking: React.FC = () => {
 
   const itinerary = searchData?.data?.itinDetails?.[itineraryIndex];
 
-  const initialValues: BookingFormValues = {
-    tripType: searchInfoParams.get("tripType"),
-    cabin: searchInfoParams.get("cabin"),
-    adult: createPassengers(Number(searchInfoParams.get("adult") ?? 0)),
-    child: createPassengers(Number(searchInfoParams.get("child") ?? 0)),
-    kid: createPassengers(Number(searchInfoParams.get("kid") ?? 0)),
-    infant: createPassengers(Number(searchInfoParams.get("infant") ?? 0)),
-  };
+  const initialValues: BookingFormValues = useMemo(() => {
+    const adultCount = Number(searchInfoParams.get("adult") ?? 0);
+    const adult = createPassengers(adultCount);
+    if (user && adult.length > 0) {
+      adult[0] = {
+        ...adult[0],
+        firstname: user.first_name || adult[0].firstname,
+        lastname: user.last_name || adult[0].lastname,
+        email: user.email || adult[0].email,
+        phone: user.phone || adult[0].phone,
+      };
+    }
+    return {
+      tripType: searchInfoParams.get("tripType"),
+      cabin: searchInfoParams.get("cabin"),
+      adult,
+      child: createPassengers(Number(searchInfoParams.get("child") ?? 0)),
+      kid: createPassengers(Number(searchInfoParams.get("kid") ?? 0)),
+      infant: createPassengers(Number(searchInfoParams.get("infant") ?? 0)),
+    };
+  }, [searchInfoParams, user]);
 
   const buildSegments = (itin: Itinerary): BookingSegment[] => {
     return itin.flightDetails.flatMap((fd) =>

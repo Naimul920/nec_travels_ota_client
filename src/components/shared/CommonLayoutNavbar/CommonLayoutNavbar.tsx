@@ -48,6 +48,9 @@ export default function CommonLayoutNavbar({
   // return <> <h1>Joy Bangla</h1></>
 
   const showSidebarToggle = isLoggedIn && user && user.role !== ROLE.B2C;
+  const isB2B = user?.role === ROLE.B2B;
+  const headerLogo =
+    isB2B && user?.logo ? user.logo : "/assets/images/logo.png";
   const profileName = user?.full_name ?? "User";
   const avatarLetter = profileName.charAt(0).toUpperCase();
   const roleLower = user?.role?.toLowerCase() ?? "b2c";
@@ -57,6 +60,12 @@ export default function CommonLayoutNavbar({
   (console.log("User => ", user),
     console.log("Is Logged In => ", isLoggedIn),
     console.log("Is Loading => ", isLoading));
+  {
+    console.log("User Currency => ", user?.currency);
+  }
+  {
+    console.log("User balance => ", user?.balance);
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full h-16  bg-white border-b border-gray-100 shadow-xs ">
@@ -66,8 +75,8 @@ export default function CommonLayoutNavbar({
           className="flex items-center"
         >
           <Image
-            src="/assets/images/logo.png"
-            alt="NEC Fly"
+            src={headerLogo}
+            alt={isB2B && user?.logo ? "Agency logo" : "NEC Fly"}
             width={130}
             height={40}
             priority
@@ -86,8 +95,21 @@ export default function CommonLayoutNavbar({
               Sign In
             </Link>
           ) : (
-            <div className="relative" ref={dropdownRef}>
-              {/* <button
+            <div className="flex items-center gap-2">
+              {isB2B && user && (
+                <div className="ml-4 hidden md:flex flex-col leading-tight">
+                  <span className="text-sm font-semibold text-gray-900">
+                    {user.agency_name || "Agent"}
+                  </span>
+
+                  <span className="text-xs text-gray-500">
+                    Balance: {user.balance?.toLocaleString() ?? "0.00"}{" "}
+                    {user.currency}
+                  </span>
+                </div>
+              )}
+              <div className="relative" ref={dropdownRef}>
+                {/* <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2 h-9 pl-1 pr-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
                 aria-haspopup="true"
@@ -106,58 +128,62 @@ export default function CommonLayoutNavbar({
                   }`}
                 />
               </button> */}
-              <button
-                onClick={() => setDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 h-9 px-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
-                aria-haspopup="true"
-                aria-expanded={dropdownOpen}
-              >
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
-                  {user?.image_key ? (
-                    <Image
-                      src={user.image_key}
-                      alt="Profile"
-                      width={32}
-                      height={32}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <FaUser className="text-gray-500 text-sm" />
-                  )}
-                </div>
+                <button
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                  className="flex items-center gap-2 h-9 px-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                  aria-haspopup="true"
+                  aria-expanded={dropdownOpen}
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                    {user?.image ? (
+                      <Image
+                        src={user.image}
+                        alt="Profile"
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FaUser className="text-gray-500 text-sm" />
+                    )}
+                  </div>
 
-                <HiChevronDown
-                  size={14}
-                  className={`text-gray-500 transition-transform ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+                  <HiChevronDown
+                    size={14}
+                    className={`text-gray-500 transition-transform ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
 
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-50">
-                  <Link
-                    href={profileLink}
-                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    My Profile
-                  </Link>
-                  <Link
-                    href={bookingsLink}
-                    className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Bookings
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-gray-50 cursor-pointer"
-                  >
-                    Log Out
-                  </button>
-                </div>
-              )}
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-50">
+                    <Link
+                      href={profileLink}
+                      className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      My Profile
+                    </Link>
+                    {isB2B || (
+                      <Link
+                        href={bookingsLink}
+                        className="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Bookings
+                      </Link>
+                    )}
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-gray-50 cursor-pointer"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

@@ -80,12 +80,9 @@ const B2cEditProfile: React.FC = () => {
     try {
       const result = await updateUserProfile(buildFormData(file));
       if (result.success) {
-        const newImage =
-          result.data?.profile?.image ??
-          result.data?.profile?.image_key ??
-          null;
+        const newImage = result.data?.profile?.image ?? null;
         if (newImage && user) {
-          setUser({ ...user, image_key: newImage });
+          setUser({ ...user, image: newImage });
         }
         setSelectedFile(null);
         message.success("Profile image updated");
@@ -147,7 +144,7 @@ const B2cEditProfile: React.FC = () => {
     }
   };
 
-  const image = userProfile?.profile?.image || user?.image_key;
+  const image = userProfile?.profile?.image || user?.image;
   const displayImage = previewUrl || image;
 
   const renderRow = (

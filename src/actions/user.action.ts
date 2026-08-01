@@ -1,7 +1,7 @@
 "use server";
 
 import { httpClient } from "@/lib/axios/httpClient";
-import { UserProfileResponse } from "@/types/user.type";
+import { ChangePasswordPayload, UserProfileResponse } from "@/types/user.type";
 import { cookies } from "next/headers";
 
 
@@ -47,11 +47,7 @@ export async function updateUserProfile(formData: FormData) {
   }
 }
 
-export interface ChangePasswordPayload {
-  current_password: string;
-  new_password: string;
-  new_password_confirmation: string;
-}
+
 
 export async function changePasswordAction(payload: ChangePasswordPayload) {
   try {

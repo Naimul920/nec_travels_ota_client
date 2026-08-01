@@ -12,6 +12,7 @@ import {
   verifyEmailSchema,
 } from "@/validations/auth.validation";
 import { getCurrenciesAction, detectUserCurrencyCode } from "@/actions/currency.action";
+import { useRouter } from "next/navigation";
 
 interface B2CRegisterFormValues {
   email: string;
@@ -34,6 +35,8 @@ export default function B2CSignUp() {
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const router = useRouter();
 
   const { data: currencies = [], isLoading: currenciesLoading } = useQuery({
     queryKey: ["currencies"],
@@ -85,6 +88,7 @@ export default function B2CSignUp() {
         });
         if (result.success) {
           helpers.setStatus({ success: result.message });
+          router.push("/auth/signin");
         } else {
           helpers.setStatus({ error: result.message });
         }

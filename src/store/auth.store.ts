@@ -5,12 +5,14 @@ export interface AuthUser {
   role: string;
   departments: string;
   full_name: string;
-  first_name:string;
-  last_name:string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phone:string;
+  phone: string;
+  currency: string;
   agency_name: string | null;
-  image_key: string | null;
+  image: string | null;
+  logo: string | null;
   balance?: number;
   creditBalance?: number;
 }

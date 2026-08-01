@@ -7,6 +7,7 @@ import { Button } from "@/components/ui";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Itinerary, Schedule } from "@/interface/flight";
 import dayjs from "dayjs";
+import { isLoginAction } from "@/actions/auth.action";
 
 interface IProps {
   state: IState;
@@ -64,12 +65,16 @@ const SearchHeader: React.FC<IProps> = ({
   const totalFare = itinerary.saleCurrencyAmount.totalFare;
   const currency = itinerary.passengerFareBreakDown[0]?.currency || "BDT";
 
-  const handelFlightBooking = (id: string) => {
+  const handelFlightBooking = async (id: string) => {
     // 4. Safely constructs query parameters string layout using native searchParams string conversion
     const currentQuery = searchParams.toString();
-    router.push(
-      `/flight-booking?${currentQuery}&i=${id}&sid=${searchId}`,
-    );
+    const bookingUrl = `/flight-booking?${currentQuery}&i=${id}&sid=${searchId}`;
+    const { loggedIn } = await isLoginAction();
+    if (loggedIn) {
+      router.push(bookingUrl);
+    } else {
+      router.push(`/auth/signin?redirect=${encodeURIComponent(bookingUrl)}`);
+    }
   };
 
   const segments = itinerary.flightDetails;

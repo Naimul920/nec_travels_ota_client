@@ -24,8 +24,10 @@ export default function AuthProvider({
         last_name: user.profile?.last_name??"",
         email: user.email ?? "",
         phone:user?.phone??"",
+        currency:user?.currency?.code ?? "",
         agency_name: user.profile?.agency_name ?? null,
-        image_key: user.profile?.image_key ?? user.profile?.image ?? null,
+        image: user.profile?.image ?? null,
+        logo:user.b2b_user?.logo??null,
         balance: user.wallet?.balance ?? user.balance ?? 0,
         creditBalance: user.wallet?.creditBalance ?? user.creditBalance ?? 0,
       });

@@ -10,8 +10,9 @@ import { RiCalendarScheduleFill } from "react-icons/ri";
 import { MdOutlineFlightTakeoff } from "react-icons/md";
 import { FaHotel, FaBookJournalWhills } from "react-icons/fa6";
 import { BsFillPassportFill } from "react-icons/bs";
-import { navigationConfig, NavRole } from "@/helper/navigation";
+import { navigationConfig, NavRole, NavItem } from "@/helper/navigation";
 import { useAuthStore } from "@/store/auth.store";
+import { ROLE } from "@/constant";
 
 const { Sider } = Layout;
 
@@ -21,10 +22,9 @@ interface SidebarProps {
 }
 
 const roleToNavRole: Record<string, NavRole> = {
-  // [Role.SUPER_ADMIN]: NavRole.SUPER_ADMIN,
-  // [Role.ADMIN]: NavRole.ADMIN,
-  // [Role.B2B]: NavRole.B2B,
-  // [Role.B2C]: NavRole.B2C,
+  [ROLE.SUPER_ADMIN]: NavRole.SUPER_ADMIN,
+  [ROLE.ADMIN]: NavRole.ADMIN,
+  [ROLE.B2B]: NavRole.B2B,
 };
 
 const publicMenuItems = [
@@ -69,45 +69,66 @@ export default function CommonLayoutSidebar ({
       };
     }
 
-    const navRole = roleToNavRole[user.role] ?? NavRole.B2C;
+    const navRole = roleToNavRole[user.role] ?? NavRole.B2B;
     const navItems = navigationConfig[navRole] ?? [];
     const pathPrefix = `/console/${navRole}`;
+    const isSuperAdmin = user.role === ROLE.SUPER_ADMIN;
 
-    const formatPath = (path: string) => {
-      if (!path) return pathPrefix;
+    const userDepartments = (user.departments || "")
+      .split(",")
+      .map((d) => d.trim())
+      .filter(Boolean);
+
+    const filterItems = (routes: NavItem[]): NavItem[] => {
+      const result: NavItem[] = [];
+      for (const route of routes) {
+        if (
+          !isSuperAdmin &&
+          route.departments?.length &&
+          !route.departments.some((dept) => userDepartments.includes(dept))
+        ) {
+          continue;
+        }
+        const children = route.children ? filterItems(route.children) : undefined;
+        if (route.children?.length && children?.length === 0) {
+          continue;
+        }
+        result.push({ ...route, children });
+      }
+      return result;
+    };
+
+    const formatPath = (base: string, path: string) => {
+      if (!path) return base;
       const cleanPath = path.startsWith("/") ? path : `/${path}`;
-      return `${pathPrefix}${cleanPath}`.replace(/\/+/g, "/");
+      return `${base}${cleanPath}`.replace(/\/+/g, "/");
     };
 
     const items: any[] = [];
     const openKeys: string[] = [];
 
-    for (const route of navItems) {
-      const fullPath = formatPath(route.path);
+    const buildItems = (routes: NavItem[], basePath: string): any[] =>
+      routes.map((route) => {
+        const fullPath = formatPath(basePath, route.path);
 
-      if (route.children?.length) {
-        const children = route.children.map((child) => {
-          const childPath = formatPath(`${route.path}${child.path}`);
-          if (pathname.startsWith(childPath)) {
+        if (route.children?.length) {
+          const children = buildItems(route.children, fullPath);
+          const hasActiveChild = children.some(
+            (child) =>
+              pathname.startsWith(child.key) || pathname === child.key,
+          );
+          if (hasActiveChild) {
             openKeys.push(fullPath);
           }
           return {
-            key: childPath,
-            icon: child.icon,
-            label: (
-              <Link
-                href={childPath}
-                onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
-                className="w-full text-xs font-medium"
-              >
-                {child.label}
-              </Link>
-            ),
+            key: fullPath,
+            icon: route.icon,
+            label: route.label,
+            children,
           };
-        });
-        items.push({ key: fullPath, icon: route.icon, label: route.label, children });
-      } else {
-        items.push({
+        }
+
+        return {
           key: fullPath,
           icon: route.icon,
           label: (
@@ -119,11 +140,13 @@ export default function CommonLayoutSidebar ({
               {route.label}
             </Link>
           ),
-        });
-      }
-    }
+        };
+      });
 
-    return { menuItems: items, defaultOpenKeys: openKeys };
+    const filteredItems = filterItems(navItems);
+    const menuItems = buildItems(filteredItems, pathPrefix);
+
+    return { menuItems, defaultOpenKeys: openKeys };
   }, [user, isLoggedIn, isLoading, pathname, setSidebarOpen]);
 
   return (

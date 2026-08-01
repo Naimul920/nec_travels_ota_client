@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import clsx from "clsx";
+import { message } from "antd";
 import { Button, Input } from "@/components/ui";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { changePasswordAction } from "@/actions/user.action";
 
 const Password: React.FC = () => {
   const [showCurrent, setShowCurrent] = useState(false);
@@ -17,9 +19,35 @@ const Password: React.FC = () => {
       newPassword: "",
       confirmPassword: "",
     },
-    onSubmit: async (values) => {
-      console.log("Password Update:", values);
-      // 🔜 API call here
+    validate: (values) => {
+      const errors: Record<string, string> = {};
+      if (!values.currentPassword) errors.currentPassword = "Current password is required";
+      if (!values.newPassword) errors.newPassword = "New password is required";
+      if (!values.confirmPassword) {
+        errors.confirmPassword = "Confirm password is required";
+      } else if (values.confirmPassword !== values.newPassword) {
+        errors.confirmPassword = "Passwords do not match";
+      }
+      return errors;
+    },
+    onSubmit: async (values, helpers) => {
+      try {
+        const result = await changePasswordAction({
+          current_password: values.currentPassword,
+          new_password: values.newPassword,
+          new_password_confirmation: values.confirmPassword,
+        });
+        if (result.success) {
+          message.success(result.message || "Password changed successfully");
+          formik.resetForm();
+        } else {
+          message.error(result.message || "Failed to change password");
+        }
+      } catch {
+        message.error("Failed to change password. Please try again.");
+      } finally {
+        helpers.setSubmitting(false);
+      }
     },
   });
 

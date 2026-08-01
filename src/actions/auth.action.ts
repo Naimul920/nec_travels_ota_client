@@ -305,3 +305,30 @@ export const verifyEmailAction = async (payload: {
     };
   }
 };
+
+export const b2bRegisterAction = async (formData: FormData) => {
+  console.log("b2bRegisterAction called with formData:", formData);
+  try {
+    const res = await httpClient.post<{ message: string; user_id: string }>(
+      "/auth/register/b2b",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
+    return {
+      success: true,
+      message: res.message || "Registration submitted successfully",
+      data: res.data,
+    };
+  } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
+    console.error("b2bRegisterAction error:", backendMessage);
+    return {
+      success: false,
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error?.message || "Registration failed",
+    };
+  }
+};

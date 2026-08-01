@@ -18,14 +18,11 @@ import {
   FaShieldAlt,
   FaUserTie,
   FaCoins,
-  FaQuestionCircle,
   FaPlane,
-  FaTasks,
   FaGift,
   FaHome,
   FaMinusCircle,
   FaPlusCircle,
-  FaImage,
   FaPhoneAlt,
   FaFacebook,
   FaGlobe,
@@ -40,13 +37,15 @@ export interface NavItem {
   label: string;
   icon?: React.ReactNode;
   children?: NavItem[];
+  /** Required departments for this item (ADMIN role). Empty/undefined = shown to all. */
+  departments?: string[];
 }
 
 export enum NavRole {
   SUPER_ADMIN = "super_admin",
   ADMIN = "admin",
   B2B = "b2b",
-  B2C = "b2c",
+  // B2C = "b2c",
 }
 
 export const navigationConfig: Record<NavRole, NavItem[]> = {
@@ -228,21 +227,53 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
     },
 
     {
-      path: "/users",
-      label: "Users",
-      icon: <FaUsers />,
+      path: "/air-tickets",
+      label: "Air Tickets",
+      icon: <FaTicketAlt />,
+      departments: ["OPERATION", "RESERVATION", "IT"],
+      children: [
+        {
+          path: "/hold",
+          label: "Hold Tickets",
+          icon: <FaFileInvoiceDollar />,
+        },
+        {
+          path: "/issued",
+          label: "Issued Tickets",
+          icon: <FaRegIdBadge />,
+        },
+        {
+          path: "/cancelled",
+          label: "Cancelled Tickets",
+          icon: <FaUndo />,
+        },
+        {
+          path: "/flown",
+          label: "Flown Tickets",
+          icon: <FaPlane />,
+        },
+      ],
     },
 
     {
-      path: "/promotions",
-      label: "Promotions",
-      icon: <FaBullhorn />,
+      path: "/flight-search",
+      label: "Flight Search",
+      icon: <FaPlane />,
+      departments: ["OPERATION", "RESERVATION"],
+    },
+
+    {
+      path: "/users",
+      label: "Users",
+      icon: <FaUsers />,
+      departments: ["IT", "SALES"],
     },
 
     {
       path: "/transactions",
       label: "Transactions",
       icon: <FaMoneyCheckAlt />,
+      departments: ["ACCOUNTS", "IT"],
       children: [
         {
           path: "/deposits",
@@ -263,21 +294,31 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
     },
 
     {
+      path: "/promotions",
+      label: "Promotions",
+      icon: <FaBullhorn />,
+      departments: ["MARKETING", "SALES"],
+    },
+
+    {
       path: "/commissions",
       label: "Commissions",
       icon: <FaCoins />,
+      departments: ["ACCOUNTS", "SALES"],
     },
 
     {
       path: "/notices",
       label: "Notices",
       icon: <FaListAlt />,
+      departments: ["MARKETING", "IT"],
     },
 
     {
       path: "/banks",
       label: "Banks",
       icon: <FaUniversity />,
+      departments: ["ACCOUNTS", "IT"],
     },
 
     {
@@ -305,12 +346,12 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
 
     {
       path: "/bookings",
-      label: "Bookings",
+      label: "Air Tickets",
       icon: <FaTicketAlt />,
       children: [
         {
           path: "/hold",
-          label: "Hold Bookings",
+          label: "Hold Tickets",
           icon: <FaFileInvoiceDollar />,
         },
         {
@@ -320,50 +361,22 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
         },
         {
           path: "/cancel",
-          label: "Cancel Tickets",
+          label: "Cancelled Tickets",
           icon: <FaUndo />,
         },
-      ],
-    },
-
-    {
-      path: "/finance",
-      label: "Finance",
-      icon: <FaMoneyCheckAlt />,
-      children: [
         {
-          path: "/payments",
-          label: "Payments",
-          icon: <FaMoneyCheckAlt />,
-        },
-        {
-          path: "/credits",
-          label: "Credit Log",
-          icon: <FaRegCreditCard />,
-        },
-        {
-          path: "/debit-vouchers",
-          label: "Debit Vouchers",
-          icon: <FaFileInvoiceDollar />,
-        },
-        {
-          path: "/statements",
-          label: "Statements",
-          icon: <FaBalanceScale />,
+          path: "/flown",
+          label: "Flown Tickets",
+          icon: <FaPlane />,
         },
       ],
     },
 
     {
       path: "/support",
-      label: "Support",
+      label: "Supports",
       icon: <FaHeadset />,
       children: [
-        {
-          path: "/tickets",
-          label: "Tickets",
-          icon: <ImList2 />,
-        },
         {
           path: "/void",
           label: "Void",
@@ -376,51 +389,115 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
         },
         {
           path: "/reissue",
-          label: "Re-issue",
+          label: "Re-issue / Date Change",
           icon: <FaTicketAlt />,
         },
         {
           path: "/cancel-open",
-          label: "Cancel open",
+          label: "Cancel Open",
           icon: <FaMinusCircle />,
         },
         {
           path: "/add-ssr",
-          label: "Add ssr",
+          label: "Add SSR Service",
           icon: <FaPlusCircle />,
+          children: [
+            {
+              path: "/seat-selection",
+              label: "Seat Selection",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/meals",
+              label: "Meals",
+              icon: <FaGift />,
+            },
+            {
+              path: "/wheelchair",
+              label: "Wheelchair",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/vvip-notes",
+              label: "VVIP Notes",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/fare-difference",
+              label: "Fare Differency",
+              icon: <FaCoins />,
+            },
+            {
+              path: "/extra-baggage",
+              label: "Extra Baggage",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/additional-charges",
+              label: "Additional Charges",
+              icon: <FaCoins />,
+            },
+          ],
+        },
+        {
+          path: "/ticket-copy",
+          label: "Airlines Ticket Copy",
+          icon: <FaFileInvoiceDollar />,
+        },
+        {
+          path: "/frequent-flyer",
+          label: "Frequent Flyer Number",
+          icon: <FaRegIdBadge />,
+        },
+      ],
+    },
+
+    {
+      path: "/finance",
+      label: "Transactions",
+      icon: <FaMoneyCheckAlt />,
+      children: [
+        {
+          path: "/payments",
+          label: "Payments",
+          icon: <FaMoneyCheckAlt />,
+        },
+        {
+          path: "/ssr-payments",
+          label: "SSR Payments",
+          icon: <FaCoins />,
+        },
+        {
+          path: "/adm",
+          label: "ADM",
+          icon: <FaFileInvoiceDollar />,
+        },
+        {
+          path: "/statements",
+          label: "Statement",
+          icon: <FaBalanceScale />,
         },
       ],
     },
 
     {
       path: "/passengers",
-      label: "Passengers",
+      label: "My Passenger",
       icon: <FaUsers />,
     },
 
     {
-      path: "/banks",
-      label: "Banks",
-      icon: <FaUniversity />,
+      path: "/profile",
+      label: "My Profile",
+      icon: <FaUserCog />,
     },
 
     {
-      path: "/settings",
-      label: "Settings",
-      icon: <FaUserCog />,
-      children: [
-        {
-          path: "/profile",
-          label: "Agency Profile",
-          icon: <FaUserCog />,
-        },
-        {
-          path: "/logo",
-          label: "Upload Logo",
-          icon: <FaImage />,
-        },
-      ],
+      path: "/banks",
+      label: "Bank Details",
+      icon: <FaUniversity />,
     },
+
     {
       path: "/contact",
       label: "Contact US",
@@ -459,69 +536,69 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
   // B2C
   // =====================================================
 
-  [NavRole.B2C]: [
-    {
-      path: "",
-      label: "Home",
-      icon: <FaHome />,
-    },
-    {
-      path: "/dashboard",
-      label: "Dashboard",
-      icon: <FaTachometerAlt />,
-    },
+  // [NavRole.B2C]: [
+  //   {
+  //     path: "",
+  //     label: "Home",
+  //     icon: <FaHome />,
+  //   },
+  //   {
+  //     path: "/dashboard",
+  //     label: "Dashboard",
+  //     icon: <FaTachometerAlt />,
+  //   },
 
-    {
-      path: "/bookings",
-      label: "My Bookings",
-      icon: <FaPlane />,
-    },
+  //   {
+  //     path: "/bookings",
+  //     label: "My Bookings",
+  //     icon: <FaPlane />,
+  //   },
 
-    {
-      path: "/tasks",
-      label: "Tasks",
-      icon: <FaTasks />,
-    },
+  //   {
+  //     path: "/tasks",
+  //     label: "Tasks",
+  //     icon: <FaTasks />,
+  //   },
 
-    {
-      path: "/referrals",
-      label: "Referrals",
-      icon: <FaGift />,
-    },
+  //   {
+  //     path: "/referrals",
+  //     label: "Referrals",
+  //     icon: <FaGift />,
+  //   },
 
-    {
-      path: "/transactions",
-      label: "Transactions",
-      icon: <FaMoneyCheckAlt />,
-      children: [
-        {
-          path: "/deposits",
-          label: "Deposits",
-          icon: <FaMoneyCheckAlt />,
-        },
-        {
-          path: "/withdrawals",
-          label: "Withdrawals",
-          icon: <FaUndo />,
-        },
-        {
-          path: "/statements",
-          label: "Statements",
-          icon: <FaBalanceScale />,
-        },
-      ],
-    },
+  //   {
+  //     path: "/transactions",
+  //     label: "Transactions",
+  //     icon: <FaMoneyCheckAlt />,
+  //     children: [
+  //       {
+  //         path: "/deposits",
+  //         label: "Deposits",
+  //         icon: <FaMoneyCheckAlt />,
+  //       },
+  //       {
+  //         path: "/withdrawals",
+  //         label: "Withdrawals",
+  //         icon: <FaUndo />,
+  //       },
+  //       {
+  //         path: "/statements",
+  //         label: "Statements",
+  //         icon: <FaBalanceScale />,
+  //       },
+  //     ],
+  //   },
 
-    {
-      path: "/support",
-      label: "Support",
-      icon: <FaQuestionCircle />,
-    },
+  //   {
+  //     path: "/support",
+  //     label: "Support",
+  //     icon: <FaQuestionCircle />,
+  //   },
 
-    {
-      path: "/profile",
-      label: "Profile",
-      icon: <FaUserCog />,
-    },
-  ],
+  //   {
+  //     path: "/profile",
+  //     label: "Profile",
+  //     icon: <FaUserCog />,
+  //   },
+  // ],
 };
