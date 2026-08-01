@@ -114,14 +114,13 @@ const httpPost = async <TData>(
   endpoint: string,
   data: unknown,
   options?: ApiRequestOptions,
-) => {
+): Promise<ApiResponse<TData>> => {
   try {
     const instance = await axiosInstance();
     const response = await instance.post<ApiResponse<TData>>(endpoint, data, {
       params: options?.params,
       headers: options?.headers,
     });
-    console.log("response.data*****************",response.data)
     return response.data;
   } catch (error) {
     console.error(`POST request to ${endpoint} failed:`, error);
@@ -133,7 +132,7 @@ const httpPut = async <TData>(
   endpoint: string,
   data: unknown,
   options?: ApiRequestOptions,
-) => {
+): Promise<ApiResponse<TData>> => {
   try {
     const response = await (
       await axiosInstance()
@@ -152,7 +151,7 @@ const httpPatch = async <TData>(
   endpoint: string,
   data: unknown,
   options?: ApiRequestOptions,
-) => {
+): Promise<ApiResponse<TData>> => {
   try {
     const response = await (
       await axiosInstance()
@@ -170,7 +169,7 @@ const httpPatch = async <TData>(
 const httpDelete = async <TData>(
   endpoint: string,
   options?: ApiRequestOptions,
-) => {
+): Promise<ApiResponse<TData>> => {
   try {
     const response = await (
       await axiosInstance()

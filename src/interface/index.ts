@@ -35,10 +35,15 @@ export interface BankAccountInfo {
 
 export interface Passenger {
   title: string;
-  name: string;
+  firstname: string;
+  lastname: string;
+  gender: string;
+  date_of_birth: string;
+  country: string;
+  passport_number: string;
+  passport_expire: string;
   email: string;
   phone: string;
-  image: string;
 }
 
 export interface BookingFormValues {

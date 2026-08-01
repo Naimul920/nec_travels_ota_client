@@ -1,201 +1,301 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import {
-  FiEye,
-  FiEyeOff,
-  FiLock,
-  FiMail,
-  FiPhone,
-  FiUser,
-} from "react-icons/fi";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { FiEye, FiEyeOff, FiLock, FiMail, FiPhone } from "react-icons/fi";
 
-import { step1Schema } from "../B2BSignUp/validation";
 import FormField from "../B2BSignUp/FormField";
+import { b2cRegisterAction, verifyEmailAction } from "@/actions/auth.action";
+import {
+  b2cRegisterSchema,
+  verifyEmailSchema,
+} from "@/validations/auth.validation";
+import { getCurrenciesAction, detectUserCurrencyCode } from "@/actions/currency.action";
 
-interface B2CSignUpFormValues {
-  first_name: string;
-  last_name: string;
+interface B2CRegisterFormValues {
   email: string;
   phone: string;
   password: string;
   password_confirmation: string;
+  currency_Id: string;
 }
 
-const initialValues: B2CSignUpFormValues = {
-  first_name: "",
-  last_name: "",
+const registerInitialValues: B2CRegisterFormValues = {
   email: "",
   phone: "",
   password: "",
   password_confirmation: "",
+  currency_Id: "",
 };
 
-type SubmitStatus = { type: "success" | "error"; message: string } | null;
-
 export default function B2CSignUp() {
+  const [step, setStep] = useState<"register" | "verify">("register");
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
 
-  const formik = useFormik<B2CSignUpFormValues>({
-    initialValues,
-    validationSchema: step1Schema,
-    onSubmit: async (values, { setSubmitting }) => {
-      setSubmitStatus(null);
+  const { data: currencies = [], isLoading: currenciesLoading } = useQuery({
+    queryKey: ["currencies"],
+    queryFn: getCurrenciesAction,
+  });
 
+  const { mutateAsync: doRegister, isPending: isRegistering } = useMutation({
+    mutationFn: (payload: B2CRegisterFormValues) => b2cRegisterAction(payload),
+  });
+
+  const { mutateAsync: doVerify, isPending: isVerifying } = useMutation({
+    mutationFn: (payload: { email: string; otp: string }) =>
+      verifyEmailAction(payload),
+  });
+
+  const registerFormik = useFormik<B2CRegisterFormValues>({
+    initialValues: registerInitialValues,
+    validationSchema: b2cRegisterSchema,
+    onSubmit: async (values, helpers) => {
+      helpers.setStatus(null);
       try {
-        console.log("Form submitted successfully:", values);
-        // await post("/auth/register", values);
-
-        setSubmitStatus({
-          type: "success",
-          message:
-            "Your account has been created. Check your email to verify it.",
+        const result = await doRegister({
+          ...values,
+          phone: `+880${values.phone}`,
         });
-      } catch (error) {
-        console.error("Submission failed:", error);
-        setSubmitStatus({
-          type: "error",
-          message: "Something went wrong while registering. Please try again.",
-        });
+        if (result.success) {
+          setRegisteredEmail(values.email);
+          setStep("verify");
+        } else {
+          helpers.setStatus({ error: result.message });
+        }
+      } catch {
+        helpers.setStatus({ error: "Something went wrong. Please try again." });
       } finally {
-        setSubmitting(false);
+        helpers.setSubmitting(false);
       }
     },
   });
 
-  const getError = (name: keyof B2CSignUpFormValues) =>
-    formik.touched[name] && formik.errors[name]
-      ? formik.errors[name]
+  const verifyFormik = useFormik({
+    initialValues: { otp: "" },
+    validationSchema: verifyEmailSchema,
+    onSubmit: async (values, helpers) => {
+      helpers.setStatus(null);
+      try {
+        const result = await doVerify({
+          email: registeredEmail,
+          otp: values.otp,
+        });
+        if (result.success) {
+          helpers.setStatus({ success: result.message });
+        } else {
+          helpers.setStatus({ error: result.message });
+        }
+      } catch {
+        helpers.setStatus({ error: "Verification failed. Please try again." });
+      } finally {
+        helpers.setSubmitting(false);
+      }
+    },
+  });
+
+  const getRegisterError = (name: keyof B2CRegisterFormValues) =>
+    registerFormik.touched[name] && registerFormik.errors[name]
+      ? registerFormik.errors[name]
       : undefined;
 
+  useEffect(() => {
+    if (registerFormik.values.currency_Id || !currencies.length) return;
+
+    let cancelled = false;
+
+    (async () => {
+      const bdt = currencies.find((c) => c.code === "BDT");
+      const preferred = await detectUserCurrencyCode();
+      if (cancelled) return;
+
+      const match = currencies.find((c) => c.code === preferred?.country_code);
+      const selected = match || bdt || currencies[0];
+      if (selected) {
+        registerFormik.setFieldValue("currency_Id", selected.id);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [currencies, registerFormik.values.currency_Id]);
+
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-6" noValidate>
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-slate-900">
-          Customer registration
-        </h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Create your customer account.
-        </p>
-      </div>
+    <>
+      {step === "register" ? (
+        <form onSubmit={registerFormik.handleSubmit} className="space-y-6" noValidate>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-900">
+              Customer registration
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Create your customer account.
+            </p>
+          </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        {/* <FormField
-          label="First name"
-          // name="first_name"
-          type="text"
-          placeholder="First name"
-          icon={<FiUser />}
-          error={getError("first_name")}
-          {...formik.getFieldProps("first_name")}
-        /> */}
+          <div className="grid gap-5 md:grid-cols-2">
+            <FormField
+              label="Email address"
+              type="email"
+              placeholder="you@example.com"
+              icon={<FiMail />}
+              error={getRegisterError("email")}
+              {...registerFormik.getFieldProps("email")}
+            />
 
-        {/* <FormField
-          label="Last name"
-          // name="last_name"
-          type="text"
-          placeholder="Last name"
-          icon={<FiUser />}
-          error={getError("last_name")}
-          {...formik.getFieldProps("last_name")}
-        /> */}
-      </div>
+            <FormField
+              label="Phone number"
+              type="tel"
+              placeholder="1700000000"
+              icon={<FiPhone />}
+              prefix="+880"
+              error={getRegisterError("phone")}
+              {...registerFormik.getFieldProps("phone")}
+            />
+          </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <FormField
-          label="Email address"
-          // name="email"
-          type="email"
-          placeholder="you@example.com"
-          icon={<FiMail />}
-          error={getError("email")}
-          {...formik.getFieldProps("email")}
-        />
-
-        <FormField
-          label="Phone number"
-          // name="phone"
-          type="tel"
-          placeholder="1700000000"
-          icon={<FiPhone />}
-          prefix="+880"
-          error={getError("phone")}
-          {...formik.getFieldProps("phone")}
-        />
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-2">
-        <FormField
-          label="Password"
-          // name="password"
-          type={showPassword ? "text" : "password"}
-          placeholder="Enter password"
-          icon={<FiLock />}
-          error={getError("password")}
-          trailing={
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="text-slate-400 transition-colors hover:text-slate-600"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <FiEyeOff /> : <FiEye />}
-            </button>
-          }
-          {...formik.getFieldProps("password")}
-        />
-
-        <FormField
-          label="Confirm password"
-          // name="password_confirmation"
-          type={showConfirmPassword ? "text" : "password"}
-          placeholder="Confirm password"
-          icon={<FiLock />}
-          error={getError("password_confirmation")}
-          trailing={
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword((prev) => !prev)}
-              className="text-slate-400 transition-colors hover:text-slate-600"
-              aria-label={
-                showConfirmPassword ? "Hide password" : "Show password"
+          <div className="grid gap-5 md:grid-cols-2">
+            <FormField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter password"
+              icon={<FiLock />}
+              error={getRegisterError("password")}
+              trailing={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="text-slate-400 transition-colors hover:text-slate-600"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
               }
+              {...registerFormik.getFieldProps("password")}
+            />
+
+            <FormField
+              label="Confirm password"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm password"
+              icon={<FiLock />}
+              error={getRegisterError("password_confirmation")}
+              trailing={
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="text-slate-400 transition-colors hover:text-slate-600"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              }
+              {...registerFormik.getFieldProps("password_confirmation")}
+            />
+          </div>
+
+          <p className="text-xs text-slate-400">
+            Use at least 8 characters, including one uppercase letter and one
+            number.
+          </p>
+
+          {registerFormik.status?.error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
             >
-              {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+              {registerFormik.status.error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isRegistering || currenciesLoading}
+            className="h-12 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {currenciesLoading
+              ? "Loading..."
+              : isRegistering
+                ? "Registering..."
+                : "Register"}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={verifyFormik.handleSubmit} className="space-y-6" noValidate>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-900">
+              Verify your email
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Enter the OTP sent to <strong>{registeredEmail}</strong>
+            </p>
+          </div>
+
+          {verifyFormik.status?.error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
+            >
+              {verifyFormik.status.error}
+            </div>
+          )}
+
+          {verifyFormik.status?.success && (
+            <div
+              role="alert"
+              className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700"
+            >
+              {verifyFormik.status.success}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-slate-700">
+              OTP Code
+            </label>
+            <div className="relative">
+              <FiLock
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
+              <input
+                id="otp"
+                type="text"
+                placeholder="123456"
+                {...verifyFormik.getFieldProps("otp")}
+                className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
+                  verifyFormik.touched.otp && verifyFormik.errors.otp
+                    ? "border-rose-300 bg-rose-50"
+                    : "border-slate-200 bg-white focus:border-brand"
+                }`}
+              />
+            </div>
+            {verifyFormik.touched.otp && verifyFormik.errors.otp && (
+              <p className="mt-1 text-xs text-rose-500">{verifyFormik.errors.otp}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isVerifying}
+            className="h-12 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isVerifying ? "Verifying..." : "Verify email"}
+          </button>
+
+          <p className="text-center text-sm text-slate-500">
+            Didn&apos;t receive it?{" "}
+            <button
+              type="button"
+              onClick={() => setStep("register")}
+              className="font-semibold text-brand hover:underline"
+            >
+              Try again
             </button>
-          }
-          {...formik.getFieldProps("password_confirmation")}
-        />
-      </div>
-
-      <p className="text-xs text-slate-400">
-        Use at least 8 characters, including one uppercase letter and one
-        number.
-      </p>
-
-      {submitStatus && (
-        <div
-          role="alert"
-          className={`rounded-xl border p-4 text-sm ${
-            submitStatus.type === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-rose-200 bg-rose-50 text-rose-700"
-          }`}
-        >
-          {submitStatus.message}
-        </div>
+          </p>
+        </form>
       )}
-
-      <button
-        type="submit"
-        disabled={formik.isSubmitting}
-        className="h-12 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {formik.isSubmitting ? "Registering..." : "Register"}
-      </button>
-    </form>
+    </>
   );
 }

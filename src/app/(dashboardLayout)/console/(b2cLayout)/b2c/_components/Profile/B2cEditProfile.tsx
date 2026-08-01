@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Card } from "antd";
+import { Card, message } from "antd";
 import Image from "next/image";
 import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose, AiOutlineUser, AiOutlineCamera } from "react-icons/ai";
 import clsx from "clsx";
 import { Input } from "@/components/ui";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useAuthStore } from "@/store/auth.store";
+import { updateUserProfile } from "@/actions/user.action";
 
 interface ProfileData {
   first_name: string;
@@ -30,6 +31,8 @@ const B2cEditProfile: React.FC = () => {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (userProfile) {
@@ -54,27 +57,80 @@ const B2cEditProfile: React.FC = () => {
     setProfile((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const buildFormData = (file?: File | null) => {
+    const fd = new FormData();
+    fd.append("first_name", profile.first_name);
+    fd.append("last_name", profile.last_name);
+    fd.append("phone", profile.phone);
     if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      fd.append("image", file);
+    }
+    fd.append("logo", "");
+    return fd;
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setIsUploading(true);
+
+    try {
+      const result = await updateUserProfile(buildFormData(file));
+      if (result.success) {
+        const newImage =
+          result.data?.profile?.image ??
+          result.data?.profile?.image_key ??
+          null;
+        if (newImage && user) {
+          setUser({ ...user, image_key: newImage });
+        }
+        setSelectedFile(null);
+        message.success("Profile image updated");
+        await refetch();
+      } else {
+        message.error(result.message || "Profile image upload failed");
+        setSelectedFile(null);
+        setPreviewUrl(null);
+      }
+    } catch {
+      message.error("Image upload failed. Please try again.");
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleUpdate = async () => {
-    setIsEditing(false);
-    console.log("Updated Profile:", { ...profile, image: selectedFile });
-    if (user) {
-      setUser({
-        ...user,
-        full_name: `${profile.first_name} ${profile.last_name}`.trim(),
-        phone: profile.phone,
-      });
+    setIsUpdating(true);
+    try {
+      const result = await updateUserProfile(buildFormData(selectedFile));
+
+      if (!result.success) {
+        message.error(result.message || "Failed to update profile");
+        return;
+      }
+
+      setIsEditing(false);
+      message.success(result.message || "Profile updated successfully");
+      if (user) {
+        setUser({
+          ...user,
+          full_name: `${profile.first_name} ${profile.last_name}`.trim(),
+          phone: profile.phone,
+        });
+      }
+      await refetch();
+    } catch {
+      message.error("Something went wrong. Please try again.");
+    } finally {
+      setIsUpdating(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
     }
-    setSelectedFile(null);
-    setPreviewUrl(null);
-    await refetch();
   };
 
   const handleCancel = () => {
@@ -91,8 +147,8 @@ const B2cEditProfile: React.FC = () => {
     }
   };
 
-  const imageKey = userProfile?.profile?.image_key || user?.image_key;
-  const displayImage = previewUrl || imageKey;
+  const image = userProfile?.profile?.image || user?.image_key;
+  const displayImage = previewUrl || image;
 
   const renderRow = (
     label: string,
@@ -138,9 +194,10 @@ const B2cEditProfile: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={handleUpdate}
-              className="flex items-center gap-1 text-primary hover:opacity-65"
+              disabled={isUpdating}
+              className="flex items-center gap-1 text-primary hover:opacity-65 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <AiOutlineCheck /> Update
+              <AiOutlineCheck /> {isUpdating ? "Updating..." : "Update"}
             </button>
             <button
               onClick={handleCancel}
@@ -170,9 +227,16 @@ const B2cEditProfile: React.FC = () => {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm hover:text-gray-800"
+            disabled={isUploading}
+            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {displayImage ? <AiOutlineCamera size={14} /> : <AiOutlineEdit size={14} />}
+            {isUploading ? (
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
+            ) : displayImage ? (
+              <AiOutlineCamera size={14} />
+            ) : (
+              <AiOutlineEdit size={14} />
+            )}
           </button>
           <input
             ref={fileInputRef}

@@ -10,6 +10,8 @@ export interface IState {
 
 interface Props {
   itinerary: Itinerary;
+  index: number;
+  searchId: string;
   passengerCount: {
     adult: number;
     child: number;
@@ -18,7 +20,12 @@ interface Props {
   };
 }
 
-const FlightCard: React.FC<Props> = ({ itinerary, passengerCount }) => {
+const FlightCard: React.FC<Props> = ({
+  itinerary,
+  index,
+  searchId,
+  passengerCount,
+}) => {
   const [state, setState] = useState<IState>({
     isDetails: false,
   });
@@ -28,6 +35,8 @@ const FlightCard: React.FC<Props> = ({ itinerary, passengerCount }) => {
         state={state}
         setState={setState}
         itinerary={itinerary}
+        index={index}
+        searchId={searchId}
         passengerCount={passengerCount}
       />
       {state.isDetails && (

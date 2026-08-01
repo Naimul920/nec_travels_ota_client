@@ -34,7 +34,7 @@ export interface FilterState {
   departureRange: [number, number];
   arrivalRange: [number, number];
 }
-
+ 
 const FlightSearch: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -61,7 +61,7 @@ const FlightSearch: React.FC = () => {
     return ["oneway", "roundtrip", "multicity"].includes(tripType ?? "");
   }, [tripType]);
 
-  const [flightSearch, { data, isLoading, isError }] =
+  const { mutate: flightSearch, data, isPending, isError } =
     useFlightSearchMutation();
 
   const payload: SearchPayload | null = useMemo(() => {
@@ -262,7 +262,7 @@ const FlightSearch: React.FC = () => {
   }
 
   return (
-    <div className="mx-4 md:mx-0" id="mainScrollContainer">
+    <div className="max-w-[1600px] mx-auto px-5 py-20 sm:px-10 bg-white" id="mainScrollContainer">
       {/* <FlightSearchSummary /> */}
 
       <div className="flex items-center justify-between mb-2">
@@ -274,7 +274,7 @@ const FlightSearch: React.FC = () => {
         </Button>
 
         <h3 className="md:text-sm text-xs font-semibold">
-          {isLoading ? "Searching..." : `${totalFlights} Available Flights`}
+          {isPending ? "Searching..." : `${totalFlights} Available Flights`}
         </h3>
 
         <p className="md:text-sm text-xs">
@@ -336,7 +336,7 @@ const FlightSearch: React.FC = () => {
             />
           </div>
 
-          {isLoading && (
+          {isPending && (
             <div className="flex justify-center py-10">
               <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
             </div>
@@ -348,13 +348,13 @@ const FlightSearch: React.FC = () => {
             </div>
           )}
 
-          {!isLoading && !isError && totalFlights === 0 && (
+          {!isPending && !isError && totalFlights === 0 && (
             <div className="text-center py-10 text-gray-500 text-sm">
               No flights found for this search.
             </div>
           )}
 
-          {!isLoading && !isError && totalFlights > 0 && (
+          {!isPending && !isError && totalFlights > 0 && (
             <InfiniteScroll
               dataLength={visibleCount}
               next={fetchMoreFlights}
@@ -376,6 +376,8 @@ const FlightSearch: React.FC = () => {
                   <FlightCard
                     key={index}
                     itinerary={itinerary}
+                    index={index}
+                    searchId={data?.data?.searchId ?? ""}
                     passengerCount={{
                       adult: data?.data?.noOfAdult ?? 0,
                       child: data?.data?.noOfChildren ?? 0,

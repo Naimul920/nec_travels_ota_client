@@ -20,6 +20,7 @@ export interface FlightSearchResponse {
 }
 
 export interface FlightSearchData {
+  searchId: string;
   tripType: string;
   from: string;
   to: string;
@@ -34,6 +35,7 @@ export interface FlightSearchData {
 export interface Itinerary {
   isRefundable: boolean;
   marriageGroup: string;
+  sourceProvider?: string;
   flightDetails: FlightDetail[];
   passengerFareBreakDown: PassengerFare[];
   saleCurrencyAmount: SaleCurrency;
@@ -87,4 +89,77 @@ export interface PassengerFare {
 export interface SaleCurrency {
   totalFare: number;
   taxFare: number;
+}
+
+export interface BookingPassenger {
+  title: string;
+  firstname: string;
+  lastname: string;
+  gender: string;
+  date_of_birth: string;
+  country: string;
+  passport_number: string;
+  passport_expire: string;
+  passenger_type: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface BookingSegment {
+  origin: string;
+  destination: string;
+  departure_date_time: string;
+  arrival_date_time: string;
+  flight_number: string;
+  carrier_code: string;
+  res_book_desig_code: string;
+}
+
+export interface BookFlightPayload {
+  quoteId: string;
+  lead_passenger: BookingPassenger;
+  passengers: BookingPassenger[];
+  segments: BookingSegment[];
+  payment_type: string;
+  provider: string;
+}
+
+export interface FlightBookingResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: unknown;
+}
+
+export interface SaleCurrencyAmount {
+  totalFare: number;
+  totalAmount: number;
+  baseAmount: number;
+  discountAmount: number;
+  offer_amount: number;
+  taxFare: number;
+}
+
+export interface RevalidateItineraryPayload {
+  tripType: string;
+  from: string;
+  to: string;
+  noOfAdult: number;
+  noOfChildren: number;
+  noOfKids: number;
+  noOfInfant: number;
+  itinDetail: { flightDetails: FlightDetail[] };
+  passengerFareBreakDown: PassengerFare[];
+  saleCurrencyAmount: SaleCurrencyAmount;
+  searchId: string;
+}
+
+export interface RevalidateItineraryResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    quoteId: string;
+    itineraries: Itinerary[];
+  };
 }

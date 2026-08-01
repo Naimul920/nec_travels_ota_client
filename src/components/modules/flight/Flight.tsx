@@ -11,6 +11,7 @@ import { ErrorAlert } from "../../common/Alert/Alert";
 import { decoding, encoding } from "@/utils";
 import { modifySearch } from "@/store/flight.store";
 import detectDomesticType from "@/utils/searchFlightSug/detactedDomesticType";
+import { useAuthStore } from "@/store/auth.store";
 
 type TripType = "oneway" | "roundtrip" | "multicity";
 type TripField = "from" | "to" | "departure" | "return";
@@ -21,6 +22,11 @@ interface FlightProps {
 const Flight: React.FC<FlightProps> = ({ useFlight }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const { user } = useAuthStore();
+  // console.log(user)
+  const roleLower = user?.role?.toLowerCase();
+ 
 
   // Next.js Search Parameters extraction pipeline
   const params = useMemo(() => {
@@ -314,15 +320,37 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
     return params.toString();
   };
 
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (useFlight === "search") {
+  //     modifySearch();
+  //   }
+  //   const query = buildSearchQuery();
+  //   // Replaced navigate() with Next.js router.push() API
+  //    const SearchRoute = user?.role ? `/console/${roleLower}/flight-search?q=${encoding(query)` : `/flight-search?q=${encoding(query)`;
+  //   if (query)
+  //     router.push(SearchRoute);
+  // };
+
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (useFlight === "search") {
-      modifySearch();
-    }
-    const query = buildSearchQuery();
-    // Replaced navigate() with Next.js router.push() API
-    if (query) router.push(`/console//flight-search?q=${encoding(query)}`);
-  };
+  e.preventDefault();
+
+  if (useFlight === "search") {
+    modifySearch();
+  }
+
+  const query = buildSearchQuery();
+
+  if (!query) return;
+
+  // Replaced navigate() with Next.js router.push() API
+  const encodedQuery = encoding(query);
+  const searchRoute = user?.role 
+    ? `/console/${roleLower}/flight-search?q=${encodedQuery}` 
+    : `/flight-search?q=${encodedQuery}`;
+
+  router.push(searchRoute);
+};
 
   return (
     <form onSubmit={handleSubmit} className="w-full relative">

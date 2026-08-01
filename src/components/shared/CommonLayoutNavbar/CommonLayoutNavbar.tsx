@@ -54,6 +54,9 @@ export default function CommonLayoutNavbar({
   const profileLink = `/console/${roleLower}/profile`;
   const bookingsLink = `/console/${roleLower}/bookings`;
   // const profileLink = user?.role === ROLE.B2C ? "/b2c/profile" : `/console/${roleLower}/settings/profile`;
+  (console.log("User => ", user),
+    console.log("Is Logged In => ", isLoggedIn),
+    console.log("Is Loading => ", isLoading));
 
   return (
     <header className="sticky top-0 z-40 w-full h-16  bg-white border-b border-gray-100 shadow-xs ">
@@ -110,7 +113,6 @@ export default function CommonLayoutNavbar({
                 aria-expanded={dropdownOpen}
               >
                 <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
-                  
                   {user?.image_key ? (
                     <Image
                       src={user.image_key}

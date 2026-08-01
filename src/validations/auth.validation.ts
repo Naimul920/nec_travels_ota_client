@@ -8,3 +8,34 @@ export const loginValidationSchema = Yup.object({
 export const forgotSchema = Yup.object({
   email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
 });
+
+export const resetPasswordSchema = Yup.object({
+  otp: Yup.string().required("OTP is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  password_confirmation: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Password confirmation is required"),
+});
+
+export const b2cRegisterSchema = Yup.object({
+  email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
+  phone: Yup.string()
+    .trim()
+    .matches(/^1[3-9]\d{8}$/, "Enter a valid BD mobile number, e.g. 1700000000")
+    .required("Phone number is required"),
+  password: Yup.string()
+    .min(8, "Must be at least 8 characters")
+    .matches(/[A-Z]/, "Include at least one uppercase letter")
+    .matches(/[0-9]/, "Include at least one number")
+    .required("Password is required"),
+  password_confirmation: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords do not match")
+    .required("Please confirm your password"),
+  currency_Id: Yup.string(),
+});
+
+export const verifyEmailSchema = Yup.object({
+  otp: Yup.string().required("OTP is required"),
+});

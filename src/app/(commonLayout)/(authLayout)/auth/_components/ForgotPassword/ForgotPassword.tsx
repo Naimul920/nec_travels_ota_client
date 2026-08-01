@@ -1,25 +1,72 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
-import { FiArrowLeft, FiMail, FiSend, FiKey } from "react-icons/fi";
-import { forgotPasswordAction } from "@/actions/auth.action";
-import { forgotSchema } from "@/validations/auth.validation";
+import {
+  FiArrowLeft,
+  FiMail,
+  FiSend,
+  FiKey,
+  FiLock,
+  FiEye,
+  FiEyeOff,
+} from "react-icons/fi";
+import { forgotPasswordAction, resetPasswordAction } from "@/actions/auth.action";
+import { forgotSchema, resetPasswordSchema } from "@/validations/auth.validation";
 
 const BARCODE_BARS = [2, 4, 1, 3, 5, 2, 1, 4, 3, 2, 5, 1, 3, 2, 4, 1, 5, 2, 3, 1, 4, 2];
 
 export default function ForgotPasswordForm() {
-  const { mutateAsync: sendOtp, isPending } = useMutation({
+  const [step, setStep] = useState<"email" | "reset">("email");
+  const [userId, setUserId] = useState<string | undefined>();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const { mutateAsync: sendOtp, isPending: isOtpPending } = useMutation({
     mutationFn: (email: string) => forgotPasswordAction(email),
   });
 
-  const formik = useFormik({
+  const { mutateAsync: resetPwd, isPending: isResetPending } = useMutation({
+    mutationFn: (payload: {
+      user_id: string;
+      otp: string;
+      password: string;
+      password_confirmation: string;
+    }) => resetPasswordAction(payload),
+  });
+
+  const emailFormik = useFormik({
     initialValues: { email: "" },
     validationSchema: forgotSchema,
     onSubmit: async (values, helpers) => {
       helpers.setStatus({ error: "", success: "" });
       const result = await sendOtp(values.email);
+      if (result.success) {
+        setUserId(result.user_id);
+        if (result.user_id) {
+          setStep("reset");
+        } else {
+          helpers.setStatus({ success: result.message });
+        }
+      } else {
+        helpers.setStatus({ error: result.message });
+      }
+      helpers.setSubmitting(false);
+    },
+  });
+
+  const resetFormik = useFormik({
+    initialValues: { otp: "", password: "", password_confirmation: "" },
+    validationSchema: resetPasswordSchema,
+    onSubmit: async (values, helpers) => {
+      if (!userId) return;
+      helpers.setStatus({ error: "", success: "" });
+      const result = await resetPwd({
+        user_id: userId,
+        ...values,
+      });
       if (result.success) {
         helpers.setStatus({ success: result.message });
       } else {
@@ -28,6 +75,9 @@ export default function ForgotPasswordForm() {
       helpers.setSubmitting(false);
     },
   });
+
+  const getResetError = (name: "otp" | "password" | "password_confirmation") =>
+    resetFormik.touched[name] ? resetFormik.errors[name] : undefined;
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4 py-10">
@@ -69,9 +119,9 @@ export default function ForgotPasswordForm() {
             </div>
 
             <p className="font-grotesk text-2xl font-medium leading-snug text-[#F7F4EC]">
-              Forgot your password?
-              <br />
-              We&apos;ll help you reset it.
+              {step === "email"
+                ? "Forgot your password?\nWe&apos;ll help you reset it."
+                : "Enter the OTP sent to\nyour email."}
             </p>
           </div>
 
@@ -99,78 +149,215 @@ export default function ForgotPasswordForm() {
 
         {/* Right form panel */}
         <div className="col-span-1 p-8 sm:p-10 md:col-span-3">
-          <form
-            onSubmit={formik.handleSubmit}
-            className="mx-auto w-full max-w-sm space-y-6"
-            noValidate
-          >
-            <div>
-              <div className="mb-6 flex items-center gap-2 md:hidden">
-                {/* <FiKey className="text-white" size={18} /> */}
-                <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
-                  NEC TRAVELS
+          {step === "email" ? (
+            <form
+              onSubmit={emailFormik.handleSubmit}
+              className="mx-auto w-full max-w-sm space-y-6"
+              noValidate
+            >
+              <div>
+                <div className="mb-6 flex items-center gap-2 md:hidden">
+                  <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
+                    NEC TRAVELS
+                  </p>
+                </div>
+
+                <Link
+                  href="/auth/signin"
+                  className="mb-4 flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                >
+                  <FiArrowLeft /> Back to sign in
+                </Link>
+
+                <h2 className="font-grotesk text-3xl font-medium text-[#12233D]">
+                  Reset password
+                </h2>
+
+                <p className="mt-1 text-sm text-[#5B6B7A]">
+                  Enter your email and we&apos;ll send you an OTP to reset your password.
                 </p>
               </div>
 
-              <Link
-                href="/auth/signin"
-                className="mb-4 flex items-center gap-1 text-xs font-medium text-brand hover:underline"
-              >
-                <FiArrowLeft /> Back to sign in
-              </Link>
-
-              <h2 className="font-grotesk text-3xl font-medium text-[#12233D]">
-                Reset password
-              </h2>
-
-              <p className="mt-1 text-sm text-[#5B6B7A]">
-                Enter your email and we&apos;ll send you an OTP to reset your password.
-              </p>
-            </div>
-
-            {formik.status?.error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                {formik.status.error}
-              </div>
-            )}
-
-            {formik.status?.success && (
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {formik.status.success}
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[#12233D]">
-                Email address
-              </label>
-              <div className="relative">
-                <FiMail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB4C7]" size={18} />
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  {...formik.getFieldProps("email")}
-                  className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
-                    formik.touched.email && formik.errors.email
-                      ? "border-red-300 bg-red-50"
-                      : "border-[#9FB4C7]/30 bg-white focus:border-brand"
-                  }`}
-                />
-              </div>
-              {formik.touched.email && formik.errors.email && (
-                <p className="mt-1 text-xs text-red-500">{formik.errors.email}</p>
+              {emailFormik.status?.error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {emailFormik.status.error}
+                </div>
               )}
-            </div>
 
-            <button
-              type="submit"
-              disabled={isPending}
-              className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/90 disabled:opacity-50"
+              {emailFormik.status?.success && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {emailFormik.status.success}
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[#12233D]">
+                  Email address
+                </label>
+                <div className="relative">
+                  <FiMail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB4C7]" size={18} />
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    {...emailFormik.getFieldProps("email")}
+                    className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
+                      emailFormik.touched.email && emailFormik.errors.email
+                        ? "border-red-300 bg-red-50"
+                        : "border-[#9FB4C7]/30 bg-white focus:border-brand"
+                    }`}
+                  />
+                </div>
+                {emailFormik.touched.email && emailFormik.errors.email && (
+                  <p className="mt-1 text-xs text-red-500">{emailFormik.errors.email}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isOtpPending}
+                className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/90 disabled:opacity-50"
+              >
+                {isOtpPending ? "Sending..." : "Send OTP"}
+              </button>
+            </form>
+          ) : (
+            <form
+              onSubmit={resetFormik.handleSubmit}
+              className="mx-auto w-full max-w-sm space-y-6"
+              noValidate
             >
-              {isPending ? "Sending..." : "Send OTP"}
-            </button>
-          </form>
+              <div>
+                <div className="mb-6 flex items-center gap-2 md:hidden">
+                  <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
+                    NEC TRAVELS
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStep("email")}
+                  className="mb-4 flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                >
+                  <FiArrowLeft /> Back
+                </button>
+
+                <h2 className="font-grotesk text-3xl font-medium text-[#12233D]">
+                  Set new password
+                </h2>
+
+                <p className="mt-1 text-sm text-[#5B6B7A]">
+                  Enter the OTP sent to your email and your new password.
+                </p>
+              </div>
+
+              {resetFormik.status?.error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {resetFormik.status.error}
+                </div>
+              )}
+
+              {resetFormik.status?.success && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {resetFormik.status.success}
+                  <Link href="/auth/signin" className="ml-1 font-semibold underline">
+                    Sign in
+                  </Link>
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-[#12233D]">
+                  OTP Code
+                </label>
+                <div className="relative">
+                  <FiLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB4C7]" size={18} />
+                  <input
+                    id="otp"
+                    type="text"
+                    placeholder="123456"
+                    {...resetFormik.getFieldProps("otp")}
+                    className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
+                      getResetError("otp")
+                        ? "border-red-300 bg-red-50"
+                        : "border-[#9FB4C7]/30 bg-white focus:border-brand"
+                    }`}
+                  />
+                </div>
+                {getResetError("otp") && (
+                  <p className="mt-1 text-xs text-red-500">{getResetError("otp")}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[#12233D]">
+                  New password
+                </label>
+                <div className="relative">
+                  <FiLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB4C7]" size={18} />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="New password"
+                    {...resetFormik.getFieldProps("password")}
+                    className={`w-full rounded-xl border py-3 pl-10 pr-10 text-sm outline-none transition-colors ${
+                      getResetError("password")
+                        ? "border-red-300 bg-red-50"
+                        : "border-[#9FB4C7]/30 bg-white focus:border-brand"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9FB4C7] hover:text-[#12233D]"
+                  >
+                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
+                </div>
+                {getResetError("password") && (
+                  <p className="mt-1 text-xs text-red-500">{getResetError("password")}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="password_confirmation" className="mb-1.5 block text-sm font-medium text-[#12233D]">
+                  Confirm password
+                </label>
+                <div className="relative">
+                  <FiLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB4C7]" size={18} />
+                  <input
+                    id="password_confirmation"
+                    type={showConfirm ? "text" : "password"}
+                    placeholder="Confirm new password"
+                    {...resetFormik.getFieldProps("password_confirmation")}
+                    className={`w-full rounded-xl border py-3 pl-10 pr-10 text-sm outline-none transition-colors ${
+                      getResetError("password_confirmation")
+                        ? "border-red-300 bg-red-50"
+                        : "border-[#9FB4C7]/30 bg-white focus:border-brand"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9FB4C7] hover:text-[#12233D]"
+                  >
+                    {showConfirm ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
+                </div>
+                {getResetError("password_confirmation") && (
+                  <p className="mt-1 text-xs text-red-500">{getResetError("password_confirmation")}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isResetPending}
+                className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/90 disabled:opacity-50"
+              >
+                {isResetPending ? "Resetting..." : "Reset password"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

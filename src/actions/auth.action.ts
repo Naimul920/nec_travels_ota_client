@@ -207,14 +207,14 @@ export const isLoginAction = async (): Promise<ILoginStatus> => {
 
 export const forgotPasswordAction = async (email: string) => {
   try {
-    const res = await httpClient.post<{ message: string }>(
+    const res = await httpClient.post<{ user_id: string }>(
       "/auth/forgot-password",
       { email },
     );
-    console.log("res***********************",res)
     return {
       success: true,
-      message: res.data?.message || "OTP sent to your email",
+      message: res.message || "OTP sent to your email",
+      user_id: res.data?.user_id,
     };
   } catch (error: any) {
     return {
@@ -223,6 +223,85 @@ export const forgotPasswordAction = async (email: string) => {
         error?.response?.data?.message ||
         error?.message ||
         "Failed to send OTP",
+    };
+  }
+};
+
+export const resetPasswordAction = async (payload: {
+  user_id: string;
+  otp: string;
+  password: string;
+  password_confirmation: string;
+}) => {
+  try {
+    const res = await httpClient.post<{ message: string }>(
+      "/auth/reset-password",
+      payload,
+    );
+    return {
+      success: true,
+      message: res.message || "Password reset successfully",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to reset password",
+    };
+  }
+};
+
+export const b2cRegisterAction = async (payload: {
+  email: string;
+  password: string;
+  password_confirmation: string;
+  phone: string;
+  currency_Id: string;
+}) => {
+  try {
+    const res = await httpClient.post<{ user_id: string; email: string }>(
+      "/auth/register/b2c",
+      payload,
+    );
+    return {
+      success: true,
+      message: res.message,
+      data: res.data,
+    };
+  } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
+    const errorMessage = Array.isArray(backendMessage)
+      ? backendMessage.join(", ")
+      : backendMessage || error?.message || "Registration failed";
+    return {
+      success: false,
+      message: errorMessage,
+    };
+  }
+};
+
+export const verifyEmailAction = async (payload: {
+  email: string;
+  otp: string;
+}) => {
+  try {
+    const res = await httpClient.post<{ message: string }>(
+      "/auth/verify-email",
+      payload,
+    );
+    return {
+      success: true,
+      message: res.message || "Email verified successfully",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Verification failed",
     };
   }
 };

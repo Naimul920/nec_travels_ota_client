@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
-import { useFormikContext, getIn } from "formik";
+import React from "react";
+import { useFormikContext } from "formik";
 import type { PassengerType } from "@/types/passengerAlertBank";
 import type { BookingFormValues } from "@/interface";
 import { Input } from "@/components/ui";
@@ -11,22 +11,9 @@ interface Props {
 }
 
 const PassengerCard: React.FC<Props> = ({ type, index }) => {
-  const { values, handleChange, setFieldValue } =
-    useFormikContext<BookingFormValues>();
+  const { values, handleChange } = useFormikContext<BookingFormValues>();
 
   const baseName = `${type}.${index}`;
-
-  const commonRequiredValue = getIn(values, "commonRequiredField") || "";
-  const commonOptionalValue = getIn(values, "commonOptionalField") || "";
-
-  useEffect(() => {
-    if (commonRequiredValue) {
-      setFieldValue(`${baseName}.title`, commonRequiredValue);
-    }
-    if (commonOptionalValue) {
-      setFieldValue(`${baseName}.image`, commonOptionalValue);
-    }
-  }, [commonRequiredValue, commonOptionalValue, baseName, setFieldValue]);
 
   return (
     <div className="border border-gray-500 p-4 rounded-md mt-3 bg-white">
@@ -39,27 +26,71 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           name={`${baseName}.title`}
           value={values[type][index].title}
           onChange={handleChange}
-          placeholder="Title (Required)"
+          placeholder="Title (Mr/Mrs/Ms)"
           required
         />
 
         <Input
-          name={`${baseName}.image`}
-          value={values[type][index].image}
+          name={`${baseName}.gender`}
+          value={values[type][index].gender}
           onChange={handleChange}
-          placeholder="Image URL (Optional)"
+          placeholder="Gender (Male/Female)"
+          required
         />
 
         <Input
-          name={`${baseName}.name`}
-          value={values[type][index].name}
+          name={`${baseName}.firstname`}
+          value={values[type][index].firstname}
           onChange={handleChange}
-          placeholder="Full Name"
+          placeholder="First Name"
+          required
+        />
+
+        <Input
+          name={`${baseName}.lastname`}
+          value={values[type][index].lastname}
+          onChange={handleChange}
+          placeholder="Last Name"
+          required
+        />
+
+        <Input
+          name={`${baseName}.date_of_birth`}
+          type="date"
+          value={values[type][index].date_of_birth}
+          onChange={handleChange}
+          placeholder="Date of Birth"
+          required
+        />
+
+        <Input
+          name={`${baseName}.country`}
+          value={values[type][index].country}
+          onChange={handleChange}
+          placeholder="Country"
+          required
+        />
+
+        <Input
+          name={`${baseName}.passport_number`}
+          value={values[type][index].passport_number}
+          onChange={handleChange}
+          placeholder="Passport Number"
+          required
+        />
+
+        <Input
+          name={`${baseName}.passport_expire`}
+          type="date"
+          value={values[type][index].passport_expire}
+          onChange={handleChange}
+          placeholder="Passport Expiry"
           required
         />
 
         <Input
           name={`${baseName}.email`}
+          type="email"
           value={values[type][index].email}
           onChange={handleChange}
           placeholder="Email"
@@ -67,6 +98,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
 
         <Input
           name={`${baseName}.phone`}
+          type="tel"
           value={values[type][index].phone}
           onChange={handleChange}
           placeholder="Phone"

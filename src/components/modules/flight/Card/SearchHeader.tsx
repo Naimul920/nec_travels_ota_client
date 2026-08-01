@@ -5,7 +5,6 @@ import type { IState } from "@/components/modules/flight/Card/FlightCard";
 import { Button } from "@/components/ui";
 // 2. Swapped React Router Hooks for Next.js Native App Router Navigation Utilities
 import { useRouter, useSearchParams } from "next/navigation";
-import { encoding } from "@/utils";
 import type { Itinerary, Schedule } from "@/interface/flight";
 import dayjs from "dayjs";
 
@@ -13,6 +12,8 @@ interface IProps {
   state: IState;
   setState: React.Dispatch<React.SetStateAction<IState>>;
   itinerary: Itinerary;
+  index: number;
+  searchId: string;
   passengerCount: {
     adult: number;
     child: number;
@@ -46,6 +47,8 @@ const SearchHeader: React.FC<IProps> = ({
   state,
   setState,
   itinerary,
+  index,
+  searchId,
   passengerCount,
 }) => {
   // 3. Initialized Next.js 16 Search Parameters & Native Router Hook
@@ -64,7 +67,9 @@ const SearchHeader: React.FC<IProps> = ({
   const handelFlightBooking = (id: string) => {
     // 4. Safely constructs query parameters string layout using native searchParams string conversion
     const currentQuery = searchParams.toString();
-    router.push(`/flight-booking?${currentQuery}&i=${encoding(id)}`);
+    router.push(
+      `/flight-booking?${currentQuery}&i=${id}&sid=${searchId}`,
+    );
   };
 
   const segments = itinerary.flightDetails;
@@ -128,7 +133,7 @@ const SearchHeader: React.FC<IProps> = ({
             {currency} {totalFare.toLocaleString()}
           </p>
           <Button
-            onClick={() => handelFlightBooking("1")}
+            onClick={() => handelFlightBooking(String(index))}
             className="text-xs rounded-sm w-2/4"
           >
             Book Now
@@ -151,7 +156,7 @@ const SearchHeader: React.FC<IProps> = ({
           <p className="text-sm font-bold">{totalFare.toLocaleString()}</p>
         </div>
         <Button
-          onClick={() => handelFlightBooking("1")}
+          onClick={() => handelFlightBooking(String(index))}
           className="text-xs rounded-sm"
         >
           Book Now

@@ -11,7 +11,6 @@ export default function AuthProvider({
 }) {
   const { setUser, clearUser, setLoading } = useAuthStore();
   const { data: user, isLoading } = useUserInfo();
-
   useEffect(() => {
     setLoading(isLoading);
 
