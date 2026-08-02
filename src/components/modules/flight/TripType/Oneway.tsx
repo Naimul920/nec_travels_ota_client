@@ -43,7 +43,7 @@ const Oneway: React.FC<OnewayProps> = ({
   const disabledDate: DatePickerProps["disabledDate"] = (current) => {
     return current && current < dayjs().startOf("day");
   };
-console.log("Oneway data:", data);
+// console.log("Oneway data:", data);
   const handleSwap = () => {
     const from = data.fromIata || "";
     const to = data.toIata || "";

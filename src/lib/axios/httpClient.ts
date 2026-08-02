@@ -38,9 +38,12 @@ const tryRefreshToken = async (): Promise<boolean> => {
     if (accessToken)
       await setTokenInCookies("access_token", accessToken, accessMaxAge);
     if (newRefreshToken)
-      await setTokenInCookies("refresh_token", newRefreshToken, 7 * 24 * 60 * 60);
-    if (expireToken)
-      await setTokenExpiresAt(expireToken);
+      await setTokenInCookies(
+        "refresh_token",
+        newRefreshToken,
+        7 * 24 * 60 * 60,
+      );
+    if (expireToken) await setTokenExpiresAt(expireToken);
 
     return true;
   } catch {
@@ -54,7 +57,8 @@ const axiosInstance = async () => {
 
   const lastRefresh = cookieStore.get("last_refresh")?.value;
   const now = Date.now();
-  const shouldRefresh = accessToken && (!lastRefresh || now - Number(lastRefresh) > 5 * 60 * 1000);
+  const shouldRefresh =
+    accessToken && (!lastRefresh || now - Number(lastRefresh) > 5 * 60 * 1000);
 
   if (shouldRefresh) {
     const refreshed = await tryRefreshToken();
@@ -63,7 +67,8 @@ const axiosInstance = async () => {
       store.set("last_refresh", now.toString(), {
         httpOnly: true,
         secure: process.env.NEXT_PUBLIC_NODE_ENV === "production",
-        sameSite: process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "strict" : "lax",
+        sameSite:
+          process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "strict" : "lax",
         path: "/",
         maxAge: 7 * 24 * 60 * 60,
       });

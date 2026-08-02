@@ -27,6 +27,12 @@ function elapsedString(minutes: number): string {
   return `${h}h ${m}m`;
 }
 
+function formatNumber(value?: number): string {
+  return typeof value === "number" && Number.isFinite(value)
+    ? value.toLocaleString()
+    : "0";
+}
+
 const passengerLabel: Record<string, string> = {
   Adult: "Adult",
   Child: "Child",
@@ -125,14 +131,16 @@ const SearchDetails: React.FC<Props> = ({ itinerary, passengerCount }) => {
                       {fare.fareBasisCode}
                     </td>
                     <td className="py-2 pr-3">
-                      {currency} {fare.totalFare.toLocaleString()}
+                      {currency} {formatNumber(fare.totalFare)}
                     </td>
                     <td className="py-2 pr-3">
-                      {currency} {fare.totalTaxAmount.toLocaleString()}
+                      {currency} {formatNumber(fare.totalTaxAmount)}
                     </td>
                     <td className="py-2 pr-3 font-semibold">
                       {currency}{" "}
-                      {(fare.totalFare + fare.totalTaxAmount).toLocaleString()}
+                      {formatNumber(
+                        (fare.totalFare || 0) + (fare.totalTaxAmount || 0),
+                      )}
                     </td>
                   </tr>
                 );
@@ -145,18 +153,18 @@ const SearchDetails: React.FC<Props> = ({ itinerary, passengerCount }) => {
                 </td>
                 <td className="py-2 pr-3">
                   {currency}{" "}
-                  {itinerary.saleCurrencyAmount.totalFare.toLocaleString()}
+                  {formatNumber(itinerary.saleCurrencyAmount?.totalFare)}
                 </td>
                 <td className="py-2 pr-3">
                   {currency}{" "}
-                  {itinerary.saleCurrencyAmount.taxFare.toLocaleString()}
+                  {formatNumber(itinerary.saleCurrencyAmount?.taxFare)}
                 </td>
                 <td className="py-2 pr-3">
                   {currency}{" "}
-                  {(
-                    itinerary.saleCurrencyAmount.totalFare +
-                    itinerary.saleCurrencyAmount.taxFare
-                  ).toLocaleString()}
+                  {formatNumber(
+                    (itinerary.saleCurrencyAmount?.totalFare || 0) +
+                      (itinerary.saleCurrencyAmount?.taxFare || 0),
+                  )}
                 </td>
               </tr>
             </tfoot>

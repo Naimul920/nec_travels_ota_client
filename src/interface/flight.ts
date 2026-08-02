@@ -38,7 +38,7 @@ export interface Itinerary {
   sourceProvider?: string;
   flightDetails: FlightDetail[];
   passengerFareBreakDown: PassengerFare[];
-  saleCurrencyAmount: SaleCurrency;
+  saleCurrencyAmount: SaleCurrencyAmount;
 }
 
 export interface FlightDetail {
@@ -141,7 +141,7 @@ export interface SaleCurrencyAmount {
   totalAmount: number;
   baseAmount: number;
   discountAmount: number;
-  offer_amount: number;
+  offerAmount: number;
   taxFare: number;
 }
 

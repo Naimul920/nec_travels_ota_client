@@ -178,7 +178,7 @@ const FlightBooking: React.FC = () => {
         totalAmount: sale.totalFare,
         baseAmount: sale.totalFare,
         discountAmount: 0,
-        offer_amount: 0,
+        offerAmount: 0,
         taxFare: sale.taxFare,
       },
       searchId,
