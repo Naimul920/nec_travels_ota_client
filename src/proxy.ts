@@ -171,7 +171,7 @@ export async function proxy(request: NextRequest) {
       );
     }
 
-    if (departments && !canAccessRoute(pathname, departments)) {
+    if (departments?.length && !canAccessRoute(pathname, departments)) {
       return NextResponse.redirect(
         new URL(getDefaultDashboardRoute(userRole as any), request.url),
       );

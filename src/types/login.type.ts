@@ -4,5 +4,6 @@ export interface LoginResponse {
   redirectTo?: string;
   email_verified?: boolean;
   need_password_change?: boolean;
+  code?: string;
   data?: Record<string, any>;
 }

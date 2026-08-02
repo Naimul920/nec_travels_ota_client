@@ -56,14 +56,15 @@ const SearchHeader: React.FC<IProps> = ({
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const totalAdultFare = itinerary.passengerFareBreakDown
+  const totalAdultFare = itinerary?.passengerFareBreakDown
     .filter((f) => f.passengerType === "Adult")
     .reduce((sum, f) => sum + f.totalFare, 0);
 
   console.log("Total Adult Fare:", totalAdultFare, passengerCount);
 
-  const totalFare = itinerary.saleCurrencyAmount.totalFare;
-  const currency = itinerary.passengerFareBreakDown[0]?.currency || "BDT";
+  const totalFare = itinerary?.saleCurrencyAmount.baseAmount;
+  const offerFare = itinerary?.saleCurrencyAmount.offerAmount;
+  const currency = itinerary?.passengerFareBreakDown[0]?.currency || "BDT";
 
   const handelFlightBooking = async (id: string) => {
     // 4. Safely constructs query parameters string layout using native searchParams string conversion
@@ -78,7 +79,7 @@ const SearchHeader: React.FC<IProps> = ({
   };
 
   const segments = itinerary.flightDetails;
-
+  // console.log("Segments:", segments, itinerary);
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-3 relative overflow-hidden shadow-xs">
       <div className="grid grid-cols-12 gap-4 items-center">
@@ -133,10 +134,24 @@ const SearchHeader: React.FC<IProps> = ({
         </div>
 
         <div className="hidden md:flex flex-col items-center justify-center md:col-span-2 text-center">
-          <p className="text-xs text-indigo-600">Lowest Fare</p>
-          <p className="text-2xl font-bold text-primary">
-            {currency} {totalFare.toLocaleString()}
-          </p>
+         
+         {offerFare && (
+           <>
+             <p className="text-xs text-indigo-600">Total Fare</p>
+             <p className="text-2xl font-bold text-primary">
+               {currency} {offerFare?.toLocaleString()}
+             </p>
+           </>
+         )}
+      
+          {totalFare && (
+            <>
+              <p className="text-xs text-indigo-600">Lowest Fare</p>
+              <p className="text-2xl font-bold text-primary">
+                {currency} {totalFare?.toLocaleString()}
+              </p>
+            </>
+          )}
           <Button
             onClick={() => handelFlightBooking(String(index))}
             className="text-xs rounded-sm w-2/4"
@@ -158,7 +173,7 @@ const SearchHeader: React.FC<IProps> = ({
         </Button>
         <div className="text-center">
           <p className="text-xs text-secondary font-bold">{currency}</p>
-          <p className="text-sm font-bold">{totalFare.toLocaleString()}</p>
+          <p className="text-sm font-bold">{totalFare?.toLocaleString()}</p>
         </div>
         <Button
           onClick={() => handelFlightBooking(String(index))}

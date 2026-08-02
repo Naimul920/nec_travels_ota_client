@@ -73,9 +73,8 @@ const UPLOAD_FIELDS: { label: string; name: FileFieldName }[] = [
   { label: "Company logo", name: "logo" },
   { label: "Trade license", name: "trade_license" },
   { label: "CAAB certificate", name: "caab_certificate" },
-  { label: "NID", name: "full_nid" },
+  { label: "NID", name: "nid" },
   { label: "Business card", name: "business_card" },
-  { label: "Address proof", name: "address_proof" },
 ];
 
 export default function Step3({ formik }: { formik: FormikProps<B2BSignUpFormValues> }) {

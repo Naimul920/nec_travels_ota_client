@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { FiArrowLeft, FiArrowRight, FiCheck } from "react-icons/fi";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { FiArrowLeft, FiArrowRight, FiCheck, FiLock } from "react-icons/fi";
 
 import Step1 from "./Step1";
 import Step2 from "./Step2";
@@ -11,6 +13,12 @@ import Step4 from "./Step4";
 import Stepper from "./Stepper";
 import { fullSchema, stepSchemas } from "./validation";
 import { B2BSignUpFormValues, TOTAL_STEPS } from "./types";
+import { b2bRegisterAction, verifyEmailAction } from "@/actions/auth.action";
+import { verifyEmailSchema } from "@/validations/auth.validation";
+import {
+  getCurrenciesAction,
+  detectUserCurrencyCode,
+} from "@/actions/currency.action";
 
 const initialValues: B2BSignUpFormValues = {
   first_name: "",
@@ -21,10 +29,9 @@ const initialValues: B2BSignUpFormValues = {
   password_confirmation: "",
 
   agency_name: "",
-  // business_type: "",
+  business_type: "COMPANY_LTD",
   currency: "BDT",
-  trade_license_number: "",
-  trade_license_expiry: "",
+  currency_Id: "",
   caab_certificate_number: "",
   caab_certificate_expiry: "",
   city: "",
@@ -35,21 +42,24 @@ const initialValues: B2BSignUpFormValues = {
   logo: null,
   trade_license: null,
   caab_certificate: null,
-  full_nid: null,
+  nid: null,
   business_card: null,
-  address_proof: null,
 };
 
 type SubmitStatus = { type: "success" | "error"; message: string } | null;
 
 export default function B2BSignUp() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [userAgent, setUserAgent] = useState("");
+  const [step, setStep] = useState<"register" | "verify">("register");
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
 
-  useEffect(() => {
-    setUserAgent(window.navigator.userAgent);
-  }, []);
+  const router = useRouter();
+
+  const { data: currencies = [] } = useQuery({
+    queryKey: ["currencies"],
+    queryFn: getCurrenciesAction,
+  });
 
   const formik = useFormik<B2BSignUpFormValues>({
     initialValues,
@@ -71,25 +81,40 @@ export default function B2BSignUp() {
 
       const formData = new FormData();
 
-      Object.entries(values).forEach(([key, value]) => {
-        if (value instanceof File) {
-          formData.append(key, value);
-        } else if (value !== null && value !== undefined) {
-          formData.append(key, String(value));
-        }
-      });
+      formData.append("first_name", values.first_name);
+      formData.append("last_name", values.last_name);
+      formData.append("email", values.email);
+      formData.append("phone", `+880${values.phone}`);
+      formData.append("password", values.password);
+      formData.append("password_confirmation", values.password_confirmation);
 
-      formData.append("user_agent", userAgent);
+      formData.append("agency_name", values.agency_name);
+      formData.append("business_type", values.business_type);
+      formData.append("currency_Id", values.currency_Id);
+      formData.append("caab_certificate_number", values.caab_certificate_number);
+      formData.append("caab_certificate_expiry", values.caab_certificate_expiry);
+      formData.append("city", values.city);
+      formData.append("postcode", values.postcode);
+      formData.append("address", values.address);
+
+      if (values.logo) formData.append("logo", values.logo);
+      if (values.trade_license) formData.append("trade_license", values.trade_license);
+      if (values.caab_certificate) formData.append("caab_certificate", values.caab_certificate);
+      if (values.nid) formData.append("nid", values.nid);
+      if (values.business_card) formData.append("business_card", values.business_card);
 
       try {
-        // Example API call:
-        // await axios.post("/api/b2b-signup", formData);
-        console.log("Form submitted successfully");
+        const result = await b2bRegisterAction(formData);
 
-        // setSubmitStatus({
-        //   type: "success",
-        //   message: "Your application has been submitted. We'll email you once it's reviewed.",
-        // });
+        if (result.success) {
+          setRegisteredEmail(values.email);
+          setStep("verify");
+        } else {
+          setSubmitStatus({
+            type: "error",
+            message: result.message,
+          });
+        }
       } catch (error) {
         console.error("Submission failed:", error);
         setSubmitStatus({
@@ -101,6 +126,53 @@ export default function B2BSignUp() {
       }
     },
   });
+
+  const verifyFormik = useFormik({
+    initialValues: { otp: "" },
+    validationSchema: verifyEmailSchema,
+    onSubmit: async (values, helpers) => {
+      helpers.setStatus(null);
+      try {
+        const result = await verifyEmailAction({
+          email: registeredEmail,
+          otp: values.otp,
+        });
+        if (result.success) {
+          helpers.setStatus({ success: result.message });
+          router.push("/auth/signin");
+        } else {
+          helpers.setStatus({ error: result.message });
+        }
+      } catch {
+        helpers.setStatus({ error: "Verification failed. Please try again." });
+      } finally {
+        helpers.setSubmitting(false);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (formik.values.currency_Id || !currencies.length) return;
+
+    let cancelled = false;
+
+    (async () => {
+      const bdt = currencies.find((c) => c.code === "BDT");
+      const preferred = await detectUserCurrencyCode();
+      if (cancelled) return;
+
+      const match = currencies.find((c) => c.code === preferred?.country_code);
+      const selected = match || bdt || currencies[0];
+      if (selected) {
+        formik.setFieldValue("currency", selected.code);
+        formik.setFieldValue("currency_Id", selected.id);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currencies, formik.values.currency_Id, formik]);
 
   const goToNextStep = async () => {
     const schema = stepSchemas[currentStep - 1];
@@ -135,6 +207,73 @@ export default function B2BSignUp() {
     setSubmitStatus(null);
     setCurrentStep((step) => Math.max(1, step - 1));
   };
+
+  if (step === "verify") {
+    return (
+      <div className="mx-auto w-full max-w-4xl p-4">
+        <form onSubmit={verifyFormik.handleSubmit} className="mt-8 space-y-6" noValidate>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-900">Verify your email</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Enter the OTP sent to <strong>{registeredEmail}</strong>
+            </p>
+          </div>
+
+          {verifyFormik.status?.error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
+            >
+              {verifyFormik.status.error}
+            </div>
+          )}
+
+          {verifyFormik.status?.success && (
+            <div
+              role="alert"
+              className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700"
+            >
+              {verifyFormik.status.success}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-slate-700">
+              OTP Code
+            </label>
+            <div className="relative">
+              <FiLock
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                size={18}
+              />
+              <input
+                id="otp"
+                type="text"
+                placeholder="123456"
+                {...verifyFormik.getFieldProps("otp")}
+                className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
+                  verifyFormik.touched.otp && verifyFormik.errors.otp
+                    ? "border-rose-300 bg-rose-50"
+                    : "border-slate-200 bg-white focus:border-brand"
+                }`}
+              />
+            </div>
+            {verifyFormik.touched.otp && verifyFormik.errors.otp && (
+              <p className="mt-1 text-xs text-rose-500">{verifyFormik.errors.otp}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={verifyFormik.isSubmitting}
+            className="h-12 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {verifyFormik.isSubmitting ? "Verifying..." : "Verify email"}
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-4xl p-4">

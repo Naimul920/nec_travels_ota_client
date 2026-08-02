@@ -9,10 +9,9 @@ export interface B2BSignUpFormValues {
 
   // Step 2 — Company
   agency_name: string;
-  // business_type: string;
+  business_type: string;
   currency: string;
-  trade_license_number: string;
-  trade_license_expiry: string;
+  currency_Id: string;
   caab_certificate_number: string;
   caab_certificate_expiry: string;
   city: string;
@@ -24,18 +23,16 @@ export interface B2BSignUpFormValues {
   logo: File | null;
   trade_license: File | null;
   caab_certificate: File | null;
-  full_nid: File | null;
+  nid: File | null;
   business_card: File | null;
-  address_proof: File | null;
 }
 
 export const FILE_FIELDS = [
   "logo",
   "trade_license",
   "caab_certificate",
-  "full_nid",
+  "nid",
   "business_card",
-  "address_proof",
 ] as const;
 
 export type FileFieldName = (typeof FILE_FIELDS)[number];

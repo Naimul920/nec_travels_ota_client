@@ -8,9 +8,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail, FiSend } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
-import { loginAction } from "@/actions/auth.action";
+import { loginAction, verifyEmailAction } from "@/actions/auth.action";
 import { useAuthStore } from "@/store/auth.store";
-import { loginValidationSchema } from "@/validations/auth.validation";
+import {
+  loginValidationSchema,
+  verifyEmailSchema,
+} from "@/validations/auth.validation";
 import { LoginResponse } from "@/types/login.type";
 
 interface SignInFormValues {
@@ -71,6 +74,8 @@ export default function SignIn({ redirectPath }: LoginProps) {
 
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
 
   const { mutateAsync: login, isPending } = useMutation({
     mutationFn: (payload: SignInFormValues) =>
@@ -78,6 +83,31 @@ export default function SignIn({ redirectPath }: LoginProps) {
         { email: payload.email, password: payload.password },
         effectiveRedirectPath,
       ),
+  });
+
+  const verifyFormik = useFormik({
+    initialValues: { otp: "" },
+    validationSchema: verifyEmailSchema,
+    onSubmit: async (values, helpers) => {
+      helpers.setStatus(null);
+      try {
+        if (!verifyEmail) return;
+        const result = await verifyEmailAction({
+          email: verifyEmail,
+          otp: values.otp,
+        });
+        if (result.success) {
+          setVerifyEmail(null);
+          setNotice(result.message || "Your email has been verified. You can now sign in.");
+        } else {
+          helpers.setStatus({ error: result.message });
+        }
+      } catch {
+        helpers.setStatus({ error: "Verification failed. Please try again." });
+      } finally {
+        helpers.setSubmitting(false);
+      }
+    },
   });
 
   const formik = useFormik<SignInFormValues>({
@@ -95,6 +125,10 @@ export default function SignIn({ redirectPath }: LoginProps) {
         }
 
         if (!result.success) {
+          if (result.code === "EMAIL_NOT_VERIFIED") {
+            setVerifyEmail(values.email);
+            return;
+          }
           setError(result.message || "Invalid email or password");
           return;
         }
@@ -202,33 +236,122 @@ export default function SignIn({ redirectPath }: LoginProps) {
 
         {/* Right form panel */}
         <div className="col-span-1 p-8 sm:p-10 md:col-span-3">
-          <form
-            onSubmit={formik.handleSubmit}
-            className="mx-auto w-full max-w-sm space-y-6"
-            noValidate
-          >
-            <div>
-              <div className="mb-6 flex items-center gap-2 md:hidden">
-                <FiSend className="rotate-45 text-white" size={18} />
-                <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
-                  NEC TRAVELS
+          {verifyEmail ? (
+            <form
+              onSubmit={verifyFormik.handleSubmit}
+              className="mx-auto w-full max-w-sm space-y-6"
+              noValidate
+            >
+              <div>
+                <div className="mb-6 flex items-center gap-2 md:hidden">
+                  <FiSend className="rotate-45 text-white" size={18} />
+                  <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
+                    NEC TRAVELS
+                  </p>
+                </div>
+
+                <h2 className="font-grotesk text-3xl font-medium text-[#12233D]">
+                  Verify your email
+                </h2>
+
+                <p className="mt-1 text-sm text-[#5B6B7A]">
+                  Enter the OTP sent to <strong>{verifyEmail}</strong>
                 </p>
               </div>
 
-              <h2 className="font-grotesk text-3xl font-medium text-[#12233D]">
-                Welcome back
-              </h2>
+              {verifyFormik.status?.error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {verifyFormik.status.error}
+                </div>
+              )}
 
-              <p className="mt-1 text-sm text-[#5B6B7A]">
-                Sign in to manage your bookings and boarding passes.
-              </p>
-            </div>
+              {verifyFormik.status?.success && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">
+                  {verifyFormik.status.success}
+                </div>
+              )}
 
-            {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                {error}
+              <div>
+                <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-slate-700">
+                  OTP Code
+                </label>
+                <div className="relative">
+                  <FiLock
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    size={18}
+                  />
+                  <input
+                    id="otp"
+                    type="text"
+                    placeholder="123456"
+                    {...verifyFormik.getFieldProps("otp")}
+                    className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
+                      verifyFormik.touched.otp && verifyFormik.errors.otp
+                        ? "border-rose-300 bg-rose-50"
+                        : "border-slate-200 bg-white focus:border-brand"
+                    }`}
+                  />
+                </div>
+                {verifyFormik.touched.otp && verifyFormik.errors.otp && (
+                  <p className="mt-1 text-xs text-rose-500">{verifyFormik.errors.otp}</p>
+                )}
               </div>
-            )}
+
+              <button
+                type="submit"
+                disabled={verifyFormik.isSubmitting}
+                className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
+              >
+                {verifyFormik.isSubmitting ? "Verifying..." : "Verify email"}
+              </button>
+
+              <p className="text-center text-sm text-[#5B6B7A]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVerifyEmail(null);
+                    setError("");
+                  }}
+                  className="font-semibold text-brand hover:underline"
+                >
+                  Back to sign in
+                </button>
+              </p>
+            </form>
+          ) : (
+            <form
+              onSubmit={formik.handleSubmit}
+              className="mx-auto w-full max-w-sm space-y-6"
+              noValidate
+            >
+              <div>
+                <div className="mb-6 flex items-center gap-2 md:hidden">
+                  <FiSend className="rotate-45 text-white" size={18} />
+                  <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
+                    NEC TRAVELS
+                  </p>
+                </div>
+
+                <h2 className="font-grotesk text-3xl font-medium text-[#12233D]">
+                  Welcome back
+                </h2>
+
+                <p className="mt-1 text-sm text-[#5B6B7A]">
+                  Sign in to manage your bookings and boarding passes.
+                </p>
+              </div>
+
+              {error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+
+              {notice && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-600">
+                  {notice}
+                </div>
+              )}
 
             <FormField
               label="Email address"
@@ -297,7 +420,8 @@ export default function SignIn({ redirectPath }: LoginProps) {
                 Sign up
               </Link>
             </p>
-          </form>
+            </form>
+          )}
         </div>
       </div>
     </div>

@@ -147,6 +147,7 @@ export const loginAction = async (
     return {
       success: false,
       message: errorMessage,
+      code: backendData?.code || undefined,
     };
   }
 };

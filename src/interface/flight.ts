@@ -87,8 +87,13 @@ export interface PassengerFare {
 }
 
 export interface SaleCurrency {
-  totalFare: number;
   taxFare: number;
+  baseAmount: number;
+  grossFare: number;
+  ait: number;
+  discountAmount: number;
+  offerAmount: number;
+  totalAmount: number;
 }
 
 export interface BookingPassenger {

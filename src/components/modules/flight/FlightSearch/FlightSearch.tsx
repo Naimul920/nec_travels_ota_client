@@ -20,7 +20,7 @@ import type {
 } from "../../../../interface/flight";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 function timeToMinutes(timeStr: string): number {
   const match = timeStr.match(/^(\d{2}):(\d{2})/);
@@ -262,7 +262,7 @@ const FlightSearch: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto px-5 py-20 sm:px-10 bg-white" id="mainScrollContainer">
+    <div className="max-w-7xl mx-auto px-5 py-20 sm:px-10 bg-white" id="mainScrollContainer">
       {/* <FlightSearchSummary /> */}
 
       <div className="flex items-center justify-between mb-2">

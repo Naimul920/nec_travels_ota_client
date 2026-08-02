@@ -70,7 +70,7 @@ export default function CommonLayoutNavbar({
   return (
     <header className="sticky top-0 z-40 w-full h-16  bg-white border-b border-gray-100 shadow-xs ">
       <div className="max-w-[1600px] mx-auto h-full px-5 sm:px-10 flex items-center justify-between">
-        <Link
+        {/* <Link
           href={isLoggedIn ? `/console/${roleLower}` : "/"}
           className="flex items-center"
         >
@@ -81,6 +81,20 @@ export default function CommonLayoutNavbar({
             height={40}
             priority
             className="h-auto w-auto object-contain"
+          />
+        </Link> */}
+
+        <Link
+          href={isLoggedIn ? `/console/${roleLower}` : "/"}
+          className="flex items-center"
+        >
+          <Image
+            src={headerLogo}
+            alt={isB2B && user?.logo ? "Agency logo" : "NEC Fly"}
+            width={130}
+            height={40}
+            priority
+            className="w-32.5 h-10 object-contain"
           />
         </Link>
 

@@ -43,7 +43,7 @@ const Oneway: React.FC<OnewayProps> = ({
   const disabledDate: DatePickerProps["disabledDate"] = (current) => {
     return current && current < dayjs().startOf("day");
   };
-
+console.log("Oneway data:", data);
   const handleSwap = () => {
     const from = data.fromIata || "";
     const to = data.toIata || "";
@@ -60,6 +60,7 @@ const Oneway: React.FC<OnewayProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
       {/* Departure Airport Selector */}
+      
       <SearchCity
         label="Departure City"
         value={data.fromIata}
