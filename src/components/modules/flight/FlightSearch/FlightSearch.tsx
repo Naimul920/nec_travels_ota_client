@@ -11,6 +11,8 @@ import SideBarFilter from "@/components/modules/flight/Filter/SidebarFilter/Side
 import { Button } from "@/components/ui";
 import { IoFilterSharp, IoClose } from "react-icons/io5";
 import FlightCard from "@/components/modules/flight/Card/FlightCard";
+import FlightSearchSkeleton from "@/components/modules/flight/Card/FlightSearchSkeleton";
+import SearchCountdown from "@/components/modules/flight/Card/SearchCountdown";
 import { useFlightSearchMutation } from "@/hooks/useFlightApi";
 import { decoding } from "@/utils";
 import type {
@@ -18,9 +20,6 @@ import type {
   SearchPayload,
   Schedule,
 } from "../../../../interface/flight";
-import InfiniteScroll from "react-infinite-scroll-component";
-
-const PAGE_SIZE = 10;
 
 function timeToMinutes(timeStr: string): number {
   const match = timeStr.match(/^(\d{2}):(\d{2})/);
@@ -37,7 +36,6 @@ export interface FilterState {
  
 const FlightSearch: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [filters, setFilters] = useState<FilterState>({
     airlines: [],
     stops: [],
@@ -132,7 +130,6 @@ const FlightSearch: React.FC = () => {
   // 4. Tracks Next.js native param instances string changes to reset standard layouts
   const searchParamsString = searchParamsHook.toString();
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
     setFilters({
       airlines: [],
       stops: [],
@@ -147,8 +144,8 @@ const FlightSearch: React.FC = () => {
   const carrierCodes = useMemo(() => {
     const codes = new Set<string>();
     allItins.forEach((itin: any) => {
-      itin.flightDetails.forEach((fd: any) => {
-        fd.schedules.forEach((s: Schedule) => {
+      itin?.flightDetails?.forEach((fd: any) => {
+        fd?.schedules?.forEach((s: Schedule) => {
           codes.add(s.marketingCarrierCode);
         });
       });
@@ -159,8 +156,8 @@ const FlightSearch: React.FC = () => {
   const stopOptions = useMemo(() => {
     const stops = new Set<number>();
     allItins.forEach((itin: any) => {
-      itin.flightDetails.forEach((fd: any) => {
-        fd.schedules.forEach((s: Schedule) => {
+      itin?.flightDetails?.forEach((fd: any) => {
+        fd?.schedules?.forEach((s: Schedule) => {
           stops.add(s.stopCount);
         });
       });
@@ -172,8 +169,8 @@ const FlightSearch: React.FC = () => {
     let list = allItins;
     if (filters.airlines.length > 0) {
       list = list.filter((itin: any) =>
-        itin.flightDetails.some((fd: any) =>
-          fd.schedules.some((s: Schedule) =>
+        itin?.flightDetails?.some((fd: any) =>
+          fd?.schedules?.some((s: Schedule) =>
             filters.airlines.includes(s.marketingCarrierCode),
           ),
         ),
@@ -181,8 +178,8 @@ const FlightSearch: React.FC = () => {
     }
     if (filters.stops.length > 0) {
       list = list.filter((itin: any) =>
-        itin.flightDetails.some((fd: any) =>
-          fd.schedules.some((s: Schedule) =>
+        itin?.flightDetails?.some((fd: any) =>
+          fd?.schedules?.some((s: Schedule) =>
             filters.stops.includes(s.stopCount),
           ),
         ),
@@ -190,8 +187,8 @@ const FlightSearch: React.FC = () => {
     }
     if (filters.departureRange[0] > 0 || filters.departureRange[1] < 1440) {
       list = list.filter((itin: any) =>
-        itin.flightDetails.some((fd: any) =>
-          fd.schedules.some((s: Schedule) => {
+        itin?.flightDetails?.some((fd: any) =>
+          fd?.schedules?.some((s: Schedule) => {
             const dep = timeToMinutes(s.departure.time);
             return (
               dep >= filters.departureRange[0] &&
@@ -203,8 +200,8 @@ const FlightSearch: React.FC = () => {
     }
     if (filters.arrivalRange[0] > 0 || filters.arrivalRange[1] < 1440) {
       list = list.filter((itin: any) =>
-        itin.flightDetails.some((fd: any) =>
-          fd.schedules.some((s: Schedule) => {
+        itin?.flightDetails?.some((fd: any) =>
+          fd?.schedules?.some((s: Schedule) => {
             const arr = timeToMinutes(s.arrival.time);
             return (
               arr >= filters.arrivalRange[0] && arr <= filters.arrivalRange[1]
@@ -217,17 +214,9 @@ const FlightSearch: React.FC = () => {
   }, [allItins, filters]);
 
   const totalFlights = filteredFlights.length;
-  const paginatedFlights = filteredFlights.slice(0, visibleCount);
-
-  const fetchMoreFlights = useCallback(() => {
-    setTimeout(() => {
-      setVisibleCount((prev) => prev + PAGE_SIZE);
-    }, 300);
-  }, []);
 
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
-    setVisibleCount(PAGE_SIZE);
   }, []);
 
   const handleAirlineSelect = useCallback((code: string | null) => {
@@ -235,7 +224,6 @@ const FlightSearch: React.FC = () => {
       ...prev,
       airlines: code ? [code] : [],
     }));
-    setVisibleCount(PAGE_SIZE);
   }, []);
 
   const minPrice = useMemo(() => {
@@ -263,11 +251,15 @@ const FlightSearch: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-5 py-20 sm:px-10 bg-white" id="mainScrollContainer">
-      {/* <FlightSearchSummary /> */}
+      <FlightSearchSummary />
 
-      <div className="flex items-center justify-between mb-2">
-        <Button
-          onClick={() => setSidebarOpen(true)}
+      {isPending && <FlightSearchSkeleton cardCount={3} />}
+
+      {!isPending && (
+        <>
+          <div className="flex items-center justify-between mb-2">
+            <Button
+              onClick={() => setSidebarOpen(true)}
           className="bg-transparent text-black! p-0! md:hidden"
         >
           <IoFilterSharp size={15} />
@@ -277,14 +269,17 @@ const FlightSearch: React.FC = () => {
           {isPending ? "Searching..." : `${totalFlights} Available Flights`}
         </h3>
 
-        <p className="md:text-sm text-xs">
-          <sup className="text-secondary">*</sup>Price Includes VAT & Tax
-        </p>
+        <div className="flex items-center gap-2">
+          <SearchCountdown expiresAt={data?.data?.expiresAt} />
+          <p className="text-xs">
+            <sup className="text-secondary">*</sup>Price Includes VAT & Tax
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-12 md:gap-5">
         <div className="lg:col-span-2 hidden lg:block ">
-          <div className="bg-white shadow rounded-b-sm sticky top-0 max-h-[80vh] overflow-y-auto custom-scrollbar">
+          <div className="bg-white shadow rounded-b-sm sticky md:top-13 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <SideBarFilter
               allItins={allItins}
               filters={filters}
@@ -327,7 +322,7 @@ const FlightSearch: React.FC = () => {
         </div>
 
         <div className="lg:col-span-10 col-span-12">
-          <div className="sticky top-0 z-10">
+          <div className="sticky md:top-14 z-10">
             <SearchHeaderFilter
               carrierCodes={carrierCodes}
               allItins={allItins}
@@ -335,12 +330,6 @@ const FlightSearch: React.FC = () => {
               onSelect={handleAirlineSelect}
             />
           </div>
-
-          {isPending && (
-            <div className="flex justify-center py-10">
-              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
-            </div>
-          )}
 
           {isError && (
             <div className="text-center py-10 text-red-500 text-sm">
@@ -355,42 +344,27 @@ const FlightSearch: React.FC = () => {
           )}
 
           {!isPending && !isError && totalFlights > 0 && (
-            <InfiniteScroll
-              dataLength={visibleCount}
-              next={fetchMoreFlights}
-              hasMore={visibleCount < filteredFlights.length}
-              scrollableTarget="mainScrollContainer"
-              loader={
-                <p className="text-center text-xs py-3">
-                  Loading more flights...
-                </p>
-              }
-              endMessage={
-                <p className="text-center text-xs py-3 text-gray-400">
-                  No more flights available
-                </p>
-              }
-            >
-              <div className="py-2 space-y-2">
-                {paginatedFlights.map((itinerary: Itinerary, index: number) => (
-                  <FlightCard
-                    key={index}
-                    itinerary={itinerary}
-                    index={index}
-                    searchId={data?.data?.searchId ?? ""}
-                    passengerCount={{
-                      adult: data?.data?.noOfAdult ?? 0,
-                      child: data?.data?.noOfChildren ?? 0,
-                      kid: data?.data?.noOfKids ?? 0,
-                      infant: data?.data?.noOfInfant ?? 0,
-                    }}
-                  />
-                ))}
-              </div>
-            </InfiniteScroll>
+            <div className="py-2 space-y-2">
+              {filteredFlights.map((itinerary: Itinerary, index: number) => (
+                <FlightCard
+                  key={index}
+                  itinerary={itinerary}
+                  index={index}
+                  searchId={data?.data?.searchId ?? ""}
+                  passengerCount={{
+                    adult: data?.data?.noOfAdult ?? 0,
+                    child: data?.data?.noOfChildren ?? 0,
+                    kid: data?.data?.noOfKids ?? 0,
+                    infant: data?.data?.noOfInfant ?? 0,
+                  }}
+                />
+              ))}
+            </div>
           )}
+          </div>
         </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

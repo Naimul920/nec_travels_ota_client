@@ -26,6 +26,7 @@ const FlightCard: React.FC<Props> = ({
   searchId,
   passengerCount,
 }) => {
+  console.log("FlightCard", itinerary);
   const [state, setState] = useState<IState>({
     isDetails: false,
   });

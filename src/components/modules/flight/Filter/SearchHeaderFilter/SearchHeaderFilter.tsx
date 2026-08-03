@@ -20,13 +20,19 @@ const SearchHeaderFilter: React.FC<Props> = ({
   const airlines = useMemo(() => {
     return carrierCodes.map((code) => {
       const matching = allItins.filter((itin) =>
-        itin.flightDetails.some((fd) =>
-          fd.schedules.some((s: Schedule) => s.marketingCarrierCode === code)
+        itin?.flightDetails?.some((fd) =>
+          fd?.schedules?.some((s: Schedule) => s.marketingCarrierCode === code)
         )
       );
 
       const minFare = matching.length
-        ? Math.min(...matching.map((i) => i.saleCurrencyAmount.totalFare))
+        ? Math.min(
+            ...matching.map((i) =>
+              i.saleCurrencyAmount?.offerAmount ??
+              i.saleCurrencyAmount?.totalAmount ??
+              0,
+            ),
+          )
         : 0;
 
       const currency =

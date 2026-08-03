@@ -182,10 +182,9 @@ const FlightBooking: React.FC = () => {
       itinDetail: { flightDetails: itin.flightDetails },
       passengerFareBreakDown: itin.passengerFareBreakDown,
       saleCurrencyAmount: {
-        totalFare: sale?.totalFare || sale?.baseAmount,
-        totalAmount: sale?.totalFare || sale?.baseAmount,
-        baseAmount: sale?.totalFare || sale?.baseAmount,
-        discountAmount: 0,
+        totalAmount: sale?.offerAmount ?? sale?.totalAmount ?? sale?.baseAmount ?? 0,
+        baseAmount: sale?.baseAmount ?? 0,
+        discountAmount: sale?.discountAmount ?? 0,
         taxFare: sale?.taxFare ?? 0,
       },
       searchId,
@@ -331,7 +330,13 @@ const FlightBooking: React.FC = () => {
         {() => (
           <Form>
             <TravelersForm />
-            <Button type="submit" className="mt-6" disabled={isBooking}>
+            <Button
+              type="submit"
+              className={`mt-6 ${
+                isBooking ? "opacity-60 cursor-not-allowed" : ""
+              }`}
+              disabled={isBooking}
+            >
               {isBooking ? "Booking..." : "Submit Booking"}
             </Button>
           </Form>

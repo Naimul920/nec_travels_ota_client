@@ -26,6 +26,11 @@ const formatTime = (minutes: number) => {
   return `${hour12}:${m.toString().padStart(2, "0")} ${ampm}`;
 };
 
+const getDisplayFare = (itin: Itinerary): number =>
+  itin.saleCurrencyAmount?.offerAmount ??
+  itin.saleCurrencyAmount?.totalAmount ??
+  0;
+
 const SideBarFilter: React.FC<Props> = ({
   allItins,
   filters,
@@ -47,12 +52,12 @@ const SideBarFilter: React.FC<Props> = ({
   const airlines = useMemo(() => {
     return carrierCodes.map((code: string) => {
       const matching = allItins.filter((itin) =>
-        itin.flightDetails.some((fd) =>
-          fd.schedules.some((s: Schedule) => s.marketingCarrierCode === code),
+        itin?.flightDetails?.some((fd) =>
+          fd?.schedules?.some((s: Schedule) => s.marketingCarrierCode === code),
         ),
       );
       const minFare = matching.length
-        ? Math.min(...matching.map((i) => i.saleCurrencyAmount.totalFare))
+        ? Math.min(...matching.map((i) => getDisplayFare(i)))
         : 0;
       return { code, count: matching.length, minPrice: minFare };
     });
@@ -61,12 +66,12 @@ const SideBarFilter: React.FC<Props> = ({
   const stops = useMemo(() => {
     return stopOptions.map((stop: number) => {
       const matching = allItins.filter((itin) =>
-        itin.flightDetails.some((fd) =>
-          fd.schedules.some((s: Schedule) => s.stopCount === stop),
+        itin?.flightDetails?.some((fd) =>
+          fd?.schedules?.some((s: Schedule) => s.stopCount === stop),
         ),
       );
       const minFare = matching.length
-        ? Math.min(...matching.map((i) => i.saleCurrencyAmount.totalFare))
+        ? Math.min(...matching.map((i) => getDisplayFare(i)))
         : 0;
       return { count: stop, total: matching.length, minPrice: minFare };
     });
@@ -238,7 +243,7 @@ const SideBarFilter: React.FC<Props> = ({
       {/* Actions */}
       <div className="p-2 flex items-center justify-between">
         <Button
-          className="bg-white text-red-500 hover:text-red-600 border border-gray-200"
+          className="bg-white text-red-500! hover:text-red-600! border border-gray-200"
           type="reset"
           onClick={handleReset}
         >

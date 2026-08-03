@@ -25,6 +25,8 @@ export interface FlightSearchData {
   from: string;
   to: string;
   startDate: string;
+  ttlSeconds?: number;
+  expiresAt?: string;
   noOfAdult: number;
   noOfChildren: number;
   noOfKids: number;
@@ -121,7 +123,7 @@ export interface BookingSegment {
 }
 
 export interface LeadPassenger {
-title: string;
+  title: string;
   firstname: string;
   lastname: string;
   gender: string;
@@ -146,7 +148,6 @@ export interface Passenger {
   passenger_type: string;
 }
 
-
 export interface BookFlightPayload {
   quoteId: string;
   lead_passenger: LeadPassenger;
@@ -156,9 +157,9 @@ export interface BookFlightPayload {
   provider: string;
 }
 export interface FlightBookingResponseData {
-booking_id: string;
-booking_reference: string;
-pnr: string;
+  booking_id: string;
+  booking_reference: string;
+  pnr: string;
 }
 export interface FlightBookingResponse {
   success: boolean;
@@ -167,13 +168,23 @@ export interface FlightBookingResponse {
   data: FlightBookingResponseData;
 }
 
+// export interface SaleCurrencyAmount {
+//   baseAmount: number;
+//   taxFare: number;
+//   totalFare?: number;
+//   totalAmount?: number;
+//   discountAmount?: number;
+//   offerAmount?: number;
+// }
+
 export interface SaleCurrencyAmount {
-  totalFare: number;
-  totalAmount: number;
-  baseAmount: number;
-  discountAmount: number;
-  offerAmount?: number;
   taxFare: number;
+  baseAmount: number;
+  grossFare?: number;
+  ait?: number;
+  discountAmount?: number;
+  offerAmount?: number;
+  totalAmount?: number;
 }
 
 export interface RevalidateItineraryPayload {

@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Itinerary, Schedule } from "@/interface/flight";
 import dayjs from "dayjs";
 import { isLoginAction } from "@/actions/auth.action";
+import { FaPlane } from "react-icons/fa";
 
 interface IProps {
   state: IState;
@@ -29,13 +30,20 @@ function formatTime(_iso: string, timeStr: string): string {
 }
 
 function formatDate(iso: string): string {
-  return dayjs(iso).format("DD MMM YYYY");
+  return dayjs(iso).format("ddd DD MMM YYYY");
 }
 
 function elapsedString(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${h}h ${m}m`;
+}
+
+function totalDuration(depISO?: string, arrISO?: string): string {
+  if (!depISO || !arrISO) return "--";
+  const mins = dayjs(arrISO).diff(dayjs(depISO), "minute");
+  if (!Number.isFinite(mins) || mins < 0) return "--";
+  return elapsedString(Math.round(mins));
 }
 
 function stopLabel(count: number): string {
@@ -62,9 +70,56 @@ const SearchHeader: React.FC<IProps> = ({
 
   console.log("Total Adult Fare:", totalAdultFare, passengerCount);
 
-  const totalFare = itinerary?.saleCurrencyAmount.baseAmount;
-  const offerFare = itinerary?.saleCurrencyAmount.offerAmount;
-  const currency = itinerary?.passengerFareBreakDown[0]?.currency || "BDT";
+  // const totalFare = itinerary?.saleCurrencyAmount.baseAmount;
+  // const offerFare = itinerary?.saleCurrencyAmount.offerAmount;
+  // const { totalAmount, offerAmount, discountAmount } =
+  //   itinerary?.saleCurrencyAmount;
+  // const currency = itinerary?.passengerFareBreakDown[0]?.currency || "BDT";
+  // const taxFare = itinerary?.saleCurrencyAmount?.taxFare;
+  // const baseAmount = itinerary?.saleCurrencyAmount?.baseAmount;
+  // const grossFare = itinerary?.saleCurrencyAmount?.grossFare;
+  // const ait = itinerary?.saleCurrencyAmount?.ait;
+  // const discountAmount = itinerary?.saleCurrencyAmount?.discountAmount;
+  // const offerAmount = itinerary?.saleCurrencyAmount?.offerAmount || 0;
+  // const totalAmount = itinerary?.saleCurrencyAmount?.totalAmount || 0;
+  // const {
+  //   totalAmount = 0,
+  //   offerAmount = 0,
+  //   discountAmount = 0,
+  // } = itinerary?.saleCurrencyAmount ?? {};
+
+  // const taxFare = itinerary?.saleCurrencyAmount?.taxFare;
+  // const baseAmount = itinerary?.saleCurrencyAmount?.baseAmount;
+  // const grossFare = itinerary?.saleCurrencyAmount?.grossFare;
+  // const ait = itinerary?.saleCurrencyAmount?.ait;
+  // const discountAmount = itinerary?.saleCurrencyAmount?.discountAmount;
+  // const offerAmount = itinerary?.saleCurrencyAmount?.offerAmount || 0;
+  // const totalAmount = itinerary?.saleCurrencyAmount?.totalAmount || 0;
+
+  // const shouldRender =
+  //   totalAmount < offerAmount ||
+  //   totalAmount > offerAmount ||
+  //   totalAmount === offerAmount ||
+  //   (totalAmount === 0 && offerAmount === 0);
+
+  // const displayTotalAmount =
+  //   totalAmount < offerAmount ? offerAmount : totalAmount;
+  // const currency = itinerary?.passengerFareBreakDown[0]?.currency || "BDT";
+
+  const {
+    taxFare,
+    baseAmount,
+    grossFare,
+    ait,
+    discountAmount,
+    offerAmount = 0,
+    totalAmount = 0,
+  } = itinerary?.saleCurrencyAmount ?? {};
+
+  const displayTotalAmount =
+    totalAmount < offerAmount ? offerAmount : totalAmount;
+
+  const currency = itinerary?.passengerFareBreakDown?.[0]?.currency ?? "BDT";
 
   const handelFlightBooking = async (id: string) => {
     // 4. Safely constructs query parameters string layout using native searchParams string conversion
@@ -78,54 +133,96 @@ const SearchHeader: React.FC<IProps> = ({
     }
   };
 
-  const segments = itinerary.flightDetails;
+  const segments = itinerary?.flightDetails;
+  
+
   // console.log("Segments:", segments, itinerary);
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-3 relative overflow-hidden shadow-xs">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 relative overflow-hidden shadow-sm mt-4 first:mt-1">
       <div className="grid grid-cols-12 gap-4 items-center">
-        <div className="col-span-12 md:col-span-10 space-y-5 md:border-r border-dashed border-gray-300 md:py-6">
+        <div className="col-span-12 md:col-span-10 space-y-5 md:border-r border-dashed border-gray-300 md:py-6 md:pe-4">
           {segments.map((seg, idx) => {
-            const schedule: Schedule = seg.schedules[0];
-            if (!schedule) return null;
+            const schedules = seg?.schedules ?? [];
+            const firstSchedule = schedules[0];
+            const lastSchedule = schedules[schedules.length - 1];
+            const stopCount = Math.max(0, schedules.length - 1);
+            const flightNumbers = schedules.map((s) => s.flightName);
+            const duration = totalDuration(
+              firstSchedule?.departureDateTime,
+              lastSchedule?.arrivalDateTime,
+            );
+
             return (
               <div
                 key={idx}
                 className="grid grid-cols-12 gap-2 items-center border-b pb-5 border-dashed border-gray-300 last:border-b-0 last:pb-0"
               >
-                <div className="md:col-span-2 col-span-3 flex flex-col items-start text-start md:ps-5">
-                  <p className="text-primary font-extrabold text-lg md:text-2xl">
-                    {schedule.departure.airport}{" "}
+                {/* Airline logo */}
+                <div className="md:col-span-1 col-span-2 flex flex-col items-center justify-center gap-1 md:ps-1">
+                  <div className="relative w-11 h-11 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                    <img
+                      src={`/api/v1/uploads/files/images/public/airlines_logo/${firstSchedule?.marketingCarrierCode}.svg`}
+                      alt={firstSchedule?.marketingCarrierCode || "airline"}
+                      className="w-8 h-8 object-contain"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                    {/* <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-300">
+                      {firstSchedule?.marketingCarrierCode || ""}
+                    </span> */}
+                  </div>
+                  <span className="text-[10px] font-semibold tracking-wide text-gray-500">
+                    {firstSchedule?.marketingCarrierCode || ""}
+                  </span>
+                </div>
+
+                {/* Departure */}
+                <div className="md:col-span-2 col-span-3 flex flex-col items-start text-start md:ps-2">
+                  <p className="text-primary font-extrabold text-base md:text-2xl whitespace-nowrap">
+                    {firstSchedule?.departure?.airport}{" "}
                     {formatTime(
-                      schedule.departureDateTime,
-                      schedule.departure.time,
+                      firstSchedule?.departureDateTime,
+                      firstSchedule?.departure?.time,
                     )}
                   </p>
-                  <p className="text-gray-500 text-xs">
-                    {formatDate(schedule.departureDateTime)}
+                  <p className="text-gray-500 text-xs whitespace-nowrap">
+                    {formatDate(firstSchedule?.departureDateTime)}
                   </p>
                 </div>
 
-                <div className="md:col-span-7 col-span-6 flex flex-col items-center">
-                  <p className="text-primary font-semibold text-xs">
-                    {stopLabel(schedule.stopCount)}
+                {/* Route */}
+                <div className="md:col-span-7 col-span-4 flex flex-col items-center">
+                  <p className="text-gray-500 text-xs font-medium">
+                    {stopLabel(stopCount)}
                   </p>
-                  <div className="border-t border-dashed border-gray-300 my-2 w-full" />
-                  <p className="text-gray-500 text-xs">
-                    {schedule.flightName} &bull;{" "}
-                    {elapsedString(seg.elapsedTime)}
+                  <p className="text-sm font-bold text-gray-900 mt-0.5">
+                    {duration}
                   </p>
+                  <div className="flex flex-wrap items-center justify-center gap-1 mt-1.5">
+                    {flightNumbers.map((fn, fIdx) => (
+                      <span
+                        key={`${fn}-${fIdx}`}
+                        className="inline-flex px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[10px] font-semibold"
+                      >
+                        {fn}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="md:col-span-2 col-span-3 flex flex-col text-end items-end md:pe-5">
-                  <p className="text-primary font-extrabold text-lg md:text-2xl">
-                    {schedule.arrival.airport}{" "}
+                {/* Arrival */}
+                <div className="md:col-span-2 col-span-3 flex flex-col text-end items-end md:pe-2">
+                  <p className="text-primary font-extrabold text-base md:text-2xl whitespace-nowrap">
+                    {lastSchedule?.arrival?.airport}{" "}
                     {formatTime(
-                      schedule.arrivalDateTime,
-                      schedule.arrival.time,
+                      lastSchedule?.arrivalDateTime,
+                      lastSchedule?.arrival?.time,
                     )}
                   </p>
-                  <p className="text-gray-500 text-xs">
-                    {formatDate(schedule.arrivalDateTime)}
+                  <p className="text-gray-500 text-xs whitespace-nowrap">
+                    {formatDate(lastSchedule?.arrivalDateTime)}
                   </p>
                 </div>
               </div>
@@ -134,27 +231,40 @@ const SearchHeader: React.FC<IProps> = ({
         </div>
 
         <div className="hidden md:flex flex-col items-center justify-center md:col-span-2 text-center">
-         
-         {offerFare && (
-           <>
-             <p className="text-xs text-indigo-600">Total Fare</p>
-             <p className="text-2xl font-bold text-primary">
-               {currency} {offerFare?.toLocaleString()}
-             </p>
-           </>
-         )}
-      
-          {totalFare && (
-            <>
-              <p className="text-xs text-indigo-600">Lowest Fare</p>
-              <p className="text-2xl font-bold text-primary">
-                {currency} {totalFare?.toLocaleString()}
-              </p>
-            </>
-          )}
+          {/* <p>taxFare: {taxFare?.toLocaleString()}</p>
+          <p>baseAmount: {baseAmount?.toLocaleString()}</p>
+          <p>grossFare: {grossFare?.toLocaleString()}</p>
+          <p>ait: {ait?.toLocaleString()}</p>
+          <p>discountAmount: {discountAmount?.toLocaleString()}</p>
+          <p>offerAmount: {offerAmount?.toLocaleString()}</p>
+          <p>totalAmount: {totalAmount?.toLocaleString()}</p> */}
+
+          {/* <div className="text-center">
+            <p className="text-sm">
+              Offer Amount: {currency} {offerAmount.toLocaleString()}
+            </p>
+
+            <p className="text-xs">
+              Total Amount: {currency} {displayTotalAmount.toLocaleString()}
+            </p>
+          </div> */}
+
+          <div className="text-center">
+            <div className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-semibold px-2 py-1 rounded-md mb-2">
+              <FaPlane className="w-3.5 h-3.5" />
+              FLIGHTINT
+            </div>
+            <p className="text-base font-bold text-gray-900">
+              {currency} {offerAmount.toLocaleString()}
+            </p>
+            <p className="text-sm text-gray-400 line-through">
+              {currency} {displayTotalAmount.toLocaleString()}
+            </p>
+          </div>
+
           <Button
             onClick={() => handelFlightBooking(String(index))}
-            className="text-xs rounded-sm w-2/4"
+            className="text-xs rounded-sm mt-2"
           >
             Book Now
           </Button>
@@ -173,7 +283,7 @@ const SearchHeader: React.FC<IProps> = ({
         </Button>
         <div className="text-center">
           <p className="text-xs text-secondary font-bold">{currency}</p>
-          <p className="text-sm font-bold">{totalFare?.toLocaleString()}</p>
+          <p className="text-sm font-bold">{totalAmount?.toLocaleString()}</p>
         </div>
         <Button
           onClick={() => handelFlightBooking(String(index))}
