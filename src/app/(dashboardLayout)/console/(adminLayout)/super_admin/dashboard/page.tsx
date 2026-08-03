@@ -1,19 +1,14 @@
 "use client";
-import { useAuthStore } from "@/store/auth.store";
 
-function Dashboard() {
-  const { user, isLoggedIn, isLoading } = useAuthStore();
+import { PaymentHistory, SalesSummery } from "../_components/Dashboard";
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!isLoggedIn || !user) return <div>Not logged in</div>;
-
+const Dashboard = () => {
   return (
-    <div>
-      <p>ID: {user.id}</p>
-      <p>Role: {user.role}</p>
-      <p>Department: {user.departments}</p>
+    <div className="max-w-[1600px] mx-auto px-10 sm:px-20 py-10">
+      <SalesSummery />
+      <PaymentHistory />
     </div>
   );
-}
+};
 
 export default Dashboard;
