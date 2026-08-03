@@ -92,7 +92,7 @@ export interface SaleCurrency {
   grossFare: number;
   ait: number;
   discountAmount: number;
-  offerAmount: number;
+  offerAmount?: number;
   totalAmount: number;
 }
 
@@ -120,20 +120,51 @@ export interface BookingSegment {
   res_book_desig_code: string;
 }
 
+export interface LeadPassenger {
+title: string;
+  firstname: string;
+  lastname: string;
+  gender: string;
+  date_of_birth: string;
+  country: string;
+  passport_number: string;
+  passport_expire: string;
+  passenger_type: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface Passenger {
+  title: string;
+  firstname: string;
+  lastname: string;
+  gender: string;
+  date_of_birth: string;
+  country: string;
+  passport_number: string;
+  passport_expire: string;
+  passenger_type: string;
+}
+
+
 export interface BookFlightPayload {
   quoteId: string;
-  lead_passenger: BookingPassenger;
-  passengers: BookingPassenger[];
+  lead_passenger: LeadPassenger;
+  passengers?: Passenger[];
   segments: BookingSegment[];
   payment_type: string;
   provider: string;
 }
-
+export interface FlightBookingResponseData {
+booking_id: string;
+booking_reference: string;
+pnr: string;
+}
 export interface FlightBookingResponse {
   success: boolean;
   statusCode: number;
   message: string;
-  data: unknown;
+  data: FlightBookingResponseData;
 }
 
 export interface SaleCurrencyAmount {
@@ -141,7 +172,7 @@ export interface SaleCurrencyAmount {
   totalAmount: number;
   baseAmount: number;
   discountAmount: number;
-  offerAmount: number;
+  offerAmount?: number;
   taxFare: number;
 }
 

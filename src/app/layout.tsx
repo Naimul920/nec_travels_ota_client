@@ -2,6 +2,7 @@ import AppLoaderProvider from "@/providers/AppLoaderProvider";
 import QueryProviders from "@/providers/QueryProvider";
 import { Inter, Space_Grotesk, IBM_Plex_Mono, Stalemate } from "next/font/google";
 import AuthProvider from "@/providers/AuthProvider";
+import { App as AntdApp } from "antd";
 import "./globals.css";
 
 const inter = Inter({
@@ -45,7 +46,9 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <QueryProviders>
           <AuthProvider>
-            <AppLoaderProvider>{children}</AppLoaderProvider>
+            <AntdApp>
+              <AppLoaderProvider>{children}</AppLoaderProvider>
+            </AntdApp>
           </AuthProvider>
         </QueryProviders>
       </body>

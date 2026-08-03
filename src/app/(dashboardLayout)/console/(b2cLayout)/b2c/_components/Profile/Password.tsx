@@ -3,12 +3,13 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import clsx from "clsx";
-import { message } from "antd";
+import { App } from "antd";
 import { Button, Input } from "@/components/ui";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { changePasswordAction } from "@/actions/user.action";
 
 const Password: React.FC = () => {
+  const { message } = App.useApp();
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);

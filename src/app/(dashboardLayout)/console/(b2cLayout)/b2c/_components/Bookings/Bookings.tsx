@@ -2,11 +2,15 @@
 
 import { useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { useSearch } from "@/hooks";
 import Table from "@/components/common/Table/Table";
 import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 import ActionButton from "@/components/common/Action/ActionButton";
-import { FiClock, FiCheckCircle, FiXCircle, FiPauseCircle, FiList, FiMapPin } from "react-icons/fi";
+import { getBookingsAction, BookingItem } from "@/actions/booking.action";
+import { FiMapPin } from "react-icons/fi";
+import ETicket from "@/components/common/ETicket/ETicket";
 
 type TabKey = "all" | "pending" | "cancel" | "hold" | "issued";
 type ProductType = "Flight" | "Hotel" | "Tour" | "Gift Card";
@@ -22,14 +26,47 @@ const tabs: { key: TabKey; label: string }[] = [
 const productTypes: ProductType[] = ["Flight", "Hotel", "Tour", "Gift Card"];
 const years = ["2026", "2025", "2024", "2023", "2022"];
 
-const allBookingsData = [
-  { key: 1, sl: 1, bookingId: "BK1001", origin: "DAC", destination: "DXB", airline: "Emirates", pnr: "PNR001", contactNo: "01711111111", amount: 85000, bookedOn: "01-12-2025", travel_date: "12-12-2025", status: "issued", productType: "Flight" as ProductType },
-  { key: 2, sl: 2, bookingId: "BK1002", origin: "DAC", destination: "KUL", airline: "Malaysia Airlines", pnr: "PNR002", contactNo: "01822222222", amount: 45000, bookedOn: "02-12-2025", travel_date: "13-12-2025", status: "hold", productType: "Flight" as ProductType },
-  { key: 3, sl: 3, bookingId: "BK1003", origin: "DAC", destination: "DEL", airline: "Indigo", pnr: "PNR003", contactNo: "01933333333", amount: 25000, bookedOn: "03-12-2025", travel_date: "12-12-2025", status: "cancel", productType: "Flight" as ProductType },
-  { key: 4, sl: 4, bookingId: "BK1004", origin: "DAC", destination: "JED", airline: "Saudia", pnr: "PNR004", contactNo: "01644444444", amount: 95000, bookedOn: "04-12-2025", travel_date: "15-12-2025", status: "pending", productType: "Flight" as ProductType },
-  { key: 5, sl: 5, bookingId: "BK1005", origin: "DAC", destination: "SIN", airline: "Singapore Airlines", pnr: "PNR005", contactNo: "01755555555", amount: 65000, bookedOn: "05-12-2025", travel_date: "14-12-2025", status: "issued", productType: "Flight" as ProductType },
-  { key: 6, sl: 6, bookingId: "BK1006", origin: "DAC", destination: "KUL", airline: "Air Asia", pnr: "PNR006", contactNo: "01866666666", amount: 35000, bookedOn: "06-12-2025", travel_date: "16-12-2025", status: "pending", productType: "Flight" as ProductType },
-];
+// const formatDate = (value?: string | null): string =>
+//   value ? dayjs(value).format("DD-MM-YYYY") : "—";
+
+// const mapBookingRow = (booking: BookingItem, index: number) => ({
+//   key: booking.id,
+//   sl: index + 1,
+//   bookingId: booking.booking_reference,
+//   origin: booking.booking_segments?.[0]?.origin_airport_code ?? "—",
+//   destination: booking.booking_segments?.[0]?.destination_airport_code ?? "—",
+//   airline: booking.booking_segments?.[0]?.airline_code ?? "—",
+//   pnr: booking.gds_pnr || booking.provider_booking_id || "—",
+//   contactNo: "—",
+//   amount: Number(booking.booking_fare?.total_amount || 0),
+//   bookedOn: formatDate(booking.created_at),
+//   travel_date: formatDate(booking.booking_segments?.[0]?.departure_at),
+//   status: booking.status.toLowerCase(),
+//   productType: "Flight" as ProductType,
+// });
+
+// type BookingRow = ReturnType<typeof mapBookingRow>;
+const formatDate = (value?: string | null): string =>
+  value ? dayjs(value).format("DD-MM-YYYY") : "—";
+
+const mapBookingRow = (booking: BookingItem, index: number) => ({
+  key: booking.id,
+  sl: index + 1,
+  bookingId: booking.booking_reference,
+  origin: booking.booking_segments?.[0]?.origin_airport_code ?? "—",
+  destination: booking.booking_segments?.[0]?.destination_airport_code ?? "—",
+  airline: booking.booking_segments?.[0]?.airline_code ?? "—",
+  pnr: booking.gds_pnr || booking.provider_booking_id || "—",
+  contactNo: "—",
+  amount: Number(booking.booking_fare?.total_amount || 0),
+  bookedOn: formatDate(booking.created_at),
+  travel_date: formatDate(booking.booking_segments?.[0]?.departure_at),
+  status: booking.status.toLowerCase(),
+  productType: "Flight" as ProductType,
+  raw: booking, // 👈 add this one line
+});
+
+type BookingRow = ReturnType<typeof mapBookingRow>;
 
 const statusTitleMap: Record<TabKey, string> = {
   all: "All Bookings",
@@ -46,7 +83,9 @@ function EmptyState() {
         <FiMapPin size={36} className="text-[#8FA9BE]" />
       </div>
       <h3 className="text-xl font-bold text-[#0F1B47]">No bookings yet</h3>
-      <p className="text-sm text-[#6B7785]">Start your travel planning for your next adventure today</p>
+      <p className="text-sm text-[#6B7785]">
+        Start your travel planning for your next adventure today
+      </p>
       <button
         type="button"
         className="mt-2 rounded-xl bg-[#F5C518] px-8 py-3 text-sm font-bold text-[#0F1B47] transition-opacity hover:opacity-90"
@@ -59,13 +98,25 @@ function EmptyState() {
 
 export default function Bookings() {
   const [activeTab, setActiveTab] = useState<TabKey>("all");
-  const [selectedProductTypes, setSelectedProductTypes] = useState<ProductType[]>([]);
+  const [selectedProductTypes, setSelectedProductTypes] = useState<
+    ProductType[]
+  >([]);
   const [selectedYears, setSelectedYears] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
 
+  const { data: bookingsData, isPending: isLoading } = useQuery({
+    queryKey: ["b2c-bookings"],
+    queryFn: async () => {
+      const res = await getBookingsAction();
+      return (res.data ?? []).map(mapBookingRow);
+    },
+  });
+
   const toggleFilter = <T,>(value: T, list: T[], setList: (v: T[]) => void) => {
-    setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+    setList(
+      list.includes(value) ? list.filter((v) => v !== value) : [...list, value],
+    );
   };
 
   const resetFilters = () => {
@@ -74,16 +125,22 @@ export default function Bookings() {
   };
 
   const filteredByStatus = useMemo(() => {
-    let data = activeTab === "all" ? allBookingsData : allBookingsData.filter((b) => b.status === activeTab);
+    const allData = bookingsData ?? [];
+    let data =
+      activeTab === "all"
+        ? allData
+        : allData.filter((b) => b.status === activeTab);
 
     if (selectedProductTypes.length) {
       data = data.filter((b) => selectedProductTypes.includes(b.productType));
     }
     if (selectedYears.length) {
-      data = data.filter((b) => selectedYears.some((y) => b.travel_date.endsWith(y)));
+      data = data.filter((b) =>
+        selectedYears.some((y) => b.travel_date.endsWith(y)),
+      );
     }
     return data;
-  }, [activeTab, selectedProductTypes, selectedYears]);
+  }, [bookingsData, activeTab, selectedProductTypes, selectedYears]);
 
   const filteredData = useSearch(filteredByStatus, searchString);
   const hasResults = !!filteredData?.length;
@@ -127,14 +184,25 @@ export default function Bookings() {
           <div className="mb-4 border-t border-[#12233D]/10" />
 
           <div className="mb-5">
-            <h3 className="mb-3 text-sm font-bold text-[#0F1B47]">Product Type</h3>
+            <h3 className="mb-3 text-sm font-bold text-[#0F1B47]">
+              Product Type
+            </h3>
             <div className="space-y-2.5">
               {productTypes.map((type) => (
-                <label key={type} className="flex cursor-pointer items-center gap-2.5 text-sm text-[#5B6B7A]">
+                <label
+                  key={type}
+                  className="flex cursor-pointer items-center gap-2.5 text-sm text-[#5B6B7A]"
+                >
                   <input
                     type="checkbox"
                     checked={selectedProductTypes.includes(type)}
-                    onChange={() => toggleFilter(type, selectedProductTypes, setSelectedProductTypes)}
+                    onChange={() =>
+                      toggleFilter(
+                        type,
+                        selectedProductTypes,
+                        setSelectedProductTypes,
+                      )
+                    }
                     className="h-4 w-4 rounded border-[#C7CED6] text-[#0F1B47] focus:ring-[#0F1B47]"
                   />
                   {type}
@@ -147,11 +215,16 @@ export default function Bookings() {
             <h3 className="mb-3 text-sm font-bold text-[#0F1B47]">Year</h3>
             <div className="space-y-2.5">
               {years.map((year) => (
-                <label key={year} className="flex cursor-pointer items-center gap-2.5 text-sm text-[#5B6B7A]">
+                <label
+                  key={year}
+                  className="flex cursor-pointer items-center gap-2.5 text-sm text-[#5B6B7A]"
+                >
                   <input
                     type="checkbox"
                     checked={selectedYears.includes(year)}
-                    onChange={() => toggleFilter(year, selectedYears, setSelectedYears)}
+                    onChange={() =>
+                      toggleFilter(year, selectedYears, setSelectedYears)
+                    }
                     className="h-4 w-4 rounded border-[#C7CED6] text-[#0F1B47] focus:ring-[#0F1B47]"
                   />
                   {year}
@@ -162,7 +235,11 @@ export default function Bookings() {
         </aside>
 
         <div>
-          {hasResults ? (
+          {isLoading ? (
+            <div className="flex justify-center py-20">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+            </div>
+          ) : hasResults ? (
             <Table
               title={statusTitleMap[activeTab]}
               columns={holdTicketsColumns}
@@ -173,15 +250,25 @@ export default function Bookings() {
                 action: (
                   <div className="flex items-center justify-center">
                     {data?.pnr && (
+                      // <ActionButton
+                      //   viewContent={
+                      //     <div>
+                      //       <p><strong>PNR:</strong> {data.pnr}</p>
+                      //       <p><strong>Booking:</strong> {data.bookingId}</p>
+                      //     </div>
+                      //   }
+                      //   handleDelete={
+                      //     activeTab === "hold" ? () => console.log("delete", data.pnr) : undefined
+                      //   }
+                      // />
                       <ActionButton
                         viewContent={
-                          <div>
-                            <p><strong>PNR:</strong> {data.pnr}</p>
-                            <p><strong>Booking:</strong> {data.bookingId}</p>
-                          </div>
+                          data?.raw ? <ETicket booking={data.raw} /> : undefined
                         }
                         handleDelete={
-                          activeTab === "hold" ? () => console.log("delete", data.pnr) : undefined
+                          activeTab === "hold"
+                            ? () => console.log("delete", data.pnr)
+                            : undefined
                         }
                       />
                     )}

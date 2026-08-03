@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Card, message } from "antd";
+import { Card, App } from "antd";
 import Image from "next/image";
 import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose, AiOutlineUser, AiOutlineCamera } from "react-icons/ai";
 import clsx from "clsx";
@@ -18,6 +18,7 @@ interface ProfileData {
 }
 
 const B2cEditProfile: React.FC = () => {
+  const { message } = App.useApp();
   const [isEditing, setIsEditing] = useState(false);
   const { data: userProfile, refetch } = useUserInfo();
   const { user, setUser } = useAuthStore();

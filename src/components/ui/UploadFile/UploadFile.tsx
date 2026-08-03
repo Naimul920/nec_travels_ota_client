@@ -1,5 +1,5 @@
 import React from "react";
-import { Upload, message } from "antd";
+import { Upload, App } from "antd";
 import type { UploadProps } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import clsx from "clsx";
@@ -21,6 +21,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
   maxSizeMB = 5,
   disabled = false,
 }) => {
+  const { message } = App.useApp();
   const props: UploadProps = {
     name: "file",
     multiple: false,

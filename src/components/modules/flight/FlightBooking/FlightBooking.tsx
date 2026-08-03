@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 // 2. Swapped React Router hook with Next.js Navigation hook
 import { useSearchParams } from "next/navigation";
 import { Formik, Form } from "formik";
-import { message } from "antd";
+import { App } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { decoding } from "../../../../utils";
 import { Button } from "../../../ui";
@@ -13,6 +13,7 @@ import type {
   BookingPassenger,
   BookingSegment,
   Itinerary,
+  LeadPassenger,
   RevalidateItineraryPayload,
 } from "@/interface/flight";
 import TravelersForm from "../Booking/TravelersForm";
@@ -94,6 +95,7 @@ const FlightBooking: React.FC = () => {
   const searchParamsHook = useSearchParams();
   const [isBooking, setIsBooking] = useState(false);
   const { user } = useAuthStore();
+  const { message } = App.useApp();
 
   // Re-creates the URLSearchParams instance dynamically from Next.js searchParams hook
   const searchParams = useMemo(() => {
@@ -165,8 +167,14 @@ const FlightBooking: React.FC = () => {
     const sale = itin.saleCurrencyAmount;
     return {
       tripType: searchInfoParams.get("tripType") || "oneway",
-      from: searchInfoParams.get("from") || itin.flightDetails[0]?.schedules[0]?.departure.airport || "",
-      to: searchInfoParams.get("to") || itin.flightDetails[0]?.schedules[0]?.arrival.airport || "",
+      from:
+        searchInfoParams.get("from") ||
+        itin.flightDetails[0]?.schedules[0]?.departure.airport ||
+        "",
+      to:
+        searchInfoParams.get("to") ||
+        itin.flightDetails[0]?.schedules[0]?.arrival.airport ||
+        "",
       noOfAdult: Number(searchInfoParams.get("adult") || 1),
       noOfChildren: Number(searchInfoParams.get("child") || 0),
       noOfKids: Number(searchInfoParams.get("kid") || 0),
@@ -174,12 +182,11 @@ const FlightBooking: React.FC = () => {
       itinDetail: { flightDetails: itin.flightDetails },
       passengerFareBreakDown: itin.passengerFareBreakDown,
       saleCurrencyAmount: {
-        totalFare: sale.totalFare,
-        totalAmount: sale.totalFare,
-        baseAmount: sale.totalFare,
+        totalFare: sale?.totalFare || sale?.baseAmount,
+        totalAmount: sale?.totalFare || sale?.baseAmount,
+        baseAmount: sale?.totalFare || sale?.baseAmount,
         discountAmount: 0,
-        offerAmount: 0,
-        taxFare: sale.taxFare,
+        taxFare: sale?.taxFare ?? 0,
       },
       searchId,
     };
@@ -208,35 +215,57 @@ const FlightBooking: React.FC = () => {
       return;
     }
 
-    const passengers: BookingPassenger[] = [];
+    // const passengers: BookingPassenger[] = [];
+    // (["adult", "child", "kid", "infant"] as const).forEach((type) => {
+    //   values[type].forEach((p) => {
+    //     passengers.push(
+    //       toBookingPassenger(p, PASSENGER_TYPE_MAP[type], false),
+    //     );
+    //   });
+    // });
+
+    // const leadPassenger = passengers[0];
+    // if (!leadPassenger) {
+    //   message.error("Please add at least one passenger.");
+    //   return;
+    // }
+    // const leadPassengerWithContact: LeadPassenger = {
+    //   ...leadPassenger,
+    //   email: values.adult[0]?.email,
+    //   phone: values.adult[0]?.phone,
+    // };
+
+    const allPassengers: BookingPassenger[] = [];
     (["adult", "child", "kid", "infant"] as const).forEach((type) => {
       values[type].forEach((p) => {
-        passengers.push(
+        allPassengers.push(
           toBookingPassenger(p, PASSENGER_TYPE_MAP[type], false),
         );
       });
     });
 
-    const leadPassenger = passengers[0];
+    const [leadPassenger, ...passengers] = allPassengers;
     if (!leadPassenger) {
       message.error("Please add at least one passenger.");
       return;
     }
-    leadPassenger.email = values.adult[0]?.email;
-    leadPassenger.phone = values.adult[0]?.phone;
+    const leadPassengerWithContact: LeadPassenger = {
+      ...leadPassenger,
+      email: values.adult[0]?.email,
+      phone: values.adult[0]?.phone,
+    };
 
     setIsBooking(true);
     try {
       const revalidateResult = await revalidateItineraryAction(
         buildRevalidatePayload(itinerary),
       );
-
-      if (
-        !revalidateResult.success ||
-        !revalidateResult.data?.quoteId
-      ) {
+      // console.log("itinerary response:", itinerary);
+      // console.log("Revalidate response:", revalidateResult);
+      if (!revalidateResult.success || !revalidateResult.data?.quoteId) {
         message.error(
-          revalidateResult.message || "Could not revalidate itinerary. Please try again.",
+          revalidateResult.message ||
+            "Could not revalidate itinerary. Please try again.",
         );
         return;
       }
@@ -244,20 +273,26 @@ const FlightBooking: React.FC = () => {
       const quoteId = revalidateResult.data.quoteId;
       const revalidatedItinerary =
         revalidateResult.data.itineraries?.[0] ?? itinerary;
+      const segmentsItinerary = Array.isArray(
+        revalidatedItinerary?.flightDetails,
+      )
+        ? revalidatedItinerary
+        : itinerary;
 
       const payload = {
         quoteId,
-        lead_passenger: leadPassenger,
+        lead_passenger: leadPassengerWithContact,
         passengers,
-        segments: buildSegments(revalidatedItinerary),
+        segments: buildSegments(segmentsItinerary),
         payment_type: "CASH",
         provider: "sb",
       };
 
+      console.log("Booking payload:", payload);
       const result = await bookFlightAction(payload);
+      console.log("Booking response:", result);
       if (result.success) {
         message.success(result.message || "Flight booked successfully");
-        console.log("Booking response:", result.data);
       } else {
         message.error(result.message || "Booking failed");
       }
