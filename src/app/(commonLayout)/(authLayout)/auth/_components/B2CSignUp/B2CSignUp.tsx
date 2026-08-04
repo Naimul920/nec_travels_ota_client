@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
-import { FiEye, FiEyeOff, FiLock, FiMail, FiPhone } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
 import { b2cRegisterAction, verifyEmailAction } from "@/actions/auth.action";
@@ -138,7 +138,7 @@ export default function B2CSignUp() {
               label="Phone number"
               type="tel"
               placeholder="1700000000"
-              icon={<FiPhone />}
+              flag={phoneCode}
               prefix={phoneCode}
               error={getRegisterError("phone")}
               {...registerFormik.getFieldProps("phone")}

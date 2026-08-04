@@ -1,10 +1,12 @@
 import { InputHTMLAttributes, ReactNode } from "react";
 import ErrorText from "./ErrorText";
+import CountryFlag from "@/components/ui/CountryFlag/CountryFlag";
 
 interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   name: string;
   icon?: ReactNode;
+  flag?: string;
   error?: string;
   prefix?: string;
   trailing?: ReactNode;
@@ -14,6 +16,7 @@ export default function FormField({
   label,
   name,
   icon,
+  flag,
   error,
   prefix,
   trailing,
@@ -33,7 +36,14 @@ export default function FormField({
           error ? "border-rose-400" : "border-slate-200"
         }`}
       >
-        {icon && <span className="mr-3 shrink-0 text-slate-400">{icon}</span>}
+        {flag ? (
+          <CountryFlag
+            dial={flag}
+            className="mr-2 h-4 w-6 rounded-[2px] object-cover"
+          />
+        ) : (
+          icon && <span className="mr-3 shrink-0 text-slate-400">{icon}</span>
+        )}
 
         {prefix && (
           <span className="mr-2 shrink-0 border-r border-slate-200 pr-2 text-sm font-medium text-slate-600">

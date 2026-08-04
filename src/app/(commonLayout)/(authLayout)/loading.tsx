@@ -1,11 +1,7 @@
-import React from "react";
+import AuthCardSkeleton from "./auth/_components/AuthCardSkeleton";
 
-const AuthLoading: React.FC = () => {
-  return (
-    <>
-      <p>Auth Loading...</p>
-    </>
-  );
+const AuthLoading = () => {
+  return <AuthCardSkeleton />;
 };
 
 export default AuthLoading;

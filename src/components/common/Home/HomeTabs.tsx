@@ -29,11 +29,17 @@ export default function HomeTabs() {
           </h1>
         </div>
 
-        <div className="mt-10 rounded-lg bg-white shadow-xs md:mt-16">
+        <div className="relative mt-10 rounded-2xl border py-5  border-white/60 bg-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_10px_40px_rgba(15,35,61,0.15)] backdrop-blur-xs md:mt-16">
+          {/* <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+
+          <div className="pointer-events-none absolute -top-10 right-6 h-44 w-44 rounded-full bg-gradient-to-br from-cyan-200/50 to-emerald-200/30 blur-3xl" />
+
+          <div className="pointer-events-none absolute -left-10 top-1/2 h-52 w-52 -translate-y-1/2 rounded-full bg-gradient-to-tr from-emerald-200/40 to-sky-200/30 blur-3xl" /> */}
+
           <Tabs
             activeKey={activeKey}
             onChange={(key) => setActiveKey(key)}
-            className="flex flex-col items-center justify-center -mt-11"
+            className="relative z-10 flex flex-col items-center justify-center -mt-13"
             containerClassName="max-w-full md:max-w-max"
           >
             <TabPane key="1" tab="Flight" icon={<MdFlight size={20} />}>

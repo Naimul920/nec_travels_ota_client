@@ -80,7 +80,7 @@ export default function ForgotPasswordForm() {
     resetFormik.touched[name] ? resetFormik.errors[name] : undefined;
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4 py-10">
+    <div className="flex min-h-[calc(100svh-4rem)] w-full items-center justify-center px-4 py-10">
       <div className="relative grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-2xl md:grid-cols-5">
         {/* Left ticket stub */}
         <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-brand p-10 md:flex">

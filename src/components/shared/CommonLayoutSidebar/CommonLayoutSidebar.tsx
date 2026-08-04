@@ -19,6 +19,7 @@ const { Sider } = Layout;
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  footerHeight?: number;
 }
 
 const roleToNavRole: Record<string, NavRole> = {
@@ -40,6 +41,7 @@ const publicMenuItems = [
 export default function CommonLayoutSidebar ({
   sidebarOpen,
   setSidebarOpen,
+  footerHeight = 0,
 }:SidebarProps) {
   const pathname = usePathname();
   // const { user, isAuthenticated, loading } = useAuth();
@@ -189,7 +191,8 @@ export default function CommonLayoutSidebar ({
         width={180}
         style={{
           backgroundColor: "#ffffff",
-          height: "100vh",
+          height: `calc(100vh - 64px - ${footerHeight}px)`,
+          top: "64px",
         }}
         className={`
           bg-white!

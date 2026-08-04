@@ -250,7 +250,7 @@ const FlightSearch: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-5 py-20 sm:px-10 bg-white" id="mainScrollContainer">
+    <div className="max-w-7xl mx-auto pt-2 px-5 sm:px-10 bg-white " id="mainScrollContainer">
       <FlightSearchSummary />
 
       {isPending && <FlightSearchSkeleton cardCount={3} />}
@@ -265,15 +265,17 @@ const FlightSearch: React.FC = () => {
           <IoFilterSharp size={15} />
         </Button>
 
-        <h3 className="md:text-sm text-xs font-semibold">
+        <div className="flex justify-between w-full px-3">
+          <h3 className="md:text-sm text-xs font-semibold">
           {isPending ? "Searching..." : `${totalFlights} Available Flights`}
         </h3>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ">
           <SearchCountdown expiresAt={data?.data?.expiresAt} />
           <p className="text-xs">
             <sup className="text-secondary">*</sup>Price Includes VAT & Tax
           </p>
+        </div>
         </div>
       </div>
 

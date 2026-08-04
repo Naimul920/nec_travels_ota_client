@@ -5,6 +5,7 @@ import { useState } from "react";
 import { FiBriefcase, FiSend, FiUser } from "react-icons/fi";
 import B2BSignUp from "../B2BSignUp/B2BSignUp";
 import B2CSignUp from "../B2CSignUp/B2CSignUp";
+import { FlightRoute } from "@/components/shared/FlightRoute/FlightRoute";
 
 export type SignUpFlow = "b2c" | "b2b";
 
@@ -16,8 +17,8 @@ export default function SignUp() {
   const [flow, setFlow] = useState<SignUpFlow>("b2c");
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center bg-[#F7F4EC] px-4 py-10 ">
-      <div className="relative grid w-full max-w-6xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-2xl md:grid-cols-5">
+    <div className="flex min-h-[calc(100svh-4rem)] w-full items-center justify-center px-4 py-10">
+      <div className="relative grid w-full max-w-6xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-xl md:grid-cols-5">
         {/* Left ticket stub */}
         <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-brand p-10 md:flex">
           <div className="relative z-10 flex items-center gap-2">
@@ -38,14 +39,14 @@ export default function SignUp() {
                 </p>
               </div>
 
-              <div className="relative flex-1">
+              {/* <div className="relative flex-1">
                 <div className="border-t border-dashed border-[#9FB4C7]/50" />
                 <FiSend
                   className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 text-white"
                   size={14}
                 />
-              </div>
-
+              </div> */}
+              <FlightRoute />
               <div className="text-right">
                 <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
                   JED

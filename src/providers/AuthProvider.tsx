@@ -19,6 +19,7 @@ export default function AuthProvider({
         id: user.id,
         role: user.role,
         departments: user.admin?.department ?? "",
+        agency_code: user.b2b_user?.agency_code ?? "",
         full_name: user.profile?.full_name ?? "",
         first_name: user.profile?.first_name ?? "",
         last_name: user.profile?.last_name??"",

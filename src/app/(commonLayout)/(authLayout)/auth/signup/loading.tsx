@@ -1,7 +1,5 @@
-export default function loading() {
-  return (
-    <div>
-      <p>Signup loading...</p>
-    </div>
-  )
+import AuthCardSkeleton from "../_components/AuthCardSkeleton";
+
+export default function Loading() {
+  return <AuthCardSkeleton />;
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FormikProps } from "formik";
-import { FiEye, FiEyeOff, FiLock, FiMail, FiPhone, FiUser } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock, FiMail, FiUser } from "react-icons/fi";
 import { B2BSignUpFormValues } from "./types";
 import FormField from "./FormField";
 import { useCurrencyStore } from "@/store/currency.store";
@@ -53,7 +53,7 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
           label="Phone number"
           type="tel"
           placeholder="1700000000"
-          icon={<FiPhone />}
+          flag={phoneCode}
           prefix={phoneCode}
           error={formik.errors.phone}
           {...formik.getFieldProps("phone")}

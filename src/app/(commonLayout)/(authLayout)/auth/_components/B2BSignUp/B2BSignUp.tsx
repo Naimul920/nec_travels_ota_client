@@ -52,8 +52,10 @@ export default function B2BSignUp() {
 
   const router = useRouter();
 
-  const { phoneCode, selectedCurrencyId, selectedCurrencyCode } =
+  const { geo, phoneCode, selectedCurrencyId, selectedCurrencyCode } =
     useCurrencyStore();
+
+  console.log("countryCode", geo?.countryCode);
 
   const formik = useFormik<B2BSignUpFormValues>({
     initialValues,
@@ -67,7 +69,8 @@ export default function B2BSignUp() {
       } catch {
         setSubmitStatus({
           type: "error",
-          message: "Some information is missing or invalid. Please review the previous steps.",
+          message:
+            "Some information is missing or invalid. Please review the previous steps.",
         });
         setSubmitting(false);
         return;
@@ -85,17 +88,27 @@ export default function B2BSignUp() {
       formData.append("agency_name", values.agency_name);
       formData.append("business_type", values.business_type);
       formData.append("currency_Id", values.currency_Id);
-      formData.append("caab_certificate_number", values.caab_certificate_number);
-      formData.append("caab_certificate_expiry", values.caab_certificate_expiry);
+      formData.append(
+        "caab_certificate_number",
+        values.caab_certificate_number,
+      );
+      formData.append(
+        "caab_certificate_expiry",
+        values.caab_certificate_expiry,
+      );
       formData.append("city", values.city);
       formData.append("postcode", values.postcode);
       formData.append("address", values.address);
+      formData.append("country", geo?.countryCode || "");
 
       if (values.logo) formData.append("logo", values.logo);
-      if (values.trade_license) formData.append("trade_license", values.trade_license);
-      if (values.caab_certificate) formData.append("caab_certificate", values.caab_certificate);
+      if (values.trade_license)
+        formData.append("trade_license", values.trade_license);
+      if (values.caab_certificate)
+        formData.append("caab_certificate", values.caab_certificate);
       if (values.nid) formData.append("nid", values.nid);
-      if (values.business_card) formData.append("business_card", values.business_card);
+      if (values.business_card)
+        formData.append("business_card", values.business_card);
 
       try {
         const result = await b2bRegisterAction(formData);
@@ -149,7 +162,12 @@ export default function B2BSignUp() {
     if (formik.values.currency_Id || !selectedCurrencyId) return;
     formik.setFieldValue("currency", selectedCurrencyCode);
     formik.setFieldValue("currency_Id", selectedCurrencyId);
-  }, [selectedCurrencyId, selectedCurrencyCode, formik.values.currency_Id, formik]);
+  }, [
+    selectedCurrencyId,
+    selectedCurrencyCode,
+    formik.values.currency_Id,
+    formik,
+  ]);
 
   const goToNextStep = async () => {
     const schema = stepSchemas[currentStep - 1];
@@ -188,9 +206,15 @@ export default function B2BSignUp() {
   if (step === "verify") {
     return (
       <div className="mx-auto w-full max-w-4xl p-4">
-        <form onSubmit={verifyFormik.handleSubmit} className="mt-8 space-y-6" noValidate>
+        <form
+          onSubmit={verifyFormik.handleSubmit}
+          className="mt-8 space-y-6"
+          noValidate
+        >
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900">Verify your email</h2>
+            <h2 className="text-2xl font-bold text-slate-900">
+              Verify your email
+            </h2>
             <p className="mt-1 text-sm text-slate-500">
               Enter the OTP sent to <strong>{registeredEmail}</strong>
             </p>
@@ -215,7 +239,10 @@ export default function B2BSignUp() {
           )}
 
           <div>
-            <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="otp"
+              className="mb-1.5 block text-sm font-medium text-slate-700"
+            >
               OTP Code
             </label>
             <div className="relative">
@@ -236,7 +263,9 @@ export default function B2BSignUp() {
               />
             </div>
             {verifyFormik.touched.otp && verifyFormik.errors.otp && (
-              <p className="mt-1 text-xs text-rose-500">{verifyFormik.errors.otp}</p>
+              <p className="mt-1 text-xs text-rose-500">
+                {verifyFormik.errors.otp}
+              </p>
             )}
           </div>
 

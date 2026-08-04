@@ -1,9 +1,5 @@
-import React from 'react'
+import AuthCardSkeleton from "../_components/AuthCardSkeleton";
 
-export default function loading() {
-  return (
-    <div>
-      <h1>Sign In loading...</h1>
-    </div>
-  )
+export default function Loading() {
+  return <AuthCardSkeleton />;
 }

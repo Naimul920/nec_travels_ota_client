@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MdPhone, MdEmail, MdLocationOn } from "react-icons/md";
-import { FaPlane } from "react-icons/fa6";
 import {
   FaFacebookF,
   FaInstagram,
@@ -12,6 +11,9 @@ import {
 } from "react-icons/fa6";
 
 import type { IconType } from "react-icons";
+import { FlightRoute } from "../FlightRoute/FlightRoute";
+import { useAuthStore } from "@/store/auth.store";
+import { ROLE } from "@/constant";
 type SocialLink = {
   label: string;
   href: string;
@@ -94,150 +96,129 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Signature element: a dashed flight-route rule with a plane gliding along it. */
-function FlightRoute() {
-  return (
-    <div
-      aria-hidden="true"
-      className="relative h-6 w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
-    >
-      <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 border-t border-dashed border-[#F2A93B]/30" />
-      <FaPlane
-        className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#F2A93B] motion-safe:animate-[fly_16s_linear_infinite]"
-        style={{ left: "-5%" }}
-      />
-      <style>{`
-        @keyframes fly {
-          from { left: -5%; opacity: 0; }
-          5% { opacity: 1; }
-          95% { opacity: 1; }
-          to { left: 105%; opacity: 0; }
-        }
-      `}</style>
-    </div>
-  );
-}
-
 export default function Footer() {
+  const { user } = useAuthStore();
   return (
     <footer className="w-full bg-[#0B1F30] text-[#8FA6BC]">
       <FlightRoute />
+      {user?.role == ROLE.B2B ? (
+        <div>agency footer</div>
+      ) : (
+        <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
+          {/* Main grid */}
+          <div className="grid grid-cols-1 gap-10 pb-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+            {/* Brand */}
+            <div className="flex flex-col items-start gap-5 sm:col-span-2 lg:col-span-4">
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/assets/images/logo.png"
+                  alt="NEC Travels Logo"
+                  width={150}
+                  height={40}
+                  className="h-auto w-auto"
+                />
+              </Link>
 
-      <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
-        {/* Main grid */}
-        <div className="grid grid-cols-1 gap-10 pb-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
-          {/* Brand */}
-          <div className="flex flex-col items-start gap-5 sm:col-span-2 lg:col-span-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/assets/images/logo.png"
-                alt="NEC Travels Logo"
-                width={150}
-                height={40}
-                className="h-auto w-auto"
-              />
-            </Link>
+              <p className="max-w-xs text-sm leading-6 text-[#8FA6BC]">
+                Discover and book unique travel experiences — flights, hotels,
+                visas and more — all in one place with NEC Travels.
+              </p>
 
-            <p className="max-w-xs text-sm leading-6 text-[#8FA6BC]">
-              Discover and book unique travel experiences — flights, hotels,
-              visas and more — all in one place with NEC Travels.
-            </p>
+              <div className="flex items-center gap-3">
+                {socialLinks.map((social) => {
+                  const Icon = social.icon;
 
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social) => {
-                const Icon = social.icon;
+                  return (
+                    <Link
+                      key={social.label}
+                      href={social.href}
+                      aria-label={social.label}
+                      style={{ background: social.background }}
+                      className="flex h-11 w-11 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-1 hover:scale-110"
+                    >
+                      <Icon className="text-[20px] text-white" />
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
 
-                return (
-                  <Link
-                    key={social.label}
-                    href={social.href}
-                    aria-label={social.label}
-                    style={{ background: social.background }}
-                    className="flex h-11 w-11 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-1 hover:scale-110"
+            {/* Learn More */}
+            <div className="lg:col-span-2">
+              <SectionHeading>Learn More</SectionHeading>
+              <ul className="flex flex-col gap-3 text-sm">
+                {learnMoreLinks.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="inline-block text-[#8FA6BC]! transition-all duration-200 hover:translate-x-1 hover:text-brand! focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-brand"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Products */}
+            <div className="lg:col-span-2">
+              <SectionHeading>Products</SectionHeading>
+              <ul className="flex flex-col gap-3 text-sm">
+                {productLinks.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="inline-block text-[#8FA6BC]! transition-all duration-200 hover:translate-x-1 hover:text-brand! focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div className="sm:col-span-2 lg:col-span-4">
+              <SectionHeading>Contact Us</SectionHeading>
+              <ul className="space-y-3.5 text-sm">
+                <li className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                    <MdPhone />
+                  </span>
+                  <span className="text-[#F5F1E8]">+880 9613-774477</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                    <MdEmail />
+                  </span>
+                  <span className="text-[#F5F1E8]">support@nectravels.com</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                    <MdLocationOn />
+                  </span>
+                  <span className="text-[#F5F1E8]">Dhaka, Bangladesh</span>
+                </li>
+              </ul>
+
+              <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6C89A1]">
+                We Accept
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {paymentMethods.map((pm) => (
+                  <span
+                    key={pm.label}
+                    className={`flex h-7 items-center justify-center rounded-md border border-white/10 px-2 text-[10px] font-bold ${pm.className}`}
                   >
-                    <Icon className="text-[20px] text-white" />
-                  </Link>
-                );
-              })}
+                    {pm.label}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Learn More */}
-          <div className="lg:col-span-2">
-            <SectionHeading>Learn More</SectionHeading>
-            <ul className="flex flex-col gap-3 text-sm">
-              {learnMoreLinks.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="inline-block text-[#8FA6BC]! transition-all duration-200 hover:translate-x-1 hover:text-brand! focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-brand"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Products */}
-          <div className="lg:col-span-2">
-            <SectionHeading>Products</SectionHeading>
-            <ul className="flex flex-col gap-3 text-sm">
-              {productLinks.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="inline-block text-[#8FA6BC]! transition-all duration-200 hover:translate-x-1 hover:text-brand! focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div className="sm:col-span-2 lg:col-span-4">
-            <SectionHeading>Contact Us</SectionHeading>
-            <ul className="space-y-3.5 text-sm">
-              <li className="flex items-center gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
-                  <MdPhone />
-                </span>
-                <span className="text-[#F5F1E8]">+880 9613-774477</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
-                  <MdEmail />
-                </span>
-                <span className="text-[#F5F1E8]">support@nectravels.com</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
-                  <MdLocationOn />
-                </span>
-                <span className="text-[#F5F1E8]">Dhaka, Bangladesh</span>
-              </li>
-            </ul>
-
-            <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6C89A1]">
-              We Accept
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {paymentMethods.map((pm) => (
-                <span
-                  key={pm.label}
-                  className={`flex h-7 items-center justify-center rounded-md border border-white/10 px-2 text-[10px] font-bold ${pm.className}`}
-                >
-                  {pm.label}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* App banner */}
-        {/* <div className="mb-12 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-white/5 p-6 md:flex-row md:px-8">
+          {/* App banner */}
+          {/* <div className="mb-12 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-white/5 p-6 md:flex-row md:px-8">
           <div className="text-center md:text-left">
             <p className="text-lg font-bold text-[#F5F1E8]">
               Get the NEC Travels App
@@ -275,19 +256,20 @@ export default function Footer() {
           </div>
         </div> */}
 
-        {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-[#6C89A1] md:flex-row">
-          <p>© 2025 NEC Travel. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <Link href="#" className="transition-colors hover:text-[#F2A93B]">
-              Terms of Service
-            </Link>
-            <Link href="#" className="transition-colors hover:text-[#F2A93B]">
-              Privacy Policy
-            </Link>
+          {/* Bottom bar */}
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-[#6C89A1] md:flex-row">
+            <p>© 2025 NEC Travel. All rights reserved.</p>
+            <div className="flex items-center gap-6">
+              <Link href="#" className="transition-colors hover:text-[#F2A93B]">
+                Terms of Service
+              </Link>
+              <Link href="#" className="transition-colors hover:text-[#F2A93B]">
+                Privacy Policy
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </footer>
   );
 }

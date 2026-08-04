@@ -36,13 +36,26 @@ export async function getCurrenciesAction(): Promise<CurrencyItem[]> {
   }
 }
 
+// export async function detectUserCurrencyCode(): Promise<UserGeo | null> {
+//   try {
+//     const res = await httpClient.get<UserGeo>(
+//       "https://pro.ip-api.com/json/?key=ygX4gRsbNbvVHAu",
+//     );
+//     console.log("User Geo Data:", res.data);
+//     return res.data;
+//   } catch {
+//     return null;
+//   }
+// }
+
 export async function detectUserCurrencyCode(): Promise<UserGeo | null> {
   try {
-    const res = await httpClient.get<UserGeo>(
+    const response = await httpClient.get<UserGeo>(
       "https://pro.ip-api.com/json/?key=ygX4gRsbNbvVHAu",
     );
-    return res.data;
-  } catch {
+    return response as unknown as UserGeo;
+  } catch (error) {
+    console.error("Failed to detect user currency:", error);
     return null;
   }
 }

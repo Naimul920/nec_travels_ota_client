@@ -15,6 +15,7 @@ import {
   verifyEmailSchema,
 } from "@/validations/auth.validation";
 import { LoginResponse } from "@/types/login.type";
+import { FlightRoute } from "@/components/shared/FlightRoute/FlightRoute";
 
 interface SignInFormValues {
   email: string;
@@ -176,14 +177,14 @@ export default function SignIn({
       className={
         compact
           ? "w-full"
-          : "flex min-h-[calc(100vh-4rem)] w-full items-center justify-center  px-4 py-10"
+          : "flex min-h-[calc(100svh-4rem)] w-full items-center justify-center px-4 py-10"
       }
     >
       <div
         className={
           compact
             ? "w-full"
-            : "relative grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-2xl md:grid-cols-5"
+            : "relative grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-xl md:grid-cols-5"
         }
       >
         {/* Left ticket stub */}
@@ -207,14 +208,14 @@ export default function SignIn({
                     DHAKA
                   </p>
                 </div>
-
-                <div className="relative flex-1">
+<FlightRoute/>
+                {/* <div className="relative flex-1">
                   <div className="border-t border-dashed border-[#9FB4C7]/50" />
                   <FiSend
                     className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 text-white"
                     size={14}
                   />
-                </div>
+                </div> */}
 
                 <div className="text-right">
                   <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
@@ -226,11 +227,13 @@ export default function SignIn({
                 </div>
               </div>
 
-              <p className="font-grotesk text-2xl font-medium leading-snug text-[#F7F4EC]">
+              {/* <p className="font-grotesk text-2xl font-medium leading-snug text-[#F7F4EC]">
                 Track every booking,
                 <br />
                 from check-in to landing.
-              </p>
+              </p> */}
+
+              <p className="font-grotesk text-xl font-medium leading-6 text-[#F7F4EC]">Every flight. <br/> Every destination. <br/> One trusted platform.</p>
             </div>
 
             {/* Barcode */}

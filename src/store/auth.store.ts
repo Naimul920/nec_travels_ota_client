@@ -4,6 +4,7 @@ export interface AuthUser {
   id: string;
   role: string;
   departments: string;
+  agency_code: string;
   full_name: string;
   first_name: string;
   last_name: string;

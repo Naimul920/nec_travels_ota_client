@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Footer from "@/components/shared/Footer/Footer";
 import CommonLayoutNavbar from "../CommonLayoutNavbar/CommonLayoutNavbar";
 import CommonLayoutSidebar from "../CommonLayoutSidebar/CommonLayoutSidebar";
@@ -14,6 +14,8 @@ interface CommonLayoutProps {
 export default function CommonLayout({ children }: CommonLayoutProps) {
   const { user, isLoggedIn } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [footerHeight, setFooterHeight] = useState(0);
 
   const showSidebar = isLoggedIn && user && user.role !== ROLE.B2C;
 
@@ -22,6 +24,17 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
       setSidebarOpen(true);
     }
   }, [showSidebar]);
+
+  useEffect(() => {
+    const measureFooter = () => {
+      if (footerRef.current) {
+        setFooterHeight(footerRef.current.offsetHeight);
+      }
+    };
+    measureFooter();
+    window.addEventListener("resize", measureFooter);
+    return () => window.removeEventListener("resize", measureFooter);
+  }, []);
 
   return (
     <div className="flex flex-col bg-white text-gray-800">
@@ -37,11 +50,14 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
             <CommonLayoutSidebar
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}
+              footerHeight={footerHeight}
             />
           </aside>
         )}
       </div>
-      <Footer />
+      <div ref={footerRef}>
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@ export interface UserProfileResponse {
   role: string;
   email: string;
   phone:string;
+  agency_code?:string;
   admin?: { department?: string };
   profile?: {
     full_name?: string;
@@ -14,6 +15,7 @@ export interface UserProfileResponse {
   };
   b2b_user?: {
     logo?: string | null;
+    agency_code?: string | null;
   };
   wallet?: {
     balance?: number;

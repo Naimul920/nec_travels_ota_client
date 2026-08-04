@@ -377,7 +377,11 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
       </div>
 
       {/* Form Content Rendering */}
-      <div className="bg-white md:py-5">
+      <div
+        className={`${
+          useFlight === "search" ? "bg-white" : "bg-transparent"
+        } md:py-5`}
+      >
         {tripType === "oneway" && (
           <Oneway
             data={flightData.oneway}

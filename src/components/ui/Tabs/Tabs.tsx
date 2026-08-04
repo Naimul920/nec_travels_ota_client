@@ -30,7 +30,7 @@ const Tabs: React.FC<TabsProps> = ({
     <div className={clsx("w-full", className)}>
       <div
         className={clsx(
-          "flex items-center bg-white border border-gray-100 rounded-lg md:rounded-xl overflow-x-auto flex-nowrap no-scrollbar shadow-xs p-1",
+          "flex items-center rounded-md border border-gray-200 bg-white p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_16px_rgba(15,35,61,0.08)] overflow-x-auto flex-nowrap no-scrollbar",
           containerClassName
         )}
       >
@@ -44,10 +44,10 @@ const Tabs: React.FC<TabsProps> = ({
             <Button
               onClick={() => !isDisabled && onChange(child.key as string)}
               className={clsx(
-                "flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold transition-all duration-300 rounded-md md:rounded-lg whitespace-nowrap shrink-0",
+                "flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold transition-all duration-300 rounded-full whitespace-nowrap shrink-0",
                 isActive
-                  ? "bg-secondary border-primary text-white shadow-sm"
-                  : "bg-transparent text-gray-600! hover:text-gray-900 hover:bg-gray-50",
+                  ? "bg-secondary text-white shadow-lg shadow-secondary/30"
+                  : "bg-transparent text-slate-700! hover:text-slate-900! hover:bg-gray-100!",
                 isDisabled &&
                   "opacity-40 cursor-not-allowed pointer-events-none grayscale"
               )}
@@ -57,7 +57,7 @@ const Tabs: React.FC<TabsProps> = ({
                 <span
                   className={clsx(
                     "text-lg md:text-xl",
-                    isActive ? "text-white" : "text-green-600"
+                    isActive ? "text-white" : "text-emerald-600"
                   )}
                 >
                   {child.props.icon}

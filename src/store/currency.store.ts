@@ -108,9 +108,8 @@ export const useCurrencyStore = create<CurrencyState>((set, get) => ({
       getCurrenciesAction(),
       detectUserCurrencyCode(),
     ]);
-
     const countryCode = geo?.countryCode;
-    const currencyCode = getCurrencyCodeByCountry(countryCode) || "BDT";
+    const currencyCode = getCurrencyCodeByCountry(countryCode) || "";
     const match = currencies.find((c) => c.code === currencyCode);
     const selected =
       match ||
