@@ -22,41 +22,43 @@ const Input: React.FC<InputProps> = ({
 }) => {
   return (
     <div className={clsx("w-full", className)}>
-      {/* Label */}
       {label && (
-        <label className="mb-1 block text-sm font-medium text-gray-700">
+        <label className="mb-1.5 block text-sm font-medium text-gray-700">
           {label}
+          {props.required && <span className="ml-0.5 text-red-500">*</span>}
         </label>
       )}
 
-      {/* Input wrapper for icons */}
       <div className="relative flex items-center">
-        {/* Left icon */}
         {iconLeft && (
-          <span className="absolute left-3 text-gray-500">{iconLeft}</span>
+          <span className="pointer-events-none absolute left-3.5 text-gray-400">
+            {iconLeft}
+          </span>
         )}
 
         <input
           type={type}
           className={clsx(
-            "placeholder:text-muted-foreground border-input flex h-12 w-full min-w-0 border bg-transparent px-3 py-1 text-base shadow-xs outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-            iconLeft && "pl-10", 
-            iconRight && "pr-10", 
-            error && "border-red-500",
+            "h-12 w-full min-w-0 rounded-lg border-2 border-gray-200 bg-white px-3.5 text-sm text-gray-800 shadow-sm outline-none transition-all duration-200",
+            "placeholder:font-normal placeholder:text-gray-400",
+            "hover:border-gray-300",
+            "focus:border-primary focus:ring-4 focus:ring-primary/15",
+            "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-60",
+            iconLeft && "pl-10",
+            iconRight && "pr-10",
+            error && "border-red-400 hover:border-red-400 focus:border-red-400 focus:ring-red-400/15",
             className
           )}
           {...props}
         />
 
-        {/* Right icon */}
         {iconRight && (
-          <span className="absolute right-3 text-gray-500 cursor-pointer">
+          <span className="absolute right-3 text-gray-400 cursor-pointer">
             {iconRight}
           </span>
         )}
       </div>
 
-      {/* Error message */}
       {error && errorMessage && (
         <p className="mt-1 text-sm text-red-500">{errorMessage}</p>
       )}

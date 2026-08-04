@@ -12,11 +12,13 @@ import type { BookingFormValues, Passenger } from "@/interface";
 import type {
   BookingPassenger,
   BookingSegment,
+  FlightBookingResponseData,
   Itinerary,
   LeadPassenger,
   RevalidateItineraryPayload,
 } from "@/interface/flight";
 import TravelersForm from "../Booking/TravelersForm";
+import BookingSuccess from "../Booking/BookingSuccess";
 import { createPassengers } from "@/utils/createPassengers";
 import {
   searchFlightAction,
@@ -94,6 +96,13 @@ const FlightBooking: React.FC = () => {
   // 3. Read search parameters natively
   const searchParamsHook = useSearchParams();
   const [isBooking, setIsBooking] = useState(false);
+  const [bookingResult, setBookingResult] = useState<{
+    booking: FlightBookingResponseData;
+    segments: BookingSegment[];
+    passengers: BookingPassenger[];
+    leadPassenger: LeadPassenger;
+    total: number;
+  } | null>(null);
   const { user } = useAuthStore();
   const { message } = App.useApp();
 
@@ -291,12 +300,30 @@ const FlightBooking: React.FC = () => {
       const result = await bookFlightAction(payload);
       console.log("Booking response:", result);
       if (result.success) {
+        const total =
+          itinerary.saleCurrencyAmount?.offerAmount ??
+          itinerary.saleCurrencyAmount?.totalAmount ??
+          itinerary.saleCurrencyAmount?.baseAmount ??
+          0;
+        setBookingResult({
+          booking: result.data,
+          segments: buildSegments(segmentsItinerary),
+          passengers,
+          leadPassenger: leadPassengerWithContact,
+          total,
+        });
         message.success(result.message || "Flight booked successfully");
       } else {
         message.error(result.message || "Booking failed");
       }
-    } catch {
-      message.error("Booking failed. Please try again.");
+    } catch (error: any) {
+      console.error("Booking error:", error?.response?.data || error);
+      const msg = Array.isArray(error?.response?.data?.message)
+        ? error.response.data.message.join(", ")
+        : error?.response?.data?.message ||
+          error?.message ||
+          "Booking failed. Please try again.";
+      message.error(msg);
     } finally {
       setIsBooking(false);
     }
@@ -310,6 +337,18 @@ const FlightBooking: React.FC = () => {
     );
   }
 
+  if (bookingResult) {
+    return (
+      <BookingSuccess
+        booking={bookingResult.booking}
+        segments={bookingResult.segments}
+        passengers={bookingResult.passengers}
+        leadPassenger={bookingResult.leadPassenger}
+        total={bookingResult.total}
+      />
+    );
+  }
+
   if (!itinerary) {
     return (
       <div className="text-center py-10 text-gray-500 text-sm">
@@ -319,7 +358,7 @@ const FlightBooking: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto px-5 sm:px-10 py-20">
+    <div className="max-w-[1600px] mx-auto p-10">
       <h1 className="text-xl font-semibold mb-4">Flight Booking</h1>
 
       <Formik
@@ -327,20 +366,54 @@ const FlightBooking: React.FC = () => {
         enableReinitialize={true}
         onSubmit={handleSubmit}
       >
-        {() => (
-          <Form>
-            <TravelersForm />
-            <Button
-              type="submit"
-              className={`mt-6 ${
-                isBooking ? "opacity-60 cursor-not-allowed" : ""
-              }`}
-              disabled={isBooking}
-            >
-              {isBooking ? "Booking..." : "Submit Booking"}
-            </Button>
-          </Form>
-        )}
+        {({ values }) => {
+          const travelerSummary = [
+            { n: values.adult.length, label: "Adult" },
+            { n: values.child.length, label: "Child" },
+            { n: values.kid.length, label: "Kid" },
+            { n: values.infant.length, label: "Infant" },
+          ].filter((t) => t.n > 0);
+
+          const total =
+            itinerary.saleCurrencyAmount?.offerAmount ??
+            itinerary.saleCurrencyAmount?.totalAmount ??
+            itinerary.saleCurrencyAmount?.baseAmount ??
+            0;
+
+          return (
+            <Form>
+              <TravelersForm />
+
+              <div className="sticky bottom-0 z-10 mt-8 -mx-5 flex flex-wrap items-center justify-between gap-4 border-t border-gray-200 bg-white/95 px-5 py-4 backdrop-blur sm:-mx-10 sm:px-10">
+                <div>
+                  <p className="text-xs text-gray-400">
+                    {travelerSummary
+                      .map(
+                        (t) =>
+                          `${t.n} ${t.label}${t.n > 1 ? "s" : ""}`,
+                      )
+                      .join(", ")}
+                  </p>
+                  <p className="text-xl font-bold text-gray-900">
+                    BDT{" "}
+                    {total.toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                </div>
+                <Button
+                  type="submit"
+                  className={`!h-12 !px-10 !text-base ${
+                    isBooking ? "opacity-60 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isBooking}
+                >
+                  {isBooking ? "Booking..." : "Submit Booking"}
+                </Button>
+              </div>
+            </Form>
+          );
+        }}
       </Formik>
     </div>
   );

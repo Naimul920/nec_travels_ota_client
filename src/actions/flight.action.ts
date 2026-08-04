@@ -56,9 +56,22 @@ export const revalidateItineraryAction = async (
 export const bookFlightAction = async (
   payload: BookFlightPayload,
 ): Promise<FlightBookingResponse> => {
-  const res = await httpClient.post<FlightBookingResponse["data"]>(
-    "/api/v1/flights/book",
-    payload,
-  );
-  return res as FlightBookingResponse;
+  try {
+    const res = await httpClient.post<FlightBookingResponse["data"]>(
+      "/api/v1/flights/book",
+      payload,
+    );
+    return res as FlightBookingResponse;
+  } catch (error: any) {
+    return {
+      success: false,
+      statusCode: error?.response?.status || 500,
+      message: Array.isArray(error?.response?.data?.message)
+        ? error.response.data.message.join(", ")
+        : error?.response?.data?.message ||
+          error?.message ||
+          "Could not book flight. Please try again.",
+      data: { booking_id: "", booking_reference: "", pnr: "" },
+    };
+  }
 };
