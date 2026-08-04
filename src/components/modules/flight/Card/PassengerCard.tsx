@@ -4,13 +4,16 @@ import type { ReactNode } from "react";
 import { useFormikContext } from "formik";
 import type { PassengerType } from "@/types/passengerAlertBank";
 import type { BookingFormValues } from "@/interface";
-import { Input, Select } from "@/components/ui";
+import { Input, Select, DatePicker } from "@/components/ui";
+import {
+  getDateOfBirthDisabledDate,
+  getPassportExpiryDisabledDate,
+} from "@/utils/passengerAge";
 import { FaUser, FaUserFriends, FaChild, FaBaby, FaGlobe } from "react-icons/fa";
 import {
   MdOutlineMailOutline,
   MdOutlinePhone,
   MdOutlineBadge,
-  MdOutlineCalendarMonth,
 } from "react-icons/md";
 
 interface Props {
@@ -30,13 +33,13 @@ const TYPE_META: Record<
   },
   child: {
     label: "Child",
-    sub: "5 to under 12",
+    sub: "7 to 11 years",
     icon: <FaUserFriends />,
     tone: "bg-secondary/10 text-secondary",
   },
   kid: {
     label: "Kid",
-    sub: "2 to under 5",
+    sub: "2 to 6 years",
     icon: <FaChild />,
     tone: "bg-amber-50 text-amber-500",
   },
@@ -52,13 +55,22 @@ const TITLE_OPTIONS = ["Mr", "Mrs", "Ms"].map((t) => ({ label: t, value: t }));
 const GENDER_OPTIONS = ["Male", "Female"].map((g) => ({ label: g, value: g }));
 
 const PassengerCard: React.FC<Props> = ({ type, index }) => {
-  const { values, handleChange, setFieldValue } =
+  const { values, errors, handleChange, setFieldValue } =
     useFormikContext<BookingFormValues>();
 
   const meta = TYPE_META[type];
   const baseName = `${type}.${index}`;
   const isLead = type === "adult" && index === 0;
   const passenger = values[type][index];
+
+  const err = (field: string) => {
+    const flat = errors as Record<string, string | undefined>;
+    const msg = flat[`${baseName}.${field}`];
+    return { error: Boolean(msg), errorMessage: msg };
+  };
+
+  const dateOfBirthDisabledDate = getDateOfBirthDisabledDate(type);
+  const passportExpiryDisabledDate = getPassportExpiryDisabledDate();
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const gender = e.target.value === "Mr" ? "Male" : "Female";
@@ -100,6 +112,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           options={TITLE_OPTIONS}
           placeholder="Select title"
           required
+          {...err("title")}
         />
         <Input
           label="First Name"
@@ -108,6 +121,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           onChange={handleChange}
           placeholder="First name"
           required
+          {...err("firstname")}
         />
         <Input
           label="Last Name"
@@ -116,6 +130,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           onChange={handleChange}
           placeholder="Last name"
           required
+          {...err("lastname")}
         />
         <Select
           label="Gender"
@@ -125,15 +140,17 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           options={GENDER_OPTIONS}
           placeholder="Select gender"
           required
+          {...err("gender")}
         />
-        <Input
+        <DatePicker
           label="Date of Birth"
-          type="date"
-          iconLeft={<MdOutlineCalendarMonth />}
           name={`${baseName}.date_of_birth`}
           value={passenger.date_of_birth}
-          onChange={handleChange}
+          onChange={(v) => setFieldValue(`${baseName}.date_of_birth`, v)}
+          placeholder="mm/dd/yyyy"
+          disabledDate={dateOfBirthDisabledDate}
           required
+          {...err("date_of_birth")}
         />
         <Input
           label="Country"
@@ -143,6 +160,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           onChange={handleChange}
           placeholder="Country"
           required
+          {...err("country")}
         />
         <Input
           label="Passport Number"
@@ -152,15 +170,17 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           onChange={handleChange}
           placeholder="Passport number"
           required
+          {...err("passport_number")}
         />
-        <Input
+        <DatePicker
           label="Passport Expiry"
-          type="date"
-          iconLeft={<MdOutlineCalendarMonth />}
           name={`${baseName}.passport_expire`}
           value={passenger.passport_expire}
-          onChange={handleChange}
+          onChange={(v) => setFieldValue(`${baseName}.passport_expire`, v)}
+          placeholder="mm/dd/yyyy"
+          disabledDate={passportExpiryDisabledDate}
           required
+          {...err("passport_expire")}
         />
 
         {isLead && (
@@ -173,6 +193,8 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
               value={passenger.email}
               onChange={handleChange}
               placeholder="you@example.com"
+              required
+              {...err("email")}
             />
             <Input
               label="Phone"
@@ -182,6 +204,8 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
               value={passenger.phone}
               onChange={handleChange}
               placeholder="+880 1XXXXXXXXX"
+              required
+              {...err("phone")}
             />
           </>
         )}

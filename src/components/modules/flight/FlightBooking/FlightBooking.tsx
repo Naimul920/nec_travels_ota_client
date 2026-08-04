@@ -21,6 +21,11 @@ import TravelersForm from "../Booking/TravelersForm";
 import BookingSuccess from "../Booking/BookingSuccess";
 import { createPassengers } from "@/utils/createPassengers";
 import {
+  AGE_RANGES,
+  calculateAge,
+  getPassengerTypeByAge,
+} from "@/utils/passengerAge";
+import {
   searchFlightAction,
   revalidateItineraryAction,
   bookFlightAction,
@@ -29,9 +34,66 @@ import { useAuthStore } from "@/store/auth.store";
 
 const PASSENGER_TYPE_MAP: Record<string, string> = {
   adult: "ADT",
-  child: "CHD",
-  kid: "CHD",
+  child: "C07",
+  kid: "C03",
   infant: "INF",
+};
+
+const TYPE_LABEL: Record<string, string> = {
+  adult: "Adult",
+  child: "Child",
+  kid: "Kid",
+  infant: "Infant",
+};
+
+const validateBooking = (values: BookingFormValues) => {
+  const errors: Record<string, string> = {};
+
+  (["adult", "child", "kid", "infant"] as const).forEach((type) => {
+    values[type].forEach((p, index) => {
+      const base = `${type}.${index}`;
+      const label = TYPE_LABEL[type];
+      const age = calculateAge(p.date_of_birth);
+      const range = AGE_RANGES[type];
+
+      if (!p.title) errors[`${base}.title`] = `${label} title is required`;
+      if (!p.firstname)
+        errors[`${base}.firstname`] = `${label} first name is required`;
+      if (!p.lastname)
+        errors[`${base}.lastname`] = `${label} last name is required`;
+      if (!p.gender) errors[`${base}.gender`] = `${label} gender is required`;
+
+      if (!p.date_of_birth) {
+        errors[`${base}.date_of_birth`] = "Date of birth is required";
+      } else if (age !== null && age < 0) {
+        errors[`${base}.date_of_birth`] =
+          "Date of birth cannot be in the future";
+      } else if (range.min !== null && age !== null && age < range.min) {
+        errors[`${base}.date_of_birth`] =
+          `${label} must be at least ${range.min} years old`;
+      } else if (range.max !== null && age !== null && age > range.max) {
+        errors[`${base}.date_of_birth`] =
+          `${label} must be at most ${range.max} years old`;
+      }
+
+      if (!p.country) errors[`${base}.country`] = `${label} country is required`;
+      if (!p.passport_number)
+        errors[`${base}.passport_number`] = "Passport number is required";
+      if (!p.passport_expire)
+        errors[`${base}.passport_expire`] = "Passport expiry is required";
+
+      if (type === "adult" && index === 0) {
+        if (!p.email) {
+          errors[`${base}.email`] = "Email is required";
+        } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.email)) {
+          errors[`${base}.email`] = "Enter a valid email address";
+        }
+        if (!p.phone) errors[`${base}.phone`] = "Phone number is required";
+      }
+    });
+  });
+
+  return errors;
 };
 
 const buildSearchPayload = (searchInfoParams: URLSearchParams) => {
@@ -246,9 +308,12 @@ const FlightBooking: React.FC = () => {
     const allPassengers: BookingPassenger[] = [];
     (["adult", "child", "kid", "infant"] as const).forEach((type) => {
       values[type].forEach((p) => {
-        allPassengers.push(
-          toBookingPassenger(p, PASSENGER_TYPE_MAP[type], false),
-        );
+        const age = calculateAge(p.date_of_birth);
+        const typeCode =
+          type === "child" || type === "kid"
+            ? getPassengerTypeByAge(age)
+            : PASSENGER_TYPE_MAP[type];
+        allPassengers.push(toBookingPassenger(p, typeCode, false));
       });
     });
 
@@ -364,6 +429,7 @@ const FlightBooking: React.FC = () => {
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
+        validate={validateBooking}
         onSubmit={handleSubmit}
       >
         {({ values }) => {
