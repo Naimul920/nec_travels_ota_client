@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiArrowRight, FiCheck, FiLock } from "react-icons/fi";
 
@@ -15,10 +14,7 @@ import { fullSchema, stepSchemas } from "./validation";
 import { B2BSignUpFormValues, TOTAL_STEPS } from "./types";
 import { b2bRegisterAction, verifyEmailAction } from "@/actions/auth.action";
 import { verifyEmailSchema } from "@/validations/auth.validation";
-import {
-  getCurrenciesAction,
-  detectUserCurrencyCode,
-} from "@/actions/currency.action";
+import { useCurrencyStore } from "@/store/currency.store";
 
 const initialValues: B2BSignUpFormValues = {
   first_name: "",
@@ -56,10 +52,8 @@ export default function B2BSignUp() {
 
   const router = useRouter();
 
-  const { data: currencies = [] } = useQuery({
-    queryKey: ["currencies"],
-    queryFn: getCurrenciesAction,
-  });
+  const { phoneCode, selectedCurrencyId, selectedCurrencyCode } =
+    useCurrencyStore();
 
   const formik = useFormik<B2BSignUpFormValues>({
     initialValues,
@@ -84,7 +78,7 @@ export default function B2BSignUp() {
       formData.append("first_name", values.first_name);
       formData.append("last_name", values.last_name);
       formData.append("email", values.email);
-      formData.append("phone", `+880${values.phone}`);
+      formData.append("phone", `${phoneCode}${values.phone}`);
       formData.append("password", values.password);
       formData.append("password_confirmation", values.password_confirmation);
 
@@ -152,27 +146,10 @@ export default function B2BSignUp() {
   });
 
   useEffect(() => {
-    if (formik.values.currency_Id || !currencies.length) return;
-
-    let cancelled = false;
-
-    (async () => {
-      const bdt = currencies.find((c) => c.code === "BDT");
-      const preferred = await detectUserCurrencyCode();
-      if (cancelled) return;
-
-      const match = currencies.find((c) => c.code === preferred?.country_code);
-      const selected = match || bdt || currencies[0];
-      if (selected) {
-        formik.setFieldValue("currency", selected.code);
-        formik.setFieldValue("currency_Id", selected.id);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currencies, formik.values.currency_Id, formik]);
+    if (formik.values.currency_Id || !selectedCurrencyId) return;
+    formik.setFieldValue("currency", selectedCurrencyCode);
+    formik.setFieldValue("currency_Id", selectedCurrencyId);
+  }, [selectedCurrencyId, selectedCurrencyCode, formik.values.currency_Id, formik]);
 
   const goToNextStep = async () => {
     const schema = stepSchemas[currentStep - 1];

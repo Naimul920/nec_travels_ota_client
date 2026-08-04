@@ -56,6 +56,9 @@ const initialValues: SignInFormValues = {
 
 interface LoginProps {
   redirectPath?: string;
+  noRedirect?: boolean;
+  compact?: boolean;
+  onSuccess?: () => void;
 }
 
 // Deterministic "barcode" bar widths — purely decorative
@@ -63,7 +66,12 @@ const BARCODE_BARS = [
   2, 4, 1, 3, 5, 2, 1, 4, 3, 2, 5, 1, 3, 2, 4, 1, 5, 2, 3, 1, 4, 2,
 ];
 
-export default function SignIn({ redirectPath }: LoginProps) {
+export default function SignIn({
+  redirectPath,
+  noRedirect = false,
+  compact = false,
+  onSuccess,
+}: LoginProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setUser, clearUser } = useAuthStore();
@@ -136,9 +144,10 @@ export default function SignIn({ redirectPath }: LoginProps) {
           queryKey: ["userInfo"],
         });
 
-        if (result.redirectTo) {
+        if (result.redirectTo && !noRedirect) {
           router.push(result.redirectTo);
         }
+        onSuccess?.();
       } catch (err: any) {
         setError(
           err?.response?.data?.message ||
@@ -163,84 +172,111 @@ export default function SignIn({ redirectPath }: LoginProps) {
     formik.touched[name] ? formik.errors[name] : undefined;
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center  px-4 py-10">
-      <div className="relative grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-2xl md:grid-cols-5">
+    <div
+      className={
+        compact
+          ? "w-full"
+          : "flex min-h-[calc(100vh-4rem)] w-full items-center justify-center  px-4 py-10"
+      }
+    >
+      <div
+        className={
+          compact
+            ? "w-full"
+            : "relative grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-2xl md:grid-cols-5"
+        }
+      >
         {/* Left ticket stub */}
-        <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-brand p-10 md:flex">
-          <div className="relative z-10 flex items-center gap-2">
-            <FiSend className="rotate-45 text-white" size={18} />
-            <p className="font-plex-mono text-xs tracking-[0.25em] text-white">
-              NEC TRAVELS
-            </p>
-          </div>
-
-          {/* Route line */}
-          <div className="relative z-10 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="text-left">
-                <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
-                  DAC
-                </p>
-                <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
-                  DHAKA
-                </p>
-              </div>
-
-              <div className="relative flex-1">
-                <div className="border-t border-dashed border-[#9FB4C7]/50" />
-                <FiSend
-                  className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 text-white"
-                  size={14}
-                />
-              </div>
-
-              <div className="text-right">
-                <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
-                  LHR
-                </p>
-                <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
-                  LONDON
-                </p>
-              </div>
+        {!compact && (
+          <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-brand p-10 md:flex">
+            <div className="relative z-10 flex items-center gap-2">
+              <FiSend className="rotate-45 text-white" size={18} />
+              <p className="font-plex-mono text-xs tracking-[0.25em] text-white">
+                NEC TRAVELS
+              </p>
             </div>
 
-            <p className="font-grotesk text-2xl font-medium leading-snug text-[#F7F4EC]">
-              Track every booking,
-              <br />
-              from check-in to landing.
-            </p>
-          </div>
+            {/* Route line */}
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="text-left">
+                  <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
+                    DAC
+                  </p>
+                  <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
+                    DHAKA
+                  </p>
+                </div>
 
-          {/* Barcode */}
-          <div className="relative z-10">
-            <div className="flex h-8 items-end gap-[2px]">
-              {BARCODE_BARS.map((w, i) => (
-                <div
-                  key={i}
-                  className="bg-white/70"
-                  style={{ width: `${w}px`, height: "100%" }}
-                />
-              ))}
+                <div className="relative flex-1">
+                  <div className="border-t border-dashed border-[#9FB4C7]/50" />
+                  <FiSend
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 text-white"
+                    size={14}
+                  />
+                </div>
+
+                <div className="text-right">
+                  <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
+                    LHR
+                  </p>
+                  <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
+                    LONDON
+                  </p>
+                </div>
+              </div>
+
+              <p className="font-grotesk text-2xl font-medium leading-snug text-[#F7F4EC]">
+                Track every booking,
+                <br />
+                from check-in to landing.
+              </p>
             </div>
-            <p className="mt-2 font-plex-mono text-[10px] tracking-[0.2em] text-white">
-              SECURE SIGN-IN · PASS NO. 048
-            </p>
+
+            {/* Barcode */}
+            <div className="relative z-10">
+              <div className="flex h-8 items-end gap-[2px]">
+                {BARCODE_BARS.map((w, i) => (
+                  <div
+                    key={i}
+                    className="bg-white/70"
+                    style={{ width: `${w}px`, height: "100%" }}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 font-plex-mono text-[10px] tracking-[0.2em] text-white">
+                SECURE SIGN-IN · PASS NO. 048
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Perforated seam — desktop only */}
-        <div className="pointer-events-none absolute inset-y-0 left-2/5 hidden -translate-x-1/2 border-l-2 border-dashed border-[#12233D]/15 md:block">
-          <div className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-[#F7F4EC]" />
-          <div className="absolute -bottom-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-[#F7F4EC]" />
-        </div>
+        {!compact && (
+          <div className="pointer-events-none absolute inset-y-0 left-2/5 hidden -translate-x-1/2 border-l-2 border-dashed border-[#12233D]/15 md:block">
+            <div className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-[#F7F4EC]" />
+            <div className="absolute -bottom-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-[#F7F4EC]" />
+          </div>
+        )}
 
         {/* Right form panel */}
-        <div className="col-span-1 p-8 sm:p-10 md:col-span-3">
+        <div className={compact ? "w-full p-6 sm:p-8" : "col-span-1 p-8 sm:p-10 md:col-span-3"}>
           {verifyEmail ? (
-            <form
-              onSubmit={verifyFormik.handleSubmit}
+            <div
+              role="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                verifyFormik.submitForm();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  verifyFormik.submitForm();
+                }
+              }}
               className="mx-auto w-full max-w-sm space-y-6"
-              noValidate
             >
               <div>
                 <div className="mb-6 flex items-center gap-2 md:hidden">
@@ -298,7 +334,8 @@ export default function SignIn({ redirectPath }: LoginProps) {
               </div>
 
               <button
-                type="submit"
+                type="button"
+                onClick={() => verifyFormik.submitForm()}
                 disabled={verifyFormik.isSubmitting}
                 className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
               >
@@ -317,12 +354,23 @@ export default function SignIn({ redirectPath }: LoginProps) {
                   Back to sign in
                 </button>
               </p>
-            </form>
+            </div>
           ) : (
-            <form
-              onSubmit={formik.handleSubmit}
+            <div
+              role="form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                formik.submitForm();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  formik.submitForm();
+                }
+              }}
               className="mx-auto w-full max-w-sm space-y-6"
-              noValidate
             >
               <div>
                 <div className="mb-6 flex items-center gap-2 md:hidden">
@@ -404,7 +452,8 @@ export default function SignIn({ redirectPath }: LoginProps) {
             </div>
 
             <button
-              type="submit"
+              type="button"
+              onClick={() => formik.submitForm()}
               disabled={formik.isSubmitting || isPending}
               className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
             >
@@ -420,7 +469,7 @@ export default function SignIn({ redirectPath }: LoginProps) {
                 Sign up
               </Link>
             </p>
-            </form>
+            </div>
           )}
         </div>
       </div>

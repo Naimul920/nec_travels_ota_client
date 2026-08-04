@@ -11,7 +11,7 @@ export const AGE_RANGES: Record<
   adult: { min: 12, max: null, label: "12 years & above" },
   child: { min: 7, max: 11, label: "7 to 11 years" },
   kid: { min: 2, max: 6, label: "2 to 6 years" },
-  infant: { min: null, max: 1, label: "Under 2" },
+  infant: { min: 0, max: 2, label: "0 to 2 year" },
 };
 
 export function calculateAge(

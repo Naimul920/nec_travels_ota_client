@@ -1,26 +1,48 @@
 import Link from "next/link";
 import Image from "next/image";
+import { MdPhone, MdEmail, MdLocationOn } from "react-icons/md";
+import { FaPlane } from "react-icons/fa6";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaXTwitter,
+  FaYoutube,
+  FaGooglePlay,
+  FaApple,
+} from "react-icons/fa6";
 
-const socialLinks = [
+import type { IconType } from "react-icons";
+type SocialLink = {
+  label: string;
+  href: string;
+  icon: IconType;
+  background: string;
+};
+
+const socialLinks: SocialLink[] = [
   {
     label: "Facebook",
     href: "#",
-    path: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z",
+    icon: FaFacebookF,
+    background: "#1877F2",
   },
   {
     label: "Instagram",
     href: "#",
-    path: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z",
+    icon: FaInstagram,
+    background: "linear-gradient(135deg,#F58529,#DD2A7B,#8134AF)",
   },
   {
-    label: "Twitter",
+    label: "X",
     href: "#",
-    path: "M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z",
+    icon: FaXTwitter,
+    background: "#000000",
   },
   {
     label: "YouTube",
     href: "#",
-    path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z",
+    icon: FaYoutube,
+    background: "#FF0000",
   },
 ];
 
@@ -41,63 +63,71 @@ const productLinks = [
 ];
 
 const paymentMethods = [
-  { label: "MC", class: "text-red-500 bg-black" },
-  { label: "amazon", class: "text-orange-400 bg-[#1E2530]" },
-  { label: "stripe", class: "text-white bg-[#635BFF]" },
-  { label: "M", class: "text-blue-500 bg-black" },
-  { label: "AMEX", class: "text-white bg-[#006FCF]" },
-  { label: "PayPal", class: "text-white italic bg-[#003087]" },
+  { label: "MC", className: "text-red-400 bg-[#0B1F30]" },
+  { label: "amazon", className: "text-[#F2A93B] bg-[#0B1F30]" },
+  { label: "stripe", className: "text-white bg-[#635BFF]" },
+  { label: "M", className: "text-sky-400 bg-[#0B1F30]" },
+  { label: "AMEX", className: "text-white bg-[#006FCF]" },
+  { label: "PayPal", className: "text-white italic bg-[#003087]" },
 ];
 
-function SocialIcon({ path }: { path: string }) {
+const appStores = [
+  {
+    qrData: "playstore",
+    topText: "GET IT ON",
+    name: "Google Play",
+    icon: <FaGooglePlay className="h-4 w-4" />,
+  },
+  {
+    qrData: "appstore",
+    topText: "Download on the",
+    name: "App Store",
+    icon: <FaApple className="h-4 w-4" />,
+  },
+];
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-      <path d={path} />
-    </svg>
+    <h4 className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-[#F5F1E8] after:mt-3 after:block after:h-[2px] after:w-8 after:rounded-full after:bg-brand">
+      {children}
+    </h4>
   );
 }
 
-function AppDownloadButton({
-  qrData,
-  topText,
-  bottomText,
-  icon,
-}: {
-  qrData: string;
-  topText: string;
-  bottomText: string;
-  icon: string;
-}) {
+/** Signature element: a dashed flight-route rule with a plane gliding along it. */
+function FlightRoute() {
   return (
-    <div className="flex items-center gap-2">
-      <div className="w-[42px] h-[42px] bg-white p-1 rounded shrink-0">
-        <Image
-          src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}`}
-          alt="QR Code"
-          width={42}
-          height={42}
-          unoptimized
-        />
-      </div>
-      <button className="h-[42px] bg-white text-black px-3 rounded-md flex items-center gap-2 border hover:bg-gray-100 transition-colors">
-        <span className="text-lg">{icon}</span>
-        <div className="flex flex-col text-left leading-none">
-          <span className="text-[8px] uppercase tracking-wider font-semibold">
-            {topText}
-          </span>
-          <span className="text-[13px] font-bold">{bottomText}</span>
-        </div>
-      </button>
+    <div
+      aria-hidden="true"
+      className="relative h-6 w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
+    >
+      <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 border-t border-dashed border-[#F2A93B]/30" />
+      <FaPlane
+        className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#F2A93B] motion-safe:animate-[fly_16s_linear_infinite]"
+        style={{ left: "-5%" }}
+      />
+      <style>{`
+        @keyframes fly {
+          from { left: -5%; opacity: 0; }
+          5% { opacity: 1; }
+          95% { opacity: 1; }
+          to { left: 105%; opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#1C1C1C] text-gray-300 pt-16 pb-8 select-none">
-      <div className="max-w-[1280px] mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-12">
-          <div className="lg:col-span-1 flex items-center">
+    <footer className="w-full bg-[#0B1F30] text-[#8FA6BC]">
+      <FlightRoute />
+
+      <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
+        {/* Main grid */}
+        <div className="grid grid-cols-1 gap-10 pb-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+          {/* Brand */}
+          <div className="flex flex-col items-start gap-5 sm:col-span-2 lg:col-span-4">
             <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/assets/images/logo.png"
@@ -107,18 +137,40 @@ export default function Footer() {
                 className="h-auto w-auto"
               />
             </Link>
+
+            <p className="max-w-xs text-sm leading-6 text-[#8FA6BC]">
+              Discover and book unique travel experiences — flights, hotels,
+              visas and more — all in one place with NEC Travels.
+            </p>
+
+            <div className="flex items-center gap-3">
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+
+                return (
+                  <Link
+                    key={social.label}
+                    href={social.href}
+                    aria-label={social.label}
+                    style={{ background: social.background }}
+                    className="flex h-11 w-11 items-center justify-center rounded-full shadow-lg ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-1 hover:scale-110"
+                  >
+                    <Icon className="text-[20px] text-white" />
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <h4 className="text-[#00A550] font-semibold text-base">
-              Learn More
-            </h4>
-            <ul className="flex flex-col gap-2.5 text-sm text-gray-300">
+          {/* Learn More */}
+          <div className="lg:col-span-2">
+            <SectionHeading>Learn More</SectionHeading>
+            <ul className="flex flex-col gap-3 text-sm">
               {learnMoreLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="hover:text-white transition-colors"
+                    className="inline-block text-[#8FA6BC]! transition-all duration-200 hover:translate-x-1 hover:text-brand! focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-brand"
                   >
                     {link.label}
                   </Link>
@@ -127,16 +179,15 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <h4 className="text-[#00A550] font-semibold text-base">
-              Products
-            </h4>
-            <ul className="flex flex-col gap-2.5 text-sm text-gray-300">
+          {/* Products */}
+          <div className="lg:col-span-2">
+            <SectionHeading>Products</SectionHeading>
+            <ul className="flex flex-col gap-3 text-sm">
               {productLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="hover:text-white transition-colors"
+                    className="inline-block text-[#8FA6BC]! transition-all duration-200 hover:translate-x-1 hover:text-brand! focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                   >
                     {link.label}
                   </Link>
@@ -145,69 +196,93 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <h4 className="text-[#00A550] font-semibold text-base">
-              Contact Us
-            </h4>
-            <p className="text-sm text-gray-300">Hotel Reservation:</p>
-            <p className="text-sm text-gray-300 font-medium">
-              Payment Method:
+          {/* Contact */}
+          <div className="sm:col-span-2 lg:col-span-4">
+            <SectionHeading>Contact Us</SectionHeading>
+            <ul className="space-y-3.5 text-sm">
+              <li className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <MdPhone />
+                </span>
+                <span className="text-[#F5F1E8]">+880 9613-774477</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <MdEmail />
+                </span>
+                <span className="text-[#F5F1E8]">support@nectravels.com</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                  <MdLocationOn />
+                </span>
+                <span className="text-[#F5F1E8]">Dhaka, Bangladesh</span>
+              </li>
+            </ul>
+
+            <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6C89A1]">
+              We Accept
             </p>
-            <div className="grid grid-cols-3 gap-2 w-fit">
+            <div className="mt-3 flex flex-wrap gap-2">
               {paymentMethods.map((pm) => (
-                <div
+                <span
                   key={pm.label}
-                  className={`w-[48px] h-[28px] border border-gray-700 rounded flex items-center justify-center text-[10px] font-bold ${pm.class}`}
+                  className={`flex h-7 items-center justify-center rounded-md border border-white/10 px-2 text-[10px] font-bold ${pm.className}`}
                 >
                   {pm.label}
-                </div>
+                </span>
               ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h4 className="text-[#00A550] font-semibold text-base">Social</h4>
-            <div className="flex items-center gap-3 text-white">
-              {socialLinks.map((social) => (
-                <Link
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="hover:text-[#00A550] transition-colors"
-                >
-                  <SocialIcon path={social.path} />
-                </Link>
-              ))}
-            </div>
-
-            <p className="text-[13px] font-semibold text-white">
-              Get Mobile App
-            </p>
-
-            <div className="flex flex-col gap-2">
-              <AppDownloadButton
-                qrData="playstore"
-                topText="GET IT ON"
-                bottomText="Google Play"
-                icon="▶"
-              />
-              <AppDownloadButton
-                qrData="appstore"
-                topText="Download on the"
-                bottomText="App Store"
-                icon=""
-              />
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-400 gap-4">
+        {/* App banner */}
+        {/* <div className="mb-12 flex flex-col items-center justify-between gap-6 rounded-2xl border border-white/10 bg-white/5 p-6 md:flex-row md:px-8">
+          <div className="text-center md:text-left">
+            <p className="text-lg font-bold text-[#F5F1E8]">
+              Get the NEC Travels App
+            </p>
+            <p className="mt-1 text-sm text-[#8FA6BC]">
+              Book flights and manage trips on the go.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            {appStores.map((store) => (
+              <a
+                key={store.name}
+                href="#"
+                className="flex w-full items-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-black shadow-sm transition hover:bg-gray-100 sm:w-auto"
+              >
+                <Image
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${store.qrData}`}
+                  alt={`${store.name} QR Code`}
+                  width={40}
+                  height={40}
+                  unoptimized
+                  className="h-10 w-10 rounded"
+                />
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="text-[9px] font-semibold uppercase tracking-wider text-gray-600">
+                    {store.topText}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-sm font-bold text-gray-900">
+                    {store.icon} {store.name}
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div> */}
+
+        {/* Bottom bar */}
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-[#6C89A1] md:flex-row">
           <p>© 2025 NEC Travel. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link href="#" className="transition-colors hover:text-[#F2A93B]">
               Terms of Service
             </Link>
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link href="#" className="transition-colors hover:text-[#F2A93B]">
               Privacy Policy
             </Link>
           </div>

@@ -12,23 +12,24 @@ export default function HomeTabs() {
   const [activeKey, setActiveKey] = useState("1");
 
   return (
-    <div className="hero-bg ">
-      <div className="mx-auto max-w-7xl px-5 sm:px-10 pb-20">
-        <div className="mb-5 mt-3 flex flex-col items-center justify-center md:mt-0 pt-10">
-          <p className="text-xs font-semibold tracking-[0.3em] text-gray-800 md:text-2xl">
+    <div className="hero-bg">
+      <div className="mx-auto max-w-7xl px-5 pb-16 pt-10 sm:px-10 md:pb-24 md:pt-14">
+        <div className="mb-5 flex flex-col items-center justify-center text-center">
+          <p className="text-xs font-semibold tracking-[0.3em] text-gray-800 sm:text-sm md:text-xl lg:text-2xl">
             YOUR TRAVEL BE SAFER
           </p>
 
-          <span className="mt-2 font-stalemate text-6xl text-gray-900 sm:text-8xl md:text-9xl">
+          <span className="mt-1 font-stalemate text-5xl text-gray-900 sm:text-7xl md:text-9xl">
             With
           </span>
 
-          <h1 className="-mt-4 text-3xl font-bold text-shadow-2xs md:text-8xl">
+          <h1 className="-mt-2 text-4xl font-bold text-shadow-2xs sm:text-6xl md:-mt-4 md:text-8xl">
             <span className="text-primary">NEC</span>{" "}
             <span className="text-secondary">TRAVELS</span>
           </h1>
         </div>
-        <div className=" bg-white rounded-lg shadow-xs md:mt-15 mt-10 mb-10">
+
+        <div className="mt-10 rounded-lg bg-white shadow-xs md:mt-16">
           <Tabs
             activeKey={activeKey}
             onChange={(key) => setActiveKey(key)}

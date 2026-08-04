@@ -237,6 +237,87 @@ body {
   box-shadow: 0 0 0 4px rgb(248 113 113 / 0.15);
 }
 
+.phone-input-wrap {
+  --PhoneInputCountryFlag-height: 1.25em;
+  height: 48px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.phone-input-wrap:hover {
+  border-color: #d1d5db;
+}
+
+.phone-input-wrap:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.phone-input-wrap .PhoneInput {
+  height: 100%;
+}
+
+.phone-input-wrap .PhoneInputCountry {
+  align-self: stretch;
+  margin-right: 0;
+  padding: 0 8px 0 10px;
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+}
+
+.phone-input-wrap .PhoneInputCountry:hover {
+  background: #f3f4f6;
+}
+
+.phone-input-wrap .PhoneInputCountrySelectArrow {
+  border-color: #9ca3af;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
+}
+
+.phone-input-wrap .PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border: none;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.875rem;
+  color: #1f2937;
+  padding: 0 12px;
+}
+
+.phone-input-wrap .PhoneInputInput:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.phone-input-wrap .PhoneInputInput::placeholder {
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+.phone-input-wrap .PhoneInputInput:disabled {
+  background: #f9fafb;
+  cursor: not-allowed;
+}
+
+.phone-input-error,
+.phone-input-error:hover,
+.phone-input-error:focus-within {
+  border-color: #f87171;
+  box-shadow: 0 0 0 4px rgb(248 113 113 / 0.15);
+}
+
+.phone-input-error .PhoneInputCountry {
+  border-right-color: #f87171;
+}
+
 
 /* ==========================================
    4. FORM & SEARCH COMPONENT OVERRIDES

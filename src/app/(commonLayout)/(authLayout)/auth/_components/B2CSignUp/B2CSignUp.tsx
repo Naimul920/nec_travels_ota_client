@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail, FiPhone } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
@@ -11,7 +11,7 @@ import {
   b2cRegisterSchema,
   verifyEmailSchema,
 } from "@/validations/auth.validation";
-import { getCurrenciesAction, detectUserCurrencyCode } from "@/actions/currency.action";
+import { useCurrencyStore } from "@/store/currency.store";
 import { useRouter } from "next/navigation";
 
 interface B2CRegisterFormValues {
@@ -38,10 +38,11 @@ export default function B2CSignUp() {
 
   const router = useRouter();
 
-  const { data: currencies = [], isLoading: currenciesLoading } = useQuery({
-    queryKey: ["currencies"],
-    queryFn: getCurrenciesAction,
-  });
+  const {
+    currenciesLoading,
+    phoneCode,
+    selectedCurrencyId,
+  } = useCurrencyStore();
 
   const { mutateAsync: doRegister, isPending: isRegistering } = useMutation({
     mutationFn: (payload: B2CRegisterFormValues) => b2cRegisterAction(payload),
@@ -60,7 +61,7 @@ export default function B2CSignUp() {
       try {
         const result = await doRegister({
           ...values,
-          phone: `+880${values.phone}`,
+          phone: `${phoneCode}${values.phone}`,
         });
         if (result.success) {
           setRegisteredEmail(values.email);
@@ -106,24 +107,9 @@ export default function B2CSignUp() {
       : undefined;
 
   useEffect(() => {
-    if (registerFormik.values.currency_Id || !currencies.length) return;
-
-    let cancelled = false;
-
-    (async () => {
-      const bdt = currencies.find((c) => c.code === "BDT");
-      const preferred = await detectUserCurrencyCode();
-      if (cancelled) return;
-
-      const match = currencies.find((c) => c.code === preferred?.country_code);
-      const selected = match || bdt || currencies[0];
-      if (selected) {
-        registerFormik.setFieldValue("currency_Id", selected.id);
-      }
-    })();
-
-    return () => { cancelled = true; };
-  }, [currencies, registerFormik.values.currency_Id]);
+    if (registerFormik.values.currency_Id || !selectedCurrencyId) return;
+    registerFormik.setFieldValue("currency_Id", selectedCurrencyId);
+  }, [selectedCurrencyId, registerFormik.values.currency_Id]);
 
   return (
     <>
@@ -153,7 +139,7 @@ export default function B2CSignUp() {
               type="tel"
               placeholder="1700000000"
               icon={<FiPhone />}
-              prefix="+880"
+              prefix={phoneCode}
               error={getRegisterError("phone")}
               {...registerFormik.getFieldProps("phone")}
             />

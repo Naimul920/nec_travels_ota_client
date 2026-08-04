@@ -4,15 +4,14 @@ import type { ReactNode } from "react";
 import { useFormikContext } from "formik";
 import type { PassengerType } from "@/types/passengerAlertBank";
 import type { BookingFormValues } from "@/interface";
-import { Input, Select, DatePicker } from "@/components/ui";
+import { Input, Select, DatePicker, PhoneInput, CountrySelect } from "@/components/ui";
 import {
   getDateOfBirthDisabledDate,
   getPassportExpiryDisabledDate,
 } from "@/utils/passengerAge";
-import { FaUser, FaUserFriends, FaChild, FaBaby, FaGlobe } from "react-icons/fa";
+import { FaUser, FaUserFriends, FaChild, FaBaby } from "react-icons/fa";
 import {
   MdOutlineMailOutline,
-  MdOutlinePhone,
   MdOutlineBadge,
 } from "react-icons/md";
 
@@ -45,7 +44,7 @@ const TYPE_META: Record<
   },
   infant: {
     label: "Infant",
-    sub: "Under 2",
+    sub: "0 to 2 year",
     icon: <FaBaby />,
     tone: "bg-gray-100 text-gray-500",
   },
@@ -152,13 +151,12 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           required
           {...err("date_of_birth")}
         />
-        <Input
+        <CountrySelect
           label="Country"
-          iconLeft={<FaGlobe />}
           name={`${baseName}.country`}
           value={passenger.country}
-          onChange={handleChange}
-          placeholder="Country"
+          onChange={(v) => setFieldValue(`${baseName}.country`, v)}
+          placeholder="Select country"
           required
           {...err("country")}
         />
@@ -196,14 +194,12 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
               required
               {...err("email")}
             />
-            <Input
+            <PhoneInput
               label="Phone"
-              type="tel"
-              iconLeft={<MdOutlinePhone />}
               name={`${baseName}.phone`}
               value={passenger.phone}
-              onChange={handleChange}
-              placeholder="+880 1XXXXXXXXX"
+              onChange={(v) => setFieldValue(`${baseName}.phone`, v)}
+              placeholder="Phone number"
               required
               {...err("phone")}
             />

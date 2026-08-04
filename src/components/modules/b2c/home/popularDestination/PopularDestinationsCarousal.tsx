@@ -112,9 +112,9 @@ export default function PopularDestinationsCarousel() {
   return (
     <section className="relative overflow-hidden bg-[#1A1A1A] py-16">
       {/* Green Background */}
-      <div className="absolute inset-x-0 top-0 h-[900px] overflow-hidden bg-[#00A550]">
+      <div className="absolute inset-x-0 top-0 h-225 overflow-hidden bg-[#00A550]">
         <svg
-          className="absolute top-0 left-0 h-[140px] w-full fill-current text-white"
+          className="absolute top-0 left-0 h-35 w-full fill-current text-white"
           viewBox="0 0 1440 140"
           preserveAspectRatio="none"
         >
@@ -122,7 +122,7 @@ export default function PopularDestinationsCarousel() {
         </svg>
 
         <svg
-          className="absolute bottom-0 left-0 h-[180px] w-full fill-current text-[#1A1A1A]"
+          className="absolute bottom-0 left-0 h-45 w-full fill-current text-[#0B1F30]"
           viewBox="0 0 1440 180"
           preserveAspectRatio="none"
         >
@@ -131,7 +131,7 @@ export default function PopularDestinationsCarousel() {
       </div>
 
       {/* Carousel */}
-      <div className="relative z-10 mx-auto my-10 flex h-[350px] w-full max-w-[1580px] items-center justify-center md:h-[460px] xl:h-[520px]">
+      <div className="relative z-10 mx-auto my-10 flex h-87.5 w-full max-w-[1580px] items-center justify-center md:h-115 xl:h-130">
         {/* Left Button */}
         <button
           onClick={handlePrev}
@@ -194,7 +194,7 @@ export default function PopularDestinationsCarousel() {
                 />
 
                 {isCenter && (
-                  <div className="absolute inset-x-0 top-0 flex h-[100px] items-start justify-center bg-gradient-to-b from-blue-700/70 via-blue-500/30 to-transparent pt-5">
+                  <div className="absolute inset-x-0 top-0 flex h-25 items-start justify-center bg-linear-to-b from-blue-700/70 via-blue-500/30 to-transparent pt-5">
                     <h3 className="text-center text-2xl font-bold tracking-wide text-white drop-shadow-md md:text-3xl xl:text-[38px]">
                       {item.name}
                     </h3>
@@ -207,7 +207,7 @@ export default function PopularDestinationsCarousel() {
       </div>
 
       {/* Newsletter */}
-      <div className="relative z-20 mx-auto mt-12 flex w-[1190px] max-w-[95%] flex-col items-center justify-between gap-8 rounded-md bg-white px-6 py-8 shadow-2xl lg:flex-row lg:px-12">
+      <div className="relative z-20 mx-auto mt-12 flex w-297.5 max-w-[95%] flex-col items-center justify-between gap-8 rounded-md bg-white px-6 py-8 shadow-2xl lg:flex-row lg:px-12">
         <div className="text-center lg:text-left">
           <h2 className="text-2xl font-semibold text-[#1C233D] md:text-4xl">
             Subscribe Newsletter
@@ -220,7 +220,7 @@ export default function PopularDestinationsCarousel() {
 
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="flex w-full max-w-[560px] flex-col gap-3 sm:flex-row"
+          className="flex w-full max-w-140 flex-col gap-3 sm:flex-row"
         >
           <input
             type="email"

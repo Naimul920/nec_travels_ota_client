@@ -15,10 +15,9 @@ export default function Home() {
 
   return (
     <>
-      <div className="max-w-[1600px] mx-auto px-5 sm:px-10">
-        
+      <div className="mx-auto max-w-[1600px] px-5 sm:px-10 lg:px-16">
         {/* <HomeHero /> */}
-        <HomeTabs/>
+        <HomeTabs />
         <ExploreNec />
         <ExclusiveOffer />
       </div>

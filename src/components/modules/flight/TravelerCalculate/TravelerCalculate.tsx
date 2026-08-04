@@ -71,7 +71,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
     },
     {
       label: "Infants",
-      sub: "Under 2",
+      sub: "0 to 2 year",
       key: "infants" as const,
       icon: <FaUser className="text-gray-400" />,
     },

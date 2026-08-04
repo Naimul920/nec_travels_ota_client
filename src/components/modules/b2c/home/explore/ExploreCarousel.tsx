@@ -56,14 +56,14 @@ export default function ExploreCarousel({ slides = DEFAULT_SLIDES }) {
   };
 
   return (
-    <div className="relative w-full  mx-auto h-[374px] flex items-center justify-center select-none  -translate-x-[70px]">
+    <div className="relative mx-auto flex h-[300px] w-[240px] select-none items-center justify-center sm:h-[340px] sm:w-[280px] md:h-[374px] md:w-[310px]">
       <button
         onClick={handlePrev}
         aria-label="Previous Slide"
-        className="absolute -left-18 top-25 z-30 p-2 text-white transition-transform hover:scale-110 active:scale-95 drop-shadow-md cursor-pointer"
+        className="absolute left-0 top-1/2 z-30 -translate-y-1/2 cursor-pointer p-2 text-white transition-transform hover:scale-110 active:scale-95 drop-shadow-md sm:-left-10"
       >
         <svg
-          className="w-8 h-8 stroke-current"
+          className="h-8 w-8 stroke-current"
           fill="none"
           strokeWidth="2.5"
           viewBox="0 0 24 24"
@@ -79,10 +79,10 @@ export default function ExploreCarousel({ slides = DEFAULT_SLIDES }) {
       <button
         onClick={handleNext}
         aria-label="Next Slide"
-        className="absolute -right-18 top-25 z-30 p-2 text-white transition-transform hover:scale-110 active:scale-95 drop-shadow-md cursor-pointer"
+        className="absolute right-0 top-1/2 z-30 -translate-y-1/2 cursor-pointer p-2 text-white transition-transform hover:scale-110 active:scale-95 drop-shadow-md sm:-right-10"
       >
         <svg
-          className="w-8 h-8 stroke-current"
+          className="h-8 w-8 stroke-current"
           fill="none"
           strokeWidth="2.5"
           viewBox="0 0 24 24"
@@ -91,7 +91,7 @@ export default function ExploreCarousel({ slides = DEFAULT_SLIDES }) {
         </svg>
       </button>
 
-      <div className="relative w-[310px] h-[372px] flex items-center justify-center">
+      <div className="relative flex h-[296px] w-[240px] items-center justify-center sm:h-[336px] sm:w-[280px] md:h-[372px] md:w-[310px]">
         {slides.map((slide, index) => {
           const position = getSlidePosition(index);
 
@@ -112,14 +112,14 @@ export default function ExploreCarousel({ slides = DEFAULT_SLIDES }) {
           return (
             <div
               key={slide.id}
-              className={`absolute w-[310px] h-[372px]  overflow-hidden transition-all duration-500 ease-in-out ${transformStyle}`}
+              className={`absolute h-[296px] w-[240px] overflow-hidden transition-all duration-500 ease-in-out sm:h-[336px] sm:w-[280px] md:h-[372px] md:w-[310px] ${transformStyle}`}
             >
               <Image
                 src={slide.src}
                 alt={slide.alt}
                 fill
                 className="object-cover"
-                sizes="310px"
+                sizes="(max-width: 640px) 240px, (max-width: 768px) 280px, 310px"
                 priority={position === "center"}
               />
 

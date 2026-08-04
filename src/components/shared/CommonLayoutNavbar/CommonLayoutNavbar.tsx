@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
 import { FaUser } from "react-icons/fa";
@@ -22,7 +21,6 @@ export default function CommonLayoutNavbar({
 }: NavbarProps) {
   const { user, isLoggedIn, isLoading, clearUser } = useAuthStore();
   console.log("User => ", user);
-  const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +41,6 @@ export default function CommonLayoutNavbar({
     setDropdownOpen(false);
     await logoutAction();
     clearUser();
-    router.push("/auth/signin");
   };
   // return <> <h1>Joy Bangla</h1></>
 

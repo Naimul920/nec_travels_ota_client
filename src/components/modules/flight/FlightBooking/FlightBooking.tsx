@@ -1,9 +1,10 @@
 "use client"; // 1. Next.js 16 Client Component Boundary
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FaUser } from "react-icons/fa";
 // 2. Swapped React Router hook with Next.js Navigation hook
 import { useSearchParams } from "next/navigation";
-import { Formik, Form } from "formik";
+import { Formik, Form, useFormikContext } from "formik";
 import { App } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { decoding } from "../../../../utils";
@@ -19,6 +20,10 @@ import type {
 } from "@/interface/flight";
 import TravelersForm from "../Booking/TravelersForm";
 import BookingSuccess from "../Booking/BookingSuccess";
+import BookingFlightInfo from "../Booking/BookingFlightInfo";
+import SearchDetails from "../Card/SearchDetails";
+import BookingPageSkeleton from "./BookingPageSkeleton";
+import SignIn from "@/app/(commonLayout)/(authLayout)/auth/_components/SignIn/SignIn";
 import { createPassengers } from "@/utils/createPassengers";
 import {
   AGE_RANGES,
@@ -31,6 +36,7 @@ import {
   bookFlightAction,
 } from "@/actions/flight.action";
 import { useAuthStore } from "@/store/auth.store";
+import { useCurrencyStore } from "@/store/currency.store";
 
 const PASSENGER_TYPE_MAP: Record<string, string> = {
   adult: "ADT",
@@ -44,6 +50,45 @@ const TYPE_LABEL: Record<string, string> = {
   child: "Child",
   kid: "Kid",
   infant: "Infant",
+};
+
+// Fills the lead traveler contact/name and every passenger's country from the
+// logged-in user / detected geo without resetting the Formik form (initialValues
+// stays stable on login/logout).
+const LeadPassengerPrefill: React.FC = () => {
+  const { values, setFieldValue } = useFormikContext<BookingFormValues>();
+  const { user } = useAuthStore();
+  const geo = useCurrencyStore((s) => s.geo);
+  const applied = useRef(false);
+
+  useEffect(() => {
+    const lead = values.adult?.[0];
+    const country = geo?.countryCode;
+    if ((!user && !country) || !lead || applied.current) return;
+    const patch: Partial<Passenger> = {};
+    if (!lead.firstname && user?.first_name) patch.firstname = user.first_name;
+    if (!lead.lastname && user?.last_name) patch.lastname = user.last_name;
+    if (!lead.email && user?.email) patch.email = user.email;
+    if (!lead.phone && user?.phone) patch.phone = user.phone;
+    if (!lead.country && country) patch.country = country;
+    if (Object.keys(patch).length > 0) {
+      Object.entries(patch).forEach(([key, val]) =>
+        setFieldValue(`adult.0.${key}`, val),
+      );
+    }
+
+    (["adult", "child", "kid", "infant"] as const).forEach((type) => {
+      values[type].forEach((p, i) => {
+        if (!p.country && country) {
+          setFieldValue(`${type}.${i}.country`, country);
+        }
+      });
+    });
+
+    applied.current = true;
+  }, [user, geo, values.adult, setFieldValue]);
+
+  return null;
 };
 
 const validateBooking = (values: BookingFormValues) => {
@@ -198,25 +243,15 @@ const FlightBooking: React.FC = () => {
 
   const initialValues: BookingFormValues = useMemo(() => {
     const adultCount = Number(searchInfoParams.get("adult") ?? 0);
-    const adult = createPassengers(adultCount);
-    if (user && adult.length > 0) {
-      adult[0] = {
-        ...adult[0],
-        firstname: user.first_name || adult[0].firstname,
-        lastname: user.last_name || adult[0].lastname,
-        email: user.email || adult[0].email,
-        phone: user.phone || adult[0].phone,
-      };
-    }
     return {
       tripType: searchInfoParams.get("tripType"),
       cabin: searchInfoParams.get("cabin"),
-      adult,
+      adult: createPassengers(adultCount),
       child: createPassengers(Number(searchInfoParams.get("child") ?? 0)),
       kid: createPassengers(Number(searchInfoParams.get("kid") ?? 0)),
       infant: createPassengers(Number(searchInfoParams.get("infant") ?? 0)),
     };
-  }, [searchInfoParams, user]);
+  }, [searchInfoParams]);
 
   const buildSegments = (itin: Itinerary): BookingSegment[] => {
     return itin.flightDetails.flatMap((fd) =>
@@ -395,11 +430,7 @@ const FlightBooking: React.FC = () => {
   };
 
   if (isSearching) {
-    return (
-      <div className="flex justify-center py-10">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
+    return <BookingPageSkeleton />;
   }
 
   if (bookingResult) {
@@ -446,36 +477,89 @@ const FlightBooking: React.FC = () => {
             itinerary.saleCurrencyAmount?.baseAmount ??
             0;
 
+          const passengerCount = {
+            adult: Number(searchInfoParams.get("adult") || 0),
+            child: Number(searchInfoParams.get("child") || 0),
+            kid: Number(searchInfoParams.get("kid") || 0),
+            infant: Number(searchInfoParams.get("infant") || 0),
+          };
+
           return (
             <Form>
-              <TravelersForm />
+              <LeadPassengerPrefill />
 
-              <div className="sticky bottom-0 z-10 mt-8 -mx-5 flex flex-wrap items-center justify-between gap-4 border-t border-gray-200 bg-white/95 px-5 py-4 backdrop-blur sm:-mx-10 sm:px-10">
-                <div>
-                  <p className="text-xs text-gray-400">
-                    {travelerSummary
-                      .map(
-                        (t) =>
-                          `${t.n} ${t.label}${t.n > 1 ? "s" : ""}`,
-                      )
-                      .join(", ")}
-                  </p>
-                  <p className="text-xl font-bold text-gray-900">
-                    BDT{" "}
-                    {total.toLocaleString("en-US", {
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
+                {/* LEFT: passenger info fields */}
+                <div className="lg:col-span-2">
+                  <TravelersForm />
                 </div>
-                <Button
-                  type="submit"
-                  className={`!h-12 !px-10 !text-base ${
-                    isBooking ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
-                  disabled={isBooking}
-                >
-                  {isBooking ? "Booking..." : "Submit Booking"}
-                </Button>
+
+                {/* RIGHT: login + flight info + submit */}
+                <aside className="space-y-5 lg:sticky lg:top-6">
+                  {!user ? (
+                    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                      <SignIn noRedirect compact />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <FaUser />
+                      </span>
+                      <div>
+                        <p className="text-xs text-gray-400">Signed in as</p>
+                        <p className="text-sm font-semibold text-gray-800">
+                          {user.first_name || user.full_name || "Traveler"}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <p className="mb-3 text-xs font-bold uppercase tracking-wide text-gray-400">
+                      Your Trip
+                    </p>
+                    <BookingFlightInfo itinerary={itinerary} />
+                  </div>
+
+                  <SearchDetails
+                    itinerary={itinerary}
+                    passengerCount={passengerCount}
+                  />
+
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <p className="text-xs text-gray-400">
+                      {travelerSummary
+                        .map(
+                          (t) =>
+                            `${t.n} ${t.label}${t.n > 1 ? "s" : ""}`,
+                        )
+                        .join(", ")}
+                    </p>
+                    <p className="mt-1 text-xl font-bold text-gray-900">
+                      BDT{" "}
+                      {total.toLocaleString("en-US", {
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                    <Button
+                      type="submit"
+                      className={`mt-4 w-full !h-12 !text-base ${
+                        isBooking || !user
+                          ? "opacity-60 cursor-not-allowed"
+                          : ""
+                      }`}
+                      disabled={isBooking || !user}
+                      title={!user ? "Please sign in to book" : undefined}
+                    >
+                      {isBooking ? "Booking..." : "Submit Booking"}
+                    </Button>
+                    {!user && (
+                      <p className="mt-2 text-center text-xs text-gray-400">
+                        Please sign in to place your booking
+                      </p>
+                    )}
+                  </div>
+                </aside>
               </div>
             </Form>
           );

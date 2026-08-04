@@ -2,6 +2,7 @@ import AppLoaderProvider from "@/providers/AppLoaderProvider";
 import QueryProviders from "@/providers/QueryProvider";
 import { Inter, Space_Grotesk, IBM_Plex_Mono, Stalemate } from "next/font/google";
 import AuthProvider from "@/providers/AuthProvider";
+import CurrencyProvider from "@/providers/CurrencyProvider";
 import { App as AntdApp } from "antd";
 import "./globals.css";
 
@@ -46,9 +47,11 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <QueryProviders>
           <AuthProvider>
-            <AntdApp>
-              <AppLoaderProvider>{children}</AppLoaderProvider>
-            </AntdApp>
+            <CurrencyProvider>
+              <AntdApp>
+                <AppLoaderProvider>{children}</AppLoaderProvider>
+              </AntdApp>
+            </CurrencyProvider>
           </AuthProvider>
         </QueryProviders>
       </body>
