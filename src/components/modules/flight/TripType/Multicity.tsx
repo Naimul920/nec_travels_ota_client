@@ -10,10 +10,9 @@ import SearchCity from "../SearchCity/SearchCity";
 import TravelerCalculate from "../TravelerCalculate/TravelerCalculate";
 import type { TravelerValue } from "../TravelerCalculate/TravelerCalculate";
 
-// Clean Ant Design dynamic type configuration mapping
 type DatePickerProps = GetProps<typeof DatePicker>;
 
-interface MultiCityRow {
+export interface MultiCityRow {
   fromIata: string;
   toIata: string;
   departureDate: string;
@@ -41,79 +40,79 @@ const MultiCity: React.FC<MultiCityProps> = ({
   traveler,
   changeTraveler,
 }) => {
-  // Compute disabled dates based on the current row index vs previous flights
   const disabledDate =
     (index: number): DatePickerProps["disabledDate"] =>
     (current) => {
       const today = dayjs().startOf("day");
-
-      // Always disable past calendar dates
       if (!current || current < today) return true;
 
-      // Disable dates occurring prior to the previous leg's departure point
-      if (index > 0 && data[index - 1].departureDate) {
+      if (index > 0 && data[index - 1]?.departureDate) {
         const prevDate = dayjs(data[index - 1].departureDate).startOf("day");
         if (current < prevDate) return true;
       }
-
       return false;
     };
 
   const handleSwap = (index: number) => {
-    const from = data[index].fromIata || "";
-    const to = data[index].toIata || "";
+    const from = data[index]?.fromIata || "";
+    const to = data[index]?.toIata || "";
     onChange(index, "from", to);
     onChange(index, "to", from);
   };
 
   const addRow = () => {
-    if (data.length >= 5) return; // Hard limit restriction up to max 5 legs
+    if (data.length >= 5) return;
 
-    // Fall back intelligently to the previous leg's date instead of forcing today
     const lastRowDate =
       data[data.length - 1]?.departureDate || dayjs().format("YYYY-MM-DD");
 
-    setData([
-      ...data,
-      { fromIata: "", toIata: "", departureDate: lastRowDate },
+    // Append a new empty flight row with immutable state update
+    setData((prev) => [
+      ...prev,
+      {
+        fromIata: "",
+        toIata: "",
+        departureDate: lastRowDate,
+      },
     ]);
   };
 
   const removeRow = () => {
-    if (data.length > 1) setData(data.slice(0, -1));
+    if (data.length > 1) {
+      setData((prev) => prev.slice(0, -1));
+    }
   };
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      {/* Left Segment Column: Multi-city interactive legs tracking layout */}
       <div className="col-span-12 lg:col-span-9 flex flex-col gap-4">
         {data.map((row, index) => (
           <div
-            key={index}
+            key={`leg-${index}`}
             className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center"
           >
-            {/* Departure City Auto-Complete Selector */}
+            {/* Departure City */}
             <SearchCity
-              label="Departure City"
-              value={row.fromIata}
+              label={`Flight ${index + 1} Departure`}
+              value={row.fromIata || ""}
               onChange={(iata) => onChange(index, "from", iata)}
               handelSwap={() => handleSwap(index)}
             />
 
-            {/* Arrival City Auto-Complete Selector */}
+            {/* Arrival City */}
             <SearchCity
-              label="Arrival City"
-              value={row.toIata}
+              label={`Flight ${index + 1} Arrival`}
+              value={row.toIata || ""}
               onChange={(iata) => onChange(index, "to", iata)}
             />
 
-            {/* Departure Calendar Date Picker */}
+            {/* Departure Date */}
             <div className="ring-1 ring-primary rounded-lg p-4 bg-white">
               <p className="text-gray-500 text-[10px] font-bold uppercase">
                 Departure Date
               </p>
               <DatePicker
-                className="search-date-picker"
+                className="search-date-picker w-full"
                 value={row.departureDate ? dayjs(row.departureDate) : null}
                 onChange={(d) =>
                   d && onChange(index, "departure", d.format("YYYY-MM-DD"))
@@ -122,7 +121,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
                 allowClear={false}
                 disabledDate={disabledDate(index)}
               />
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[10px] text-gray-500 mt-1">
                 {row.departureDate
                   ? dayjs(row.departureDate).format("dddd")
                   : "Select Date"}
@@ -132,29 +131,27 @@ const MultiCity: React.FC<MultiCityProps> = ({
         ))}
       </div>
 
-      {/* Right Segment Column: Traveler breakdown controller and segment row controls */}
-      <div className="col-span-12 lg:col-span-3 flex flex-col gap-4">
+      <div className="col-span-12 lg:col-span-3 flex flex-col gap-4 justify-between">
         <TravelerCalculate value={traveler} onChange={changeTraveler} />
 
-        {/* Dynamic Multi-City Row Modification Anchors */}
         <div className="flex gap-2">
           <Button
             type="button"
             onClick={addRow}
-            className={`bg-primary text-white p-3 rounded-lg hover:opacity-90 transition-opacity ${
+            disabled={data.length >= 5}
+            className={`flex-1 bg-primary text-white p-3 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity ${
               data.length >= 5 ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={data.length >= 5}
           >
-            <FaPlus />
+            <FaPlus /> Add City
           </Button>
           <Button
             type="button"
             onClick={removeRow}
-            className={`bg-primary text-white p-3 rounded-lg hover:opacity-90 transition-opacity ${
+            disabled={data.length <= 1}
+            className={`bg-red-500 text-white p-3 rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity ${
               data.length <= 1 ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={data.length <= 1}
           >
             <FaMinus />
           </Button>

@@ -79,7 +79,7 @@ export const getDefaultDashboardRoute = (role: USER_ROLE) => {
     return "/console/b2b/dashboard";
   }
   if (role === "B2C") {
-    return "/console/b2c";
+    return "/";
   }
   return "/";
 };

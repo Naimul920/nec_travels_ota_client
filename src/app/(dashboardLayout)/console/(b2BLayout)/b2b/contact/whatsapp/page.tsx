@@ -1,8 +1,24 @@
+﻿"use client";
 
-export default function page() {
+import Table from "@/components/common/Table/Table";
+import { getCrudConfig } from "@/constant/crudPages";
+import { useTablePageData } from "@/hooks/useTablePageData";
+
+export default function Page() {
+  const config = getCrudConfig("/console/b2b/contact/whatsapp");
+  const { data, loading } = useTablePageData(config);
+
   return (
-    <div>
-      this is whatsapp page
-    </div>
-  )
+    <Table
+      className="p-3 md:p-0 md:pt-2"
+      loading={loading}
+      title={config.title}
+      columns={config.columns as never}
+      dataSource={data}
+      rowKey={config.rowKey ?? "id"}
+      createButtonText={config.createButtonText ?? "Create"}
+      createFields={config.fields}
+    />
+  );
 }
+

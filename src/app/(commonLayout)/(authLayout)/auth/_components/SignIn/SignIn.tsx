@@ -107,7 +107,10 @@ export default function SignIn({
         });
         if (result.success) {
           setVerifyEmail(null);
-          setNotice(result.message || "Your email has been verified. You can now sign in.");
+          setNotice(
+            result.message ||
+              "Your email has been verified. You can now sign in.",
+          );
         } else {
           helpers.setStatus({ error: result.message });
         }
@@ -208,7 +211,7 @@ export default function SignIn({
                     DHAKA
                   </p>
                 </div>
-<FlightRoute/>
+                <FlightRoute />
                 {/* <div className="relative flex-1">
                   <div className="border-t border-dashed border-[#9FB4C7]/50" />
                   <FiSend
@@ -233,7 +236,10 @@ export default function SignIn({
                 from check-in to landing.
               </p> */}
 
-              <p className="font-grotesk text-xl font-medium leading-6 text-[#F7F4EC]">Every flight. <br/> Every destination. <br/> One trusted platform.</p>
+              <p className="font-grotesk text-xl font-medium leading-6 text-[#F7F4EC]">
+                Every flight. <br /> Every destination. <br /> One trusted
+                platform.
+              </p>
             </div>
 
             {/* Barcode */}
@@ -263,7 +269,13 @@ export default function SignIn({
         )}
 
         {/* Right form panel */}
-        <div className={compact ? "w-full p-6 sm:p-8" : "col-span-1 p-8 sm:p-10 md:col-span-3"}>
+        <div
+          className={
+            compact
+              ? "w-full p-6 sm:p-8"
+              : "col-span-1 p-8 sm:p-10 md:col-span-3"
+          }
+        >
           {verifyEmail ? (
             <div
               role="form"
@@ -311,7 +323,10 @@ export default function SignIn({
               )}
 
               <div>
-                <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-slate-700">
+                <label
+                  htmlFor="otp"
+                  className="mb-1.5 block text-sm font-medium text-slate-700"
+                >
                   OTP Code
                 </label>
                 <div className="relative">
@@ -332,7 +347,9 @@ export default function SignIn({
                   />
                 </div>
                 {verifyFormik.touched.otp && verifyFormik.errors.otp && (
-                  <p className="mt-1 text-xs text-rose-500">{verifyFormik.errors.otp}</p>
+                  <p className="mt-1 text-xs text-rose-500">
+                    {verifyFormik.errors.otp}
+                  </p>
                 )}
               </div>
 
@@ -404,74 +421,74 @@ export default function SignIn({
                 </div>
               )}
 
-            <FormField
-              label="Email address"
-              type="email"
-              placeholder="you@example.com"
-              icon={<FiMail />}
-              error={getError("email")}
-              {...formik.getFieldProps("email")}
-            />
-
-            <div>
               <FormField
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter password"
-                icon={<FiLock />}
-                error={getError("password")}
-                trailing={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="text-[#9FB4C7] hover:text-[#12233D]"
-                  >
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                }
-                {...formik.getFieldProps("password")}
+                label="Email address"
+                type="email"
+                placeholder="you@example.com"
+                icon={<FiMail />}
+                error={getError("email")}
+                {...formik.getFieldProps("email")}
               />
 
-              <div className="mt-3 flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm text-brand">
-                  <input
-                    type="checkbox"
-                    name="rememberMe"
-                    checked={formik.values.rememberMe}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    className="h-4 w-4 rounded border-[#9FB4C7]/60! accent-red-600 focus:ring-red-600/40!"
-                  />
-                  Remember me
-                </label>
+              <div>
+                <FormField
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password"
+                  icon={<FiLock />}
+                  error={getError("password")}
+                  trailing={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="text-[#9FB4C7] hover:text-[#12233D]"
+                    >
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  }
+                  {...formik.getFieldProps("password")}
+                />
 
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-xs font-medium text-brand hover:underline"
-                >
-                  Forgot password?
-                </Link>
+                <div className="mt-3 flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-sm text-brand">
+                    <input
+                      type="checkbox"
+                      name="rememberMe"
+                      checked={formik.values.rememberMe}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className="h-4 w-4 rounded border-[#9FB4C7]/60! accent-red-600 focus:ring-red-600/40!"
+                    />
+                    Remember me
+                  </label>
+
+                  <Link
+                    href="/auth/forgot-password"
+                    className="text-xs font-medium text-brand hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => formik.submitForm()}
-              disabled={formik.isSubmitting || isPending}
-              className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
-            >
-              {formik.isSubmitting || isPending ? "Signing in..." : "Sign in"}
-            </button>
-
-            <p className="text-center text-sm text-[#5B6B7A]">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/signup"
-                className="font-semibold text-brand hover:underline"
+              <button
+                type="button"
+                onClick={() => formik.submitForm()}
+                disabled={formik.isSubmitting || isPending}
+                className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
               >
-                Sign up
-              </Link>
-            </p>
+                {formik.isSubmitting || isPending ? "Signing in..." : "Sign in"}
+              </button>
+
+              <p className="text-center text-sm text-[#5B6B7A]">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href="/auth/signup"
+                  className="font-semibold text-brand hover:underline"
+                >
+                  Sign up
+                </Link>
+              </p>
             </div>
           )}
         </div>

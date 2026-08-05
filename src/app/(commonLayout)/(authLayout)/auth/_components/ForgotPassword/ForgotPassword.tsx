@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import { forgotPasswordAction, resetPasswordAction } from "@/actions/auth.action";
 import { forgotSchema, resetPasswordSchema } from "@/validations/auth.validation";
+import { OtpInput } from "@/components/ui";
 
 const BARCODE_BARS = [2, 4, 1, 3, 5, 2, 1, 4, 3, 2, 5, 1, 3, 2, 4, 1, 5, 2, 3, 1, 4, 2];
 
@@ -267,26 +268,19 @@ export default function ForgotPasswordForm() {
               )}
 
               <div>
-                <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-[#12233D]">
-                  OTP Code
-                </label>
-                <div className="relative">
-                  <FiLock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB4C7]" size={18} />
-                  <input
-                    id="otp"
-                    type="text"
-                    placeholder="123456"
-                    {...resetFormik.getFieldProps("otp")}
-                    className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
-                      getResetError("otp")
-                        ? "border-red-300 bg-red-50"
-                        : "border-[#9FB4C7]/30 bg-white focus:border-brand"
-                    }`}
-                  />
-                </div>
-                {getResetError("otp") && (
-                  <p className="mt-1 text-xs text-red-500">{getResetError("otp")}</p>
-                )}
+                <OtpInput
+                  label="OTP Code"
+                  length={6}
+                  value={resetFormik.values.otp}
+                  onChange={(v) => {
+                    resetFormik.setFieldValue("otp", v);
+                  }}
+                  onBlur={() => {
+                    resetFormik.setFieldTouched("otp", true);
+                  }}
+                  error={getResetError("otp") ? true : false}
+                  errorMessage={getResetError("otp") as string | undefined}
+                />
               </div>
 
               <div>

@@ -1,34 +1,54 @@
 "use client";
-import Image from "next/image";
-import withImage from "../../../../public/assets/images/with.png"; 
+
+import React from "react";
 
 const Loader = () => {
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-primary relative overflow-hidden">
-      <div className="absolute w-64 h-64 bg-white/10 rounded-full blur-3xl animate-ping"></div>
-      <div className="absolute w-40 h-40 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
+    <div 
+      role="status"
+      aria-live="polite"
+      aria-label="Loading application"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-primary overflow-hidden"
+    >
+      {/* Background Ambient Glow Effects */}
+      <div 
+        aria-hidden="true" 
+        className="absolute w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse" 
+      />
+      <div 
+        aria-hidden="true" 
+        className="absolute w-44 h-44 bg-secondary/10 rounded-full blur-2xl animate-ping opacity-50" 
+      />
 
-      <div className="relative">
-        <div className="w-20 h-20 border-4 border-white border-t-secondary rounded-full animate-spin"></div>
-
-        <div className="absolute top-1/2 left-1/2 w-5 h-5 bg-secondary rounded-full -translate-x-1/2 -translate-y-1/2 animate-ping"></div>
+      {/* Spinner Graphic */}
+      <div className="relative flex items-center justify-center">
+        {/* Outer Spinning Ring */}
+        <div className="w-20 h-20 border-4 border-white/20 border-t-secondary rounded-full animate-spin" />
+        
+        {/* Inner Pulsing Core */}
+        <div className="absolute w-4 h-4 bg-secondary rounded-full animate-ping opacity-75" />
+        <div className="absolute w-3 h-3 bg-secondary rounded-full shadow-lg shadow-secondary/50" />
       </div>
 
-      <div className="flex flex-col justify-center items-center mt-5">
-        <p className="text-xs font-semibold">YOUR TRAVEL BE SAFER</p>
-        <Image
-          src={withImage}
-          alt="Logo"
-          className="mx-auto w-9"
-          width={200}
-          height={200}
-          draggable={false}
-        />
-        <h1 className="font-extrabold text-3xl -mt-2.5 text-shadow-2xs">
-          <span className="text-white">NEC</span>{" "}
-          <span className="text-secondary">TRAVELS</span>
+      {/* Branding & Typography */}
+      <div className="flex flex-col items-center mt-6 text-center select-none">
+        <p className="text-xs font-semibold uppercase tracking-widest text-white/80">
+          Your Travel Be Safer
+        </p>
+        
+        {/* Removed my-1 and added leading-none to tighten the font box */}
+        <p className="font-stalemate text-white/90 text-3xl leading-none mt-1">
+          With
+        </p>
+        
+        {/* Added -mt-2.5 to pull NEC TRAVELS up closer to 'With' */}
+        <h1 className="font-extrabold text-3xl tracking-wide -mt-2.5">
+          <span className="text-white drop-shadow-sm">NEC</span>{" "}
+          <span className="text-secondary drop-shadow-sm">TRAVELS</span>
         </h1>
       </div>
+      
+      <span className="sr-only">Loading...</span>
     </div>
   );
 };

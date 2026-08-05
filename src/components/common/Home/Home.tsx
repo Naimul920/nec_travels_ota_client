@@ -15,7 +15,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="mx-auto max-w-[1600px] px-5 sm:px-10 lg:px-16">
+      <div className="mx-auto max-w-7xl px-2 sm:px-4">
         {/* <HomeHero /> */}
         <HomeTabs />
         <ExploreNec />

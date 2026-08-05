@@ -407,13 +407,13 @@ body {
   font-size: 1rem;
 }
 
-.hero-bg{
+/* .hero-bg{
   background-image:url(/assets/images/vector.png);
   background-position: top;
   background-repeat: no-repeat;
-  background-size: cover;
-  z-index: auto;
-}
+  background-size: fill;
+  z-index: -10;
+} */
 
 @keyframes dropdown-pop {
   from {
