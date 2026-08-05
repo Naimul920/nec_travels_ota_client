@@ -1,11 +1,11 @@
 import FlightSearch from "@/components/modules/flight/FlightSearch/FlightSearch";
 
-function page() {
+function FlightSearchPage() {
   return (
     <>
       <FlightSearch />
     </>
   );
 }
-
-export default page;
+ 
+export default FlightSearchPage;

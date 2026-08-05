@@ -411,8 +411,8 @@ body {
   background-image:url(/assets/images/vector.png);
   background-position: top;
   background-repeat: no-repeat;
-  background-size: cover;
-  z-index: auto;
+  background-size: fill;
+  z-index: -10;
 }
 
 @keyframes dropdown-pop {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import Footer from "@/components/shared/Footer/Footer";
 import CommonLayoutNavbar from "../CommonLayoutNavbar/CommonLayoutNavbar";
 import CommonLayoutSidebar from "../CommonLayoutSidebar/CommonLayoutSidebar";
@@ -17,25 +17,12 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
   const { user, isLoggedIn } = useAuthStore();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const footerRef = useRef<HTMLDivElement>(null);
-  const [footerHeight, setFooterHeight] = useState(0);
 
   const showSidebar = isLoggedIn && user && user.role !== ROLE.B2C;
   const isLanding = pathname === "/";
 
-  useEffect(() => {
-    const measureFooter = () => {
-      if (footerRef.current) {
-        setFooterHeight(footerRef.current.offsetHeight);
-      }
-    };
-    measureFooter();
-    window.addEventListener("resize", measureFooter);
-    return () => window.removeEventListener("resize", measureFooter);
-  }, []);
-
   return (
-    <div className="flex min-h-screen flex-col bg-white text-gray-800">
+    <div className="flex min-h-dvh flex-col bg-white text-gray-800">
       <CommonLayoutNavbar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -44,26 +31,24 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
       <div className="relative flex w-full flex-1">
         <main
           className={clsx(
-            "w-full",
-            !isLanding &&
-              "space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8",
+            "w-full flex-1 bg-white",
+            isLanding ? "pt-5" : "mx-auto max-w-7xl px-2 py-8 sm:px-4 sm:py-12"
           )}
         >
           {children}
         </main>
+
         {showSidebar && (
-          <aside className="fixed right-0 top-15 z-30 pointer-events-auto">
+          <aside className="sticky top-15 h-[calc(100vh-3.75rem)] z-30 pointer-events-auto">
             <CommonLayoutSidebar
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}
-              footerHeight={footerHeight}
             />
           </aside>
         )}
       </div>
-      <div ref={footerRef}>
-        <Footer />
-      </div>
+
+      <Footer />
     </div>
   );
 }

@@ -353,9 +353,9 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
 };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full relative">
+    <form onSubmit={handleSubmit} className="w-full relative ">
       {/* Trip Type selection inputs */}
-      <div className="flex items-center justify-center gap-6 mb-6 zoom-0-9 md-zoom-1">
+      <div className="flex items-center justify-center gap-6 mb-3 zoom-0-9 md-zoom-1">
         {["oneway", "roundtrip", "multicity"].map((type) => (
           <label key={type} className="flex items-center gap-2 cursor-pointer">
             <input

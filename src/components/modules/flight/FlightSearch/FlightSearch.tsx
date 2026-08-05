@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 // 2. Swapped React Router Hook for Next.js App Router Native Hook Engine
 import { useSearchParams } from "next/navigation";
-import NotFound from "@/components/modules/flight/NotFound/NotFound";
+import { NotFound } from "@/components/ui";
 import FlightSearchSummary from "@/components/modules/flight/FlightSearchSummary/FlightSearchSummary";
 import SearchHeaderFilter from "@/components/modules/flight/Filter/SearchHeaderFilter/SearchHeaderFilter";
 import SideBarFilter from "@/components/modules/flight/Filter/SidebarFilter/SideBarFilter";
@@ -282,7 +282,7 @@ const FlightSearch: React.FC = () => {
 
   return (
     <div
-      className="max-w-7xl mx-auto pt-2 px-5 sm:px-10 bg-white "
+      className=""
       id="mainScrollContainer"
     >
       <FlightSearchSummary />

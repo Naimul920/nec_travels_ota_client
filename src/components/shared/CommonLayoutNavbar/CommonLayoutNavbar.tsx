@@ -62,7 +62,7 @@ export default function CommonLayoutNavbar({
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/95 shadow-xs backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-4 px-5 sm:px-10">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-2 sm:px-4">
         {/* Logo */}
         <Link
           href={isLoggedIn ? `/console/${roleLower}` : "/"}
