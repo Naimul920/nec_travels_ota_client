@@ -20,7 +20,7 @@ export const isAuthRoute = (pathname: string) =>
 
 export const commonProtectedRoutes: RouteConfig = {
   exact: ["/console/change-password"],
-  pattern: [],
+  pattern: [/^\/console\/bookings(\/|$)/],
 };
 
 export const superadminProtectedRoutes: RouteConfig = {
