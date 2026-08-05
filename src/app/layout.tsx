@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk, IBM_Plex_Mono, Stalemate } from "next/font/google
 import AuthProvider from "@/providers/AuthProvider";
 import CurrencyProvider from "@/providers/CurrencyProvider";
 import { App as AntdApp } from "antd";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,11 +35,14 @@ export const metadata = {
   description: "Nec Travels Online Travel Agency",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const hasAuth = Boolean(cookieStore.get("access_token")?.value);
+
   return (
     <html
       lang="en"
@@ -46,7 +50,7 @@ export default function RootLayout({
     >
       <body suppressHydrationWarning>
         <QueryProviders>
-          <AuthProvider>
+          <AuthProvider hasAuth={hasAuth}>
             <CurrencyProvider>
               <AntdApp>
                 <AppLoaderProvider>{children}</AppLoaderProvider>

@@ -63,24 +63,15 @@ const MultiCity: React.FC<MultiCityProps> = ({
   const addRow = () => {
     if (data.length >= 5) return;
 
-    // Find the last selected arrival city across previous rows
-    let lastDestination = "";
-    for (let i = data.length - 1; i >= 0; i--) {
-      if (data[i]?.toIata) {
-        lastDestination = data[i].toIata;
-        break;
-      }
-    }
-
     const lastRowDate =
       data[data.length - 1]?.departureDate || dayjs().format("YYYY-MM-DD");
 
-    // Append new flight row with immutable state update
+    // Append a new empty flight row with immutable state update
     setData((prev) => [
       ...prev,
       {
-        fromIata: lastDestination,
-        toIata: lastDestination,
+        fromIata: "",
+        toIata: "",
         departureDate: lastRowDate,
       },
     ]);

@@ -41,7 +41,10 @@ const FlightSearchSummary: React.FC = () => {
       const str = params.get("segments");
       if (!str) return [];
       return str.split(",").map((seg) => {
-        const [from, to, date] = seg.split("-");
+        const parts = seg.split("-");
+        const from = parts[0];
+        const to = parts[1];
+        const date = parts.slice(2).join("-");
         return { from, to, date };
       });
     }

@@ -12,7 +12,7 @@ export default function HomeTabs() {
   const [activeKey, setActiveKey] = useState("1");
 
   return (
-    <div className="hero-bg">
+    <div className="w-full bg-[url('/assets/images/vector.png')] bg-top bg-no-repeat bg-size-[100%_auto]">
         <div className="mb-5 flex flex-col items-center justify-center text-center">
           <p className="text-xs font-semibold tracking-[0.3em] text-gray-800 sm:text-sm md:text-xl lg:text-2xl">
             YOUR TRAVEL BE SAFER

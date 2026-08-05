@@ -5,7 +5,13 @@ import { useFormikContext } from "formik";
 import type { PassengerType } from "@/types/passengerAlertBank";
 import type { BookingFormValues } from "@/interface";
 import { useAuthStore } from "@/store/auth.store";
-import { Input, Select, DatePicker, PhoneInput, CountrySelect } from "@/components/ui";
+import {
+  Input,
+  Select,
+  DatePicker,
+  PhoneInput,
+  CountrySelect,
+} from "@/components/ui";
 import {
   getDateOfBirthDisabledDate,
   getPassportExpiryDisabledDate,
@@ -76,6 +82,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
   const meta = TYPE_META[type];
   const baseName = `${type}.${index}`;
   const passenger = values[type][index];
+  const isLeadPassenger = type === "adult" && index === 0;
 
   const err = (field: string) => {
     const flat = errors as Record<string, string | undefined>;
@@ -103,6 +110,13 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           >
             {meta.label} {index + 1}
           </span>
+          {isLeadPassenger && (
+            <span
+              className={`rounded-md px-2.5 py-1 text-xs bg-brand text-white font-semibold`}
+            >
+              Lead Passenger
+            </span>
+          )}
         </div>
 
         {/* Quick Search Field */}
@@ -182,27 +196,6 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           {...err("country")}
         />
 
-        <Input
-          label="Email"
-          type="email"
-          name={`${baseName}.email`}
-          value={passenger.email}
-          onChange={handleChange}
-          placeholder="EMAIL ADDRESS"
-          required
-          {...err("email")}
-        />
-
-        <PhoneInput
-          label="Phone Number"
-          name={`${baseName}.phone`}
-          value={passenger.phone}
-          onChange={(v) => setFieldValue(`${baseName}.phone`, v)}
-          placeholder="PHONE NUMBER"
-          required
-          {...err("phone")}
-        />
-
         {/* Row 3 */}
         <Input
           label="Passport Number"
@@ -224,6 +217,33 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           required
           {...err("passport_expire")}
         />
+
+        {isLeadPassenger && (
+          <>
+            <Input
+              label="Email"
+              type="email"
+              name={`${baseName}.email`}
+              value={passenger.email}
+              onChange={handleChange}
+              placeholder="EMAIL ADDRESS"
+              required
+              className="lg:col-span-2"
+              {...err("email")}
+            />
+
+            <PhoneInput
+              label="Phone Number"
+              name={`${baseName}.phone`}
+              value={passenger.phone}
+              onChange={(v) => setFieldValue(`${baseName}.phone`, v)}
+              placeholder="PHONE NUMBER"
+              required
+              className="lg:col-span-2"
+              {...err("phone")}
+            />
+          </>
+        )}
       </div>
     </div>
   );

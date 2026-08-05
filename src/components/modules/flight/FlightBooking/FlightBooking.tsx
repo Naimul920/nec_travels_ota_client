@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Formik, Form, useFormikContext } from "formik";
 import { App } from "antd";
 import Swal from "sweetalert2";
@@ -20,6 +21,9 @@ import type {
 import TravelersForm from "../Booking/TravelersForm";
 import BookingSuccess from "../Booking/BookingSuccess";
 import BookingPageSkeleton from "./BookingPageSkeleton";
+import FlightSummaryCard from "./FlightSummaryCard";
+import BookingPreviewModal from "./BookingPreviewModal";
+import { ROLE } from "@/constant/enum/role";
 import { createPassengers } from "@/utils/createPassengers";
 import {
   AGE_RANGES,
@@ -36,6 +40,7 @@ import { useCurrencyStore } from "@/store/currency.store";
 import SearchCountdown from "../Card/SearchCountdown";
 import FlightCard from "../Card/FlightCard";
 import { getSearchExpiry } from "@/utils/searchCountdown";
+import { FaArrowLeft, FaEye } from "react-icons/fa";
 
 const PASSENGER_TYPE_MAP: Record<string, string> = {
   adult: "ADT",
@@ -117,7 +122,8 @@ const validateBooking = (values: BookingFormValues) => {
           `${label} must be at most ${range.max} years old`;
       }
 
-      if (!p.country) errors[`${base}.country`] = `${label} country is required`;
+      if (!p.country)
+        errors[`${base}.country`] = `${label} country is required`;
       if (!p.passport_number)
         errors[`${base}.passport_number`] = "Passport number is required";
       if (!p.passport_expire)
@@ -202,6 +208,7 @@ const FlightBooking: React.FC = () => {
   const searchParamsHook = useSearchParams();
   const router = useRouter();
   const [isBooking, setIsBooking] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [searchExpired, setSearchExpired] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [bookingResult, setBookingResult] = useState<{
@@ -274,6 +281,19 @@ const FlightBooking: React.FC = () => {
   }, [searchExpired, searchParamsHook]);
 
   const itinerary = searchData?.data?.itinDetails?.[itineraryIndex];
+
+  const isB2C = user?.role === ROLE.B2C;
+
+  const handleBack = () => {
+    const query = new URLSearchParams(searchParamsHook.toString());
+    query.delete("i");
+    query.delete("sid");
+    if (typeof window !== "undefined") {
+      window.location.href = query.toString()
+        ? `/flight-search?${query.toString()}`
+        : "/flight-search";
+    }
+  };
 
   const initialValues: BookingFormValues = useMemo(() => {
     const adultCount = Number(searchInfoParams.get("adult") ?? 0);
@@ -467,12 +487,32 @@ const FlightBooking: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto p-10">
-      <SearchCountdown
+    <div className="">
+      {/* Top bar */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-brand hover:text-brand"
+          >
+            <FaArrowLeft className="text-xs" />
+            Back to Results
+          </button>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 lg:text-2xl">
+              Complete Your Booking
+            </h1>
+            <p className="text-xs text-gray-500 lg:text-sm">
+              Please review your flight details and traveler information
+            </p>
+          </div>
+        </div>
+        <SearchCountdown
           expiresAt={expiresAt}
           onExpire={() => setSearchExpired(true)}
         />
-      
+      </div>
 
       <Formik
         initialValues={initialValues}
@@ -482,7 +522,7 @@ const FlightBooking: React.FC = () => {
         validateOnChange={false}
         onSubmit={handleSubmit}
       >
-        {({ values }) => {
+        {({ values, submitForm }) => {
           const travelerSummary = [
             { n: values.adult.length, label: "Adult" },
             { n: values.child.length, label: "Child" },
@@ -490,113 +530,82 @@ const FlightBooking: React.FC = () => {
             { n: values.infant.length, label: "Infant" },
           ].filter((t) => t.n > 0);
 
-          const total =
-            itinerary.saleCurrencyAmount?.offerAmount ??
-            itinerary.saleCurrencyAmount?.totalAmount ??
-            itinerary.saleCurrencyAmount?.baseAmount ??
-            0;
-
-          const passengerCount = {
-            adult: Number(searchInfoParams.get("adult") || 0),
-            child: Number(searchInfoParams.get("child") || 0),
-            kid: Number(searchInfoParams.get("kid") || 0),
-            infant: Number(searchInfoParams.get("infant") || 0),
-          };
-
           return (
             <Form>
-              <LeadPassengerPrefill />
-
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
-                <div className="lg:col-span-2">
+                <div className="space-y-6 lg:col-span-2">
                   <TravelersForm />
                 </div>
 
                 <aside className="space-y-5 lg:sticky lg:top-6">
-                  <FlightCard
+                  <FlightSummaryCard
                     itinerary={itinerary}
-                    index={itineraryIndex}
-                    searchId={searchId}
-                    passengerCount={passengerCount}
+                    travelerSummary={travelerSummary}
                   />
 
-                  <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <p className="text-xs text-gray-400">
-                      {travelerSummary
-                        .map(
-                          (t) => `${t.n} ${t.label}${t.n > 1 ? "s" : ""}`,
-                        )
-                        .join(", ")}
-                    </p>
-                    <p className="mt-1 text-xl font-bold text-gray-900">
-                      BDT{" "}
-                      {total.toLocaleString("en-US", {
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
-                    <label className="mt-4 flex items-start gap-2 text-xs text-gray-600">
+                  {/* Action buttons */}
+                  <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewOpen(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-brand bg-brand-light px-4 py-3 text-sm font-bold text-brand transition-colors hover:bg-brand hover:text-white"
+                    >
+                      <FaEye className="text-sm" />
+                      Preview Booking
+                    </button>
+
+                    {/* Terms agreement */}
+                    <label
+                      htmlFor="terms-agreement"
+                      className="flex cursor-pointer items-start gap-2.5 rounded-lg bg-gray-50 px-3.5 py-3"
+                    >
                       <input
+                        id="terms-agreement"
                         type="checkbox"
-                        name="acceptedTerms"
                         checked={acceptedTerms}
                         onChange={(e) => setAcceptedTerms(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 shrink-0 accent-red-600"
+                        className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-brand"
                       />
-                      <span>
+                      <span className="text-xs leading-relaxed text-gray-600">
                         I agree to the{" "}
-                        <a
-                          href="/terms-and-conditions"
+                        <Link
+                          href="/terms"
                           target="_blank"
-                          className="font-medium text-primary hover:underline"
+                          className="font-semibold text-brand underline underline-offset-2"
                         >
                           NEC Travels terms and conditions
-                        </a>
-                        .
+                        </Link>
                       </span>
                     </label>
-                    <Button
-                      type="submit"
-                      className={`mt-4 w-full h-12! text-base! ${
-                        isBooking || !user || searchExpired || !acceptedTerms
-                          ? "opacity-60 cursor-not-allowed"
-                          : ""
-                      }`}
-                      disabled={
-                        isBooking || !user || searchExpired || !acceptedTerms
-                      }
-                      title={
-                        searchExpired
-                          ? "Search session expired. Please search again"
-                          : !user
-                            ? "Please sign in to book"
-                            : !acceptedTerms
-                              ? "Please accept the terms and conditions"
-                              : undefined
-                      }
-                    >
-                      {isBooking ? "Booking..." : "Submit Booking"}
-                    </Button>
-                    {!user && (
-                      <p className="mt-2 text-center text-xs text-gray-400">
-                        Please sign in to place your booking
-                      </p>
+
+                    {isB2C ? (
+                      <div className="rounded-lg bg-amber-50 px-4 py-3 text-center text-xs font-medium text-amber-700">
+                        Online payment is coming soon. Please check back shortly
+                        to complete your booking.
+                      </div>
+                    ) : (
+                      <Button
+                        type="submit"
+                        onClick={submitForm}
+                        disabled={!acceptedTerms}
+                        isLoading={isBooking}
+                        className="w-full py-3 !text-sm"
+                      >
+                        {acceptedTerms
+                          ? "Confirm & Submit"
+                          : "Accept terms to continue"}
+                      </Button>
                     )}
-                    {searchExpired && (
-                      <p className="mt-2 text-center text-xs text-red-500">
-                        Your search session has expired. Please search again.
-                      </p>
-                    )}
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="mt-2 w-full h-12! text-base!"
-                      onClick={() => router.back()}
-                    >
-                      Back to Search
-                    </Button>
                   </div>
                 </aside>
               </div>
+
+              <BookingPreviewModal
+                open={previewOpen}
+                onClose={() => setPreviewOpen(false)}
+                itinerary={itinerary}
+                values={values}
+              />
             </Form>
           );
         }}

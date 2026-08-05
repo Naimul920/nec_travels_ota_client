@@ -73,6 +73,7 @@ export default function MainFooter() {
                 width={150}
                 height={40}
                 priority // Preloads image high priority
+                className="h-[40px] w-[150px] object-contain"
                 aria-label="NEC Travels"
               />
             </Link>
