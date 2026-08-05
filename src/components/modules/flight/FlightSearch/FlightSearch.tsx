@@ -14,7 +14,7 @@ import FlightCard from "@/components/modules/flight/Card/FlightCard";
 import FlightSearchSkeleton from "@/components/modules/flight/Card/FlightSearchSkeleton";
 import SearchCountdown from "@/components/modules/flight/Card/SearchCountdown";
 import { useFlightSearchMutation } from "@/hooks/useFlightApi";
-import { decoding } from "@/utils";
+import { decoding, storeSearchExpiry } from "@/utils";
 import type {
   Itinerary,
   SearchPayload,
@@ -33,7 +33,7 @@ export interface FilterState {
   departureRange: [number, number];
   arrivalRange: [number, number];
 }
- 
+
 const FlightSearch: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
@@ -59,8 +59,12 @@ const FlightSearch: React.FC = () => {
     return ["oneway", "roundtrip", "multicity"].includes(tripType ?? "");
   }, [tripType]);
 
-  const { mutate: flightSearch, data, isPending, isError } =
-    useFlightSearchMutation();
+  const {
+    mutate: flightSearch,
+    data,
+    isPending,
+    isError,
+  } = useFlightSearchMutation();
 
   const payload: SearchPayload | null = useMemo(() => {
     if (!tripType) return null;
@@ -71,11 +75,32 @@ const FlightSearch: React.FC = () => {
     const infant = Number(searchParams.get("infant") || 0);
     const flight_class = (searchParams.get("cabin") || "economy").toLowerCase();
 
+    // if (tripType === "multicity") {
+    //   const segmentsStr = searchParams.get("segments");
+    //   const segments =
+    //     segmentsStr?.split(",").map((seg) => {
+    //       const [from, to, start_date] = seg.split("-");
+    //       return { from, to, start_date };
+    //     }) || [];
+    //   return {
+    //     flight: "multicity",
+    //     no_of_adult: adult,
+    //     no_of_children: child,
+    //     no_of_kids: kid,
+    //     no_of_infant: infant,
+    //     flight_class,
+    //     segments,
+    //   };
+    // }
+
     if (tripType === "multicity") {
       const segmentsStr = searchParams.get("segments");
       const segments =
         segmentsStr?.split(",").map((seg) => {
-          const [from, to, start_date] = seg.split("-");
+          const parts = seg.split("-");
+          const from = parts[0];
+          const to = parts[1];
+          const start_date = parts.slice(2).join("-"); // rejoin the date parts
           return { from, to, start_date };
         }) || [];
       return {
@@ -140,6 +165,12 @@ const FlightSearch: React.FC = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const allItins = data?.data?.itinDetails ?? [];
+
+  useEffect(() => {
+    if (data?.data?.searchId) {
+      storeSearchExpiry(data.data.searchId, data.data.expiresAt);
+    }
+  }, [data]);
 
   const carrierCodes = useMemo(() => {
     const codes = new Set<string>();
@@ -250,7 +281,10 @@ const FlightSearch: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto pt-2 px-5 sm:px-10 bg-white " id="mainScrollContainer">
+    <div
+      className="max-w-7xl mx-auto pt-2 px-5 sm:px-10 bg-white "
+      id="mainScrollContainer"
+    >
       <FlightSearchSummary />
 
       {isPending && <FlightSearchSkeleton cardCount={3} />}
@@ -260,111 +294,116 @@ const FlightSearch: React.FC = () => {
           <div className="flex items-center justify-between mb-2">
             <Button
               onClick={() => setSidebarOpen(true)}
-          className="bg-transparent text-black! p-0! md:hidden"
-        >
-          <IoFilterSharp size={15} />
-        </Button>
+              className="bg-transparent text-black! p-0! md:hidden"
+            >
+              <IoFilterSharp size={15} />
+            </Button>
 
-        <div className="flex justify-between w-full px-3">
-          <h3 className="md:text-sm text-xs font-semibold">
-          {isPending ? "Searching..." : `${totalFlights} Available Flights`}
-        </h3>
+            <div className="flex justify-between w-full px-3">
+              <h3 className="md:text-sm text-xs font-semibold">
+                {isPending
+                  ? "Searching..."
+                  : `${totalFlights} Available Flights`}
+              </h3>
 
-        <div className="flex items-center gap-2 ">
-          <SearchCountdown expiresAt={data?.data?.expiresAt} />
-          <p className="text-xs">
-            <sup className="text-secondary">*</sup>Price Includes VAT & Tax
-          </p>
-        </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-12 md:gap-5">
-        <div className="lg:col-span-2 hidden lg:block ">
-          <div className="bg-white shadow rounded-b-sm sticky md:top-13 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <SideBarFilter
-              allItins={allItins}
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              carrierCodes={carrierCodes}
-              stopOptions={stopOptions}
-              minPrice={minPrice}
-            />
+              <div className="flex items-center gap-2 ">
+                <SearchCountdown expiresAt={data?.data?.expiresAt} />
+                <p className="text-xs">
+                  <sup className="text-secondary">*</sup>Price Includes VAT &
+                  Tax
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {sidebarOpen && (
-          <div className="fixed inset-0 bg-black/40 z-40 md:hidden pointer-events-none" />
-        )}
+          <div className="grid grid-cols-12 md:gap-5">
+            <div className="lg:col-span-2 hidden lg:block ">
+              <div className="bg-white shadow rounded-b-sm sticky md:top-13 max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <SideBarFilter
+                  allItins={allItins}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  carrierCodes={carrierCodes}
+                  stopOptions={stopOptions}
+                  minPrice={minPrice}
+                />
+              </div>
+            </div>
 
-        <div
-          className={`fixed top-0 left-0 h-full w-full bg-white z-99 md:hidden overflow-y-scroll
+            {sidebarOpen && (
+              <div className="fixed inset-0 bg-black/40 z-40 md:hidden pointer-events-none" />
+            )}
+
+            <div
+              className={`fixed top-0 left-0 h-full w-full bg-white z-99 md:hidden overflow-y-scroll
             transform transition-transform duration-300 ease-in-out
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
-        >
-          <div className="flex items-center justify-between p-4 border-b">
-            <h3 className="font-semibold text-sm">Filter Flights</h3>
-            <Button
-              onClick={() => setSidebarOpen(false)}
-              className="bg-transparent text-secondary! p-0"
             >
-              <IoClose size={22} />
-            </Button>
-          </div>
-          <div className="overflow-y-auto h-[calc(100%-56px)] custom-scrollbar">
-            <SideBarFilter
-              allItins={allItins}
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              carrierCodes={carrierCodes}
-              stopOptions={stopOptions}
-              minPrice={minPrice}
-            />
-          </div>
-        </div>
-
-        <div className="lg:col-span-10 col-span-12">
-          <div className="sticky md:top-14 z-10">
-            <SearchHeaderFilter
-              carrierCodes={carrierCodes}
-              allItins={allItins}
-              selectedCode={filters.airlines[0] || null}
-              onSelect={handleAirlineSelect}
-            />
-          </div>
-
-          {isError && (
-            <div className="text-center py-10 text-red-500 text-sm">
-              Failed to load flights. Please try again.
-            </div>
-          )}
-
-          {!isPending && !isError && totalFlights === 0 && (
-            <div className="text-center py-10 text-gray-500 text-sm">
-              No flights found for this search.
-            </div>
-          )}
-
-          {!isPending && !isError && totalFlights > 0 && (
-            <div className="py-2 space-y-2">
-              {filteredFlights.map((itinerary: Itinerary, index: number) => (
-                <FlightCard
-                  key={index}
-                  itinerary={itinerary}
-                  index={index}
-                  searchId={data?.data?.searchId ?? ""}
-                  passengerCount={{
-                    adult: data?.data?.noOfAdult ?? 0,
-                    child: data?.data?.noOfChildren ?? 0,
-                    kid: data?.data?.noOfKids ?? 0,
-                    infant: data?.data?.noOfInfant ?? 0,
-                  }}
+              <div className="flex items-center justify-between p-4 border-b">
+                <h3 className="font-semibold text-sm">Filter Flights</h3>
+                <Button
+                  onClick={() => setSidebarOpen(false)}
+                  className="bg-transparent text-secondary! p-0"
+                >
+                  <IoClose size={22} />
+                </Button>
+              </div>
+              <div className="overflow-y-auto h-[calc(100%-56px)] custom-scrollbar">
+                <SideBarFilter
+                  allItins={allItins}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  carrierCodes={carrierCodes}
+                  stopOptions={stopOptions}
+                  minPrice={minPrice}
                 />
-              ))}
+              </div>
             </div>
-          )}
+
+            <div className="lg:col-span-10 col-span-12">
+              <div className="sticky md:top-14 z-10">
+                <SearchHeaderFilter
+                  carrierCodes={carrierCodes}
+                  allItins={allItins}
+                  selectedCode={filters.airlines[0] || null}
+                  onSelect={handleAirlineSelect}
+                />
+              </div>
+
+              {isError && (
+                <div className="text-center py-10 text-red-500 text-sm">
+                  Failed to load flights. Please try again.
+                </div>
+              )}
+
+              {!isPending && !isError && totalFlights === 0 && (
+                <div className="text-center py-10 text-gray-500 text-sm">
+                  No flights found for this search.
+                </div>
+              )}
+
+              {!isPending && !isError && totalFlights > 0 && (
+                <div className="py-2 space-y-2">
+                  {filteredFlights.map(
+                    (itinerary: Itinerary, index: number) => (
+                      <FlightCard
+                        key={index}
+                        itinerary={itinerary}
+                        index={index}
+                        searchId={data?.data?.searchId ?? ""}
+                        passengerCount={{
+                          adult: data?.data?.noOfAdult ?? 0,
+                          child: data?.data?.noOfChildren ?? 0,
+                          kid: data?.data?.noOfKids ?? 0,
+                          infant: data?.data?.noOfInfant ?? 0,
+                        }}
+                      />
+                    ),
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         </>
       )}
     </div>

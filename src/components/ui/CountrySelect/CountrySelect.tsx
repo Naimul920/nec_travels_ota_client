@@ -4,7 +4,6 @@ import * as React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
-import { getCountries, getCountryCallingCode } from "libphonenumber-js";
 import * as Flags from "country-flag-icons/react/3x2";
 import type { FlagComponent } from "country-flag-icons/react/3x2";
 import { MdOutlineLanguage } from "react-icons/md";
@@ -13,7 +12,6 @@ import { FaChevronDown, FaSearch } from "react-icons/fa";
 interface CountryOption {
   code: string;
   name: string;
-  dialCode: string;
 }
 
 const flagMap = Flags as unknown as Record<string, FlagComponent | undefined>;
@@ -28,24 +26,20 @@ const Flag: React.FC<{ code: string; className?: string }> = ({
 };
 
 function buildCountryList(): CountryOption[] {
-  const names = new Intl.DisplayNames(["en"], { type: "region" });
-  return getCountries()
+  const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+  
+  // Get ISO 3166-1 alpha-2 codes supported by country-flag-icons
+  return Object.keys(Flags)
+    .filter((code) => code.length === 2 && code === code.toUpperCase())
     .map((code) => {
-      let name: string = code;
+      let name = code;
       try {
-        name = names.of(code) || code;
+        name = regionNames.of(code) || code;
       } catch {
         name = code;
       }
-      let dialCode = "";
-      try {
-        dialCode = `+${getCountryCallingCode(code)}`;
-      } catch {
-        dialCode = "";
-      }
-      return { code, name, dialCode };
+      return { code, name };
     })
-    .filter((c) => c.dialCode)
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -80,8 +74,9 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
   const [query, setQuery] = useState("");
   const [highlight, setHighlight] = useState(0);
   const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(
-    null,
+    null
   );
+
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -92,9 +87,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return allOptions;
-    return allOptions.filter((c) =>
-      `${c.name} ${c.code} ${c.dialCode}`.toLowerCase().includes(q),
-    );
+    return allOptions.filter((c) => c.name.toLowerCase().includes(q));
   }, [allOptions, query]);
 
   useEffect(() => setMounted(true), []);
@@ -120,13 +113,12 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
 
   useEffect(() => {
     if (!open) return;
-    const onResize = () => computePos();
-    const onScroll = () => computePos();
-    window.addEventListener("resize", onResize);
-    window.addEventListener("scroll", onScroll, true);
+    const handleResizeOrScroll = () => computePos();
+    window.addEventListener("resize", handleResizeOrScroll);
+    window.addEventListener("scroll", handleResizeOrScroll, true);
     return () => {
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", handleResizeOrScroll);
+      window.removeEventListener("scroll", handleResizeOrScroll, true);
     };
   }, [open]);
 
@@ -206,21 +198,19 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
           "hover:border-gray-300",
           "focus:border-primary focus:ring-4 focus:ring-primary/15",
           error &&
-            "border-red-400 hover:border-red-400 focus:border-red-400 focus:ring-red-400/15",
+            "border-red-400 hover:border-red-400 focus:border-red-400 focus:ring-red-400/15"
         )}
       >
         {selected ? (
           <>
             <Flag code={selected.code} className="h-4 w-6 shrink-0 rounded-[2px]" />
-            <span className="font-semibold text-gray-500">{selected.code}</span>
-            <span className="flex-1 truncate text-left text-gray-700">
+            <span className="flex-1 truncate text-left text-gray-800 font-medium">
               {selected.name}
             </span>
-            <span className="text-xs text-gray-400">{selected.dialCode}</span>
           </>
         ) : (
           <>
-            <MdOutlineLanguage className="shrink-0 text-gray-400" />
+            <MdOutlineLanguage className="shrink-0 text-gray-400 text-lg" />
             <span className="flex-1 truncate text-left text-gray-400">
               {placeholder}
             </span>
@@ -229,7 +219,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
         <FaChevronDown
           className={clsx(
             "h-3 w-3 shrink-0 text-gray-400 transition-transform duration-200",
-            open && "rotate-180",
+            open && "rotate-180"
           )}
         />
       </button>
@@ -268,20 +258,18 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
                     onMouseEnter={() => setHighlight(i)}
                     onClick={() => selectOption(c.code)}
                     className={clsx(
-                      "flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm transition-colors",
+                      "flex w-full items-center gap-3 px-3.5 py-2.5 text-left text-sm transition-colors",
                       i === highlight ? "bg-primary/10" : "",
                       c.code === value
-                        ? "font-semibold text-gray-800"
-                        : "text-gray-700",
+                        ? "font-semibold text-primary"
+                        : "text-gray-700"
                     )}
                   >
                     <Flag
                       code={c.code}
                       className="h-4 w-6 shrink-0 rounded-[2px]"
                     />
-                    <span className="font-semibold text-gray-500">{c.code}</span>
                     <span className="flex-1 truncate">{c.name}</span>
-                    <span className="text-xs text-gray-400">{c.dialCode}</span>
                   </button>
                 </li>
               ))}
@@ -292,7 +280,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
               )}
             </ul>
           </div>,
-          document.body,
+          document.body
         )}
 
       {error && errorMessage && (

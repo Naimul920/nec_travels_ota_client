@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Itinerary, Schedule } from "@/interface/flight";
 import dayjs from "dayjs";
 import { FaPlane } from "react-icons/fa";
+import { useAuthStore } from "@/store/auth.store";
 
 interface IProps {
   state: IState;
@@ -62,6 +63,7 @@ const SearchHeader: React.FC<IProps> = ({
   // 3. Initialized Next.js 16 Search Parameters & Native Router Hook
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isLoggedIn } = useAuthStore();
 
   const totalAdultFare = itinerary?.passengerFareBreakDown
     .filter((f) => f.passengerType === "Adult")
@@ -124,6 +126,13 @@ const SearchHeader: React.FC<IProps> = ({
     // 4. Safely constructs query parameters string layout using native searchParams string conversion
     const currentQuery = searchParams.toString();
     const bookingUrl = `/flight-booking?${currentQuery}&i=${id}&sid=${searchId}`;
+    // If user is not logged in, send them to sign-in first and bring them back
+    // to the same booking (with the same info) using client-side navigation after login.
+    if (!isLoggedIn) {
+      const redirect = encodeURIComponent(bookingUrl);
+      router.push(`/auth/signin?redirect=${redirect}`);
+      return;
+    }
     router.push(bookingUrl);
   };
 

@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
@@ -10,6 +9,7 @@ import { FiUser, FiList, FiLogOut } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
 import { logoutAction } from "@/actions/auth.action";
 import { ROLE } from "@/constant";
+import { NavRole } from "@/helper/navigation";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -68,12 +68,11 @@ export default function CommonLayoutNavbar({
           href={isLoggedIn ? `/console/${roleLower}` : "/"}
           className="flex shrink-0 items-center"
         >
-          <Image
+          <img
             src={headerLogo}
             alt={isB2B && user?.logo ? "Agency logo" : "NEC Fly"}
             width={130}
             height={40}
-            priority
             className="object-contain"
             style={{ width: "auto", height: 50 }}
           />
@@ -119,8 +118,8 @@ export default function CommonLayoutNavbar({
                 >
                   <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-linear-to-br from-brand to-emerald-600">
                     {user?.image ? (
-                      <Image
-                        src={user.image ||""}
+                      <img
+                        src={user.image || ""}
                         alt="Profile"
                         width={32}
                         height={32}
@@ -151,7 +150,7 @@ export default function CommonLayoutNavbar({
                     <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-brand to-emerald-600 text-white">
                         {user?.image ? (
-                          <Image
+                          <img
                             src={user.image}
                             alt="Profile"
                             width={40}
@@ -185,7 +184,7 @@ export default function CommonLayoutNavbar({
                       My Profile
                     </Link>
 
-                    {!isB2B && (
+                    {(user?.role == NavRole.SUPER_ADMIN || user?.role == NavRole.ADMIN) && (
                       <Link
                         href={bookingsLink}
                         onClick={() => setDropdownOpen(false)}

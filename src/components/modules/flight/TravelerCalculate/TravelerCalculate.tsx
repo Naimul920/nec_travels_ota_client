@@ -98,15 +98,15 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
   );
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative " ref={ref}>
       {/* Dropdown Trigger */}
       <div
-        className="cursor-pointer rounded-xl border-2 border-primary bg-white p-4 transition-all hover:border-primary/70 hover:shadow-md"
+        className="cursor-pointer  rounded-xl border-2 border-primary bg-white px-3 py-5 transition-all hover:border-primary/70 hover:shadow-md "
         onClick={() => setOpen(!open)}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+            <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">
               Travelers & Class
             </p>
             <p className="mt-0.5 flex items-center gap-2 text-2xl font-extrabold text-primary">
@@ -125,7 +125,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
 
       {/* Dropdown Panel */}
       {open && (
-        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-gray-200 bg-white p-5 shadow-xl space-y-4 md:translate-x-0 -translate-x-6">
+        <div className="absolute z-50 mt-2 right-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-xl space-y-4 w-full md:w-96">
           {/* Header */}
           <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">

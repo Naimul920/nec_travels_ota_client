@@ -1,11 +1,10 @@
-"use client"; // 1. Next.js 16 Client Component Boundary
+"use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { FaUser } from "react-icons/fa";
-// 2. Swapped React Router hook with Next.js Navigation hook
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Formik, Form, useFormikContext } from "formik";
 import { App } from "antd";
+import Swal from "sweetalert2";
 import { useQuery } from "@tanstack/react-query";
 import { decoding } from "../../../../utils";
 import { Button } from "../../../ui";
@@ -20,10 +19,7 @@ import type {
 } from "@/interface/flight";
 import TravelersForm from "../Booking/TravelersForm";
 import BookingSuccess from "../Booking/BookingSuccess";
-import BookingFlightInfo from "../Booking/BookingFlightInfo";
-import SearchDetails from "../Card/SearchDetails";
 import BookingPageSkeleton from "./BookingPageSkeleton";
-import SignIn from "@/app/(commonLayout)/(authLayout)/auth/_components/SignIn/SignIn";
 import { createPassengers } from "@/utils/createPassengers";
 import {
   AGE_RANGES,
@@ -37,6 +33,9 @@ import {
 } from "@/actions/flight.action";
 import { useAuthStore } from "@/store/auth.store";
 import { useCurrencyStore } from "@/store/currency.store";
+import SearchCountdown from "../Card/SearchCountdown";
+import FlightCard from "../Card/FlightCard";
+import { getSearchExpiry } from "@/utils/searchCountdown";
 
 const PASSENGER_TYPE_MAP: Record<string, string> = {
   adult: "ADT",
@@ -52,9 +51,6 @@ const TYPE_LABEL: Record<string, string> = {
   infant: "Infant",
 };
 
-// Fills the lead traveler contact/name and every passenger's country from the
-// logged-in user / detected geo without resetting the Formik form (initialValues
-// stays stable on login/logout).
 const LeadPassengerPrefill: React.FC = () => {
   const { values, setFieldValue } = useFormikContext<BookingFormValues>();
   const { user } = useAuthStore();
@@ -157,7 +153,10 @@ const buildSearchPayload = (searchInfoParams: URLSearchParams) => {
     const segmentsStr = searchInfoParams.get("segments");
     const segments =
       segmentsStr?.split(",").map((seg) => {
-        const [from, to, start_date] = seg.split("-");
+        const parts = seg.split("-");
+        const from = parts[0];
+        const to = parts[1];
+        const start_date = parts.slice(2).join("-");
         return { from, to, start_date };
       }) || [];
     return {
@@ -200,9 +199,11 @@ const buildSearchPayload = (searchInfoParams: URLSearchParams) => {
 };
 
 const FlightBooking: React.FC = () => {
-  // 3. Read search parameters natively
   const searchParamsHook = useSearchParams();
+  const router = useRouter();
   const [isBooking, setIsBooking] = useState(false);
+  const [searchExpired, setSearchExpired] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [bookingResult, setBookingResult] = useState<{
     booking: FlightBookingResponseData;
     segments: BookingSegment[];
@@ -213,7 +214,6 @@ const FlightBooking: React.FC = () => {
   const { user } = useAuthStore();
   const { message } = App.useApp();
 
-  // Re-creates the URLSearchParams instance dynamically from Next.js searchParams hook
   const searchParams = useMemo(() => {
     return new URLSearchParams(searchParamsHook.toString());
   }, [searchParamsHook]);
@@ -238,6 +238,40 @@ const FlightBooking: React.FC = () => {
     queryFn: () => searchFlightAction(searchPayload!),
     enabled: !!searchPayload,
   });
+
+  const expiresAt = useMemo(() => {
+    const stored = getSearchExpiry(searchId);
+    return stored ?? searchData?.data?.expiresAt;
+  }, [searchId, searchData]);
+
+  useEffect(() => {
+    if (!searchExpired) return;
+    Swal.fire({
+      title: "Search Session Expired",
+      html: "Your 30 minute booking window has expired. To confirm your booking at the latest price and availability, please search again.",
+      icon: "warning",
+      confirmButtonText: "Search Again",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      allowEnterKey: false,
+      customClass: {
+        confirmButton: "!bg-primary",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setSearchExpired(false);
+        const query = new URLSearchParams(searchParamsHook.toString());
+        query.delete("i");
+        query.delete("sid");
+        const searchUrl = query.toString()
+          ? `/flight-search?${query.toString()}`
+          : "/";
+        if (typeof window !== "undefined") {
+          window.location.href = searchUrl;
+        }
+      }
+    });
+  }, [searchExpired, searchParamsHook]);
 
   const itinerary = searchData?.data?.itinDetails?.[itineraryIndex];
 
@@ -288,7 +322,8 @@ const FlightBooking: React.FC = () => {
       itinDetail: { flightDetails: itin.flightDetails },
       passengerFareBreakDown: itin.passengerFareBreakDown,
       saleCurrencyAmount: {
-        totalAmount: sale?.offerAmount ?? sale?.totalAmount ?? sale?.baseAmount ?? 0,
+        totalAmount:
+          sale?.offerAmount ?? sale?.totalAmount ?? sale?.baseAmount ?? 0,
         baseAmount: sale?.baseAmount ?? 0,
         discountAmount: sale?.discountAmount ?? 0,
         taxFare: sale?.taxFare ?? 0,
@@ -300,7 +335,6 @@ const FlightBooking: React.FC = () => {
   const toBookingPassenger = (
     p: Passenger,
     passenger_type: string,
-    includeContact: boolean,
   ): BookingPassenger => ({
     title: p.title,
     firstname: p.firstname,
@@ -311,34 +345,17 @@ const FlightBooking: React.FC = () => {
     passport_number: p.passport_number,
     passport_expire: p.passport_expire,
     passenger_type,
-    ...(includeContact ? { email: p.email, phone: p.phone } : {}),
   });
 
   const handleSubmit = async (values: BookingFormValues) => {
+    if (searchExpired) {
+      message.warning("Your search session has expired. Please search again.");
+      return;
+    }
     if (!itinerary) {
       message.error("Selected flight could not be found. Please search again.");
       return;
     }
-
-    // const passengers: BookingPassenger[] = [];
-    // (["adult", "child", "kid", "infant"] as const).forEach((type) => {
-    //   values[type].forEach((p) => {
-    //     passengers.push(
-    //       toBookingPassenger(p, PASSENGER_TYPE_MAP[type], false),
-    //     );
-    //   });
-    // });
-
-    // const leadPassenger = passengers[0];
-    // if (!leadPassenger) {
-    //   message.error("Please add at least one passenger.");
-    //   return;
-    // }
-    // const leadPassengerWithContact: LeadPassenger = {
-    //   ...leadPassenger,
-    //   email: values.adult[0]?.email,
-    //   phone: values.adult[0]?.phone,
-    // };
 
     const allPassengers: BookingPassenger[] = [];
     (["adult", "child", "kid", "infant"] as const).forEach((type) => {
@@ -348,7 +365,7 @@ const FlightBooking: React.FC = () => {
           type === "child" || type === "kid"
             ? getPassengerTypeByAge(age)
             : PASSENGER_TYPE_MAP[type];
-        allPassengers.push(toBookingPassenger(p, typeCode, false));
+        allPassengers.push(toBookingPassenger(p, typeCode));
       });
     });
 
@@ -368,8 +385,6 @@ const FlightBooking: React.FC = () => {
       const revalidateResult = await revalidateItineraryAction(
         buildRevalidatePayload(itinerary),
       );
-      // console.log("itinerary response:", itinerary);
-      // console.log("Revalidate response:", revalidateResult);
       if (!revalidateResult.success || !revalidateResult.data?.quoteId) {
         message.error(
           revalidateResult.message ||
@@ -396,9 +411,7 @@ const FlightBooking: React.FC = () => {
         provider: "sb",
       };
 
-      console.log("Booking payload:", payload);
       const result = await bookFlightAction(payload);
-      console.log("Booking response:", result);
       if (result.success) {
         const total =
           itinerary.saleCurrencyAmount?.offerAmount ??
@@ -455,12 +468,18 @@ const FlightBooking: React.FC = () => {
 
   return (
     <div className="max-w-[1600px] mx-auto p-10">
-      <h1 className="text-xl font-semibold mb-4">Flight Booking</h1>
+      <SearchCountdown
+          expiresAt={expiresAt}
+          onExpire={() => setSearchExpired(true)}
+        />
+      
 
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
         validate={validateBooking}
+        validateOnBlur={false}
+        validateOnChange={false}
         onSubmit={handleSubmit}
       >
         {({ values }) => {
@@ -489,40 +508,15 @@ const FlightBooking: React.FC = () => {
               <LeadPassengerPrefill />
 
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
-                {/* LEFT: passenger info fields */}
                 <div className="lg:col-span-2">
                   <TravelersForm />
                 </div>
 
-                {/* RIGHT: login + flight info + submit */}
                 <aside className="space-y-5 lg:sticky lg:top-6">
-                  {!user ? (
-                    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                      <SignIn noRedirect compact />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <FaUser />
-                      </span>
-                      <div>
-                        <p className="text-xs text-gray-400">Signed in as</p>
-                        <p className="text-sm font-semibold text-gray-800">
-                          {user.first_name || user.full_name || "Traveler"}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <p className="mb-3 text-xs font-bold uppercase tracking-wide text-gray-400">
-                      Your Trip
-                    </p>
-                    <BookingFlightInfo itinerary={itinerary} />
-                  </div>
-
-                  <SearchDetails
+                  <FlightCard
                     itinerary={itinerary}
+                    index={itineraryIndex}
+                    searchId={searchId}
                     passengerCount={passengerCount}
                   />
 
@@ -530,8 +524,7 @@ const FlightBooking: React.FC = () => {
                     <p className="text-xs text-gray-400">
                       {travelerSummary
                         .map(
-                          (t) =>
-                            `${t.n} ${t.label}${t.n > 1 ? "s" : ""}`,
+                          (t) => `${t.n} ${t.label}${t.n > 1 ? "s" : ""}`,
                         )
                         .join(", ")}
                     </p>
@@ -541,15 +534,45 @@ const FlightBooking: React.FC = () => {
                         maximumFractionDigits: 2,
                       })}
                     </p>
+                    <label className="mt-4 flex items-start gap-2 text-xs text-gray-600">
+                      <input
+                        type="checkbox"
+                        name="acceptedTerms"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-red-600"
+                      />
+                      <span>
+                        I agree to the{" "}
+                        <a
+                          href="/terms-and-conditions"
+                          target="_blank"
+                          className="font-medium text-primary hover:underline"
+                        >
+                          NEC Travels terms and conditions
+                        </a>
+                        .
+                      </span>
+                    </label>
                     <Button
                       type="submit"
-                      className={`mt-4 w-full !h-12 !text-base ${
-                        isBooking || !user
+                      className={`mt-4 w-full h-12! text-base! ${
+                        isBooking || !user || searchExpired || !acceptedTerms
                           ? "opacity-60 cursor-not-allowed"
                           : ""
                       }`}
-                      disabled={isBooking || !user}
-                      title={!user ? "Please sign in to book" : undefined}
+                      disabled={
+                        isBooking || !user || searchExpired || !acceptedTerms
+                      }
+                      title={
+                        searchExpired
+                          ? "Search session expired. Please search again"
+                          : !user
+                            ? "Please sign in to book"
+                            : !acceptedTerms
+                              ? "Please accept the terms and conditions"
+                              : undefined
+                      }
                     >
                       {isBooking ? "Booking..." : "Submit Booking"}
                     </Button>
@@ -558,6 +581,19 @@ const FlightBooking: React.FC = () => {
                         Please sign in to place your booking
                       </p>
                     )}
+                    {searchExpired && (
+                      <p className="mt-2 text-center text-xs text-red-500">
+                        Your search session has expired. Please search again.
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="mt-2 w-full h-12! text-base!"
+                      onClick={() => router.back()}
+                    >
+                      Back to Search
+                    </Button>
                   </div>
                 </aside>
               </div>

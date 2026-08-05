@@ -1,4 +1,4 @@
-import { Table as AntTable, type TableProps } from "antd";
+import { Table as AntTable, ConfigProvider, type TableProps } from "antd";
 import TableHeader from "@/components/common/Table/TableHeader";
 import clsx from "clsx";
 
@@ -24,17 +24,33 @@ const Table = <RecordType extends object>({
   isSelect = false,
 }: CustomTableProps<RecordType>) => {
   return (
-    <AntTable
-      className={clsx("m-3 md:m-0 pt-3 custom-table", className)}
-      title={() => <TableHeader title={title} isSelect={isSelect} />}
-      columns={columns}
-      dataSource={dataSource}
-      onChange={onChange}
-      pagination={pagination}
-      rowKey={rowKey}
-      scroll={{ x: "50%" }}
-      bordered
-    />
+    <div className={clsx("p-3 md:p-0 md:pt-2", className)}>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: "#00a550",
+            borderRadius: 8,
+            fontFamily: "var(--font-sans), sans-serif",
+          },
+          components: {
+            Pagination: {
+              itemBg: "#ffffff",
+            },
+          },
+        }}
+      >
+        <AntTable
+          className="custom-table"
+          title={() => <TableHeader title={title} isSelect={isSelect} />}
+          columns={columns}
+          dataSource={dataSource}
+          onChange={onChange}
+          pagination={pagination}
+          rowKey={rowKey}
+          scroll={{ x: "50%" }}
+        />
+      </ConfigProvider>
+    </div>
   );
 };
 

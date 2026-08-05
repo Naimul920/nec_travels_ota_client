@@ -28,6 +28,12 @@ import {
   FaGlobe,
   FaInstagram,
   FaYoutube,
+  FaBoxOpen,
+  FaMoneyBillWave,
+  FaBell,
+  FaNewspaper,
+  FaArrowDown,
+  FaClock,
 } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa6";
 import { ImList2 } from "react-icons/im";
@@ -39,6 +45,8 @@ export interface NavItem {
   children?: NavItem[];
   /** Required departments for this item (ADMIN role). Empty/undefined = shown to all. */
   departments?: string[];
+  /** View-only departments (read access only, ADMIN role). */
+  readOnlyDepartments?: string[];
 }
 
 export enum NavRole {
@@ -189,6 +197,162 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       path: "/banks",
       label: "Banks",
       icon: <FaUniversity />,
+      children: [
+        {
+          path: "/all",
+          label: "All Banks",
+          icon: <FaUniversity />,
+        },
+        {
+          path: "/add",
+          label: "Add Bank",
+          icon: <FaPlusCircle />,
+        },
+      ],
+    },
+
+    {
+      path: "/deposits",
+      label: "Deposits",
+      icon: <FaArrowDown />,
+      children: [
+        {
+          path: "/all",
+          label: "All Deposits",
+          icon: <FaArrowDown />,
+        },
+        {
+          path: "/pending",
+          label: "Pending Deposits",
+          icon: <FaClock />,
+        },
+      ],
+    },
+
+    {
+      path: "/notices",
+      label: "Notices",
+      icon: <FaBullhorn />,
+      children: [
+        {
+          path: "/all",
+          label: "All Notices",
+          icon: <FaBullhorn />,
+        },
+        {
+          path: "/create",
+          label: "Create Notice",
+          icon: <FaPlusCircle />,
+        },
+      ],
+    },
+
+    {
+      path: "/notifications",
+      label: "Notifications",
+      icon: <FaBell />,
+      children: [
+        {
+          path: "/all",
+          label: "All Notifications",
+          icon: <FaBell />,
+        },
+        {
+          path: "/send",
+          label: "Send Notification",
+          icon: <FaPlusCircle />,
+        },
+      ],
+    },
+
+    {
+      path: "/newsletter",
+      label: "Newsletter",
+      icon: <FaNewspaper />,
+      children: [
+        {
+          path: "/subscribers",
+          label: "Subscribers",
+          icon: <FaUsers />,
+        },
+        {
+          path: "/campaigns",
+          label: "Campaigns",
+          icon: <FaNewspaper />,
+        },
+      ],
+    },
+
+    {
+      path: "/commissions",
+      label: "Commission",
+      icon: <FaCoins />,
+      children: [
+        {
+          path: "/rules",
+          label: "Commission Rules",
+          icon: <FaCoins />,
+        },
+        {
+          path: "/history",
+          label: "Commission History",
+          icon: <FaFileInvoiceDollar />,
+        },
+      ],
+    },
+
+    {
+      path: "/users",
+      label: "Users",
+      icon: <FaUsers />,
+      children: [
+        {
+          path: "/all",
+          label: "All Users",
+          icon: <FaUsers />,
+        },
+        {
+          path: "/roles",
+          label: "Roles & Permissions",
+          icon: <FaUserCog />,
+        },
+      ],
+    },
+
+    {
+      path: "/packages",
+      label: "Packages",
+      icon: <FaBoxOpen />,
+      children: [
+        {
+          path: "/all",
+          label: "All Packages",
+          icon: <FaBoxOpen />,
+        },
+        {
+          path: "/create",
+          label: "Create Package",
+          icon: <FaPlusCircle />,
+        },
+      ],
+    },
+
+    {
+      path: "/currencies",
+      label: "Currency",
+      icon: <FaMoneyBillWave />,
+      children: [
+        {
+          path: "/list",
+          label: "Currency List",
+          icon: <FaMoneyBillWave />,
+        },
+        {
+          path: "/rates",
+          label: "Exchange Rates",
+          icon: <FaBalanceScale />,
+        },
+      ],
     },
 
     {
@@ -230,95 +394,213 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       path: "/air-tickets",
       label: "Air Tickets",
       icon: <FaTicketAlt />,
-      departments: ["OPERATION", "RESERVATION", "IT"],
+      departments: ["OPERATION", "RESERVATION", "MARKETING", "ACCOUNTS"],
       children: [
         {
           path: "/hold",
-          label: "Hold Tickets",
+          label: "Hold Queue",
           icon: <FaFileInvoiceDollar />,
         },
         {
+          path: "/pending",
+          label: "Pending Order / Ordered Queue",
+          icon: <FaListAlt />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
           path: "/issued",
-          label: "Issued Tickets",
+          label: "Issued Tickets list",
           icon: <FaRegIdBadge />,
         },
         {
           path: "/cancelled",
-          label: "Cancelled Tickets",
+          label: "Cancelled Tickets list",
           icon: <FaUndo />,
         },
         {
           path: "/flown",
-          label: "Flown Tickets",
+          label: "Flown Tickets list",
           icon: <FaPlane />,
+          departments: ["OPERATION", "RESERVATION", "ACCOUNTS"],
         },
       ],
     },
 
     {
-      path: "/flight-search",
-      label: "Flight Search",
-      icon: <FaPlane />,
-      departments: ["OPERATION", "RESERVATION"],
-    },
-
-    {
-      path: "/users",
-      label: "Users",
-      icon: <FaUsers />,
-      departments: ["IT", "SALES"],
+      path: "/support",
+      label: "Supports",
+      icon: <FaHeadset />,
+      departments: ["OPERATION", "RESERVATION", "MARKETING"],
+      children: [
+        {
+          path: "/void",
+          label: "Void Request",
+          icon: <FaUndo />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
+          path: "/refund",
+          label: "Refund Request",
+          icon: <FaUndo />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
+          path: "/reissue",
+          label: "Re-issue / Date Change Request",
+          icon: <FaTicketAlt />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
+          path: "/cancel-open",
+          label: "Cancel Open Request",
+          icon: <FaMinusCircle />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
+          path: "/add-ssr",
+          label: "Add SSR Service Request",
+          icon: <FaPlusCircle />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
+          path: "/ticket-copy",
+          label: "Airlines Ticket Copy Request",
+          icon: <FaFileInvoiceDollar />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
+          path: "/frequent-flyer",
+          label: "Frequent Flyer Number Request",
+          icon: <FaRegIdBadge />,
+          readOnlyDepartments: ["MARKETING"],
+        },
+      ],
     },
 
     {
       path: "/transactions",
       label: "Transactions",
       icon: <FaMoneyCheckAlt />,
-      departments: ["ACCOUNTS", "IT"],
+      departments: ["OPERATION", "RESERVATION", "MARKETING", "ACCOUNTS"],
       children: [
         {
-          path: "/deposits",
-          label: "Deposits",
+          path: "/payments",
+          label: "Payments Request",
           icon: <FaMoneyCheckAlt />,
+          readOnlyDepartments: ["MARKETING"],
         },
         {
-          path: "/withdrawals",
-          label: "Withdrawals",
-          icon: <FaUndo />,
+          path: "/ssr-payments",
+          label: "SSR Payments",
+          icon: <FaCoins />,
+          departments: ["OPERATION", "RESERVATION", "MARKETING"],
+          readOnlyDepartments: ["MARKETING"],
+          children: [
+            {
+              path: "/seat-selection",
+              label: "Seat Selection",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/meals",
+              label: "Meals",
+              icon: <FaGift />,
+            },
+            {
+              path: "/wheelchair",
+              label: "Wheelchair",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/vvip-notes",
+              label: "VVIP Notes",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/fare-difference",
+              label: "Fare Difference",
+              icon: <FaCoins />,
+            },
+            {
+              path: "/extra-baggage",
+              label: "Extra Baggage",
+              icon: <FaCogs />,
+            },
+            {
+              path: "/additional-charges",
+              label: "Additional Charges",
+              icon: <FaCoins />,
+            },
+          ],
         },
         {
-          path: "/statements",
-          label: "Statements",
+          path: "/adm",
+          label: "ADM",
+          icon: <FaFileInvoiceDollar />,
+          departments: ["OPERATION", "RESERVATION", "MARKETING"],
+          readOnlyDepartments: ["MARKETING"],
+        },
+        {
+          path: "/sales-statement",
+          label: "Sales Statement",
           icon: <FaBalanceScale />,
+          departments: ["OPERATION", "ACCOUNTS"],
+        },
+        {
+          path: "/agent-statement",
+          label: "Agent Statement",
+          icon: <FaRegCreditCard />,
+          departments: ["OPERATION", "ACCOUNTS"],
         },
       ],
     },
 
     {
-      path: "/promotions",
-      label: "Promotions",
-      icon: <FaBullhorn />,
-      departments: ["MARKETING", "SALES"],
+      path: "/agencies",
+      label: "Agency List",
+      icon: <FaUserTie />,
+      departments: ["OPERATION", "MARKETING"],
     },
 
     {
-      path: "/commissions",
-      label: "Commissions",
-      icon: <FaCoins />,
-      departments: ["ACCOUNTS", "SALES"],
+      path: "/admins",
+      label: "My Admins",
+      icon: <FaUsers />,
+      departments: ["OPERATION"],
     },
 
     {
-      path: "/notices",
-      label: "Notices",
-      icon: <FaListAlt />,
-      departments: ["MARKETING", "IT"],
-    },
-
-    {
-      path: "/banks",
-      label: "Banks",
-      icon: <FaUniversity />,
-      departments: ["ACCOUNTS", "IT"],
+      path: "/settings",
+      label: "Settings",
+      icon: <FaUserCog />,
+      departments: ["OPERATION"],
+      children: [
+        {
+          path: "/edit-agency",
+          label: "Edit Agency",
+          icon: <FaUserTie />,
+        },
+        {
+          path: "/edit-currency",
+          label: "Edit Currency",
+          icon: <FaCoins />,
+        },
+        {
+          path: "/edit-bank-info",
+          label: "Edit Bank Info",
+          icon: <FaUniversity />,
+        },
+        {
+          path: "/notice-edit",
+          label: "Notice Edit",
+          icon: <FaBullhorn />,
+        },
+        {
+          path: "/popup-notice",
+          label: "Pop-up Notice",
+          icon: <FaBullhorn />,
+        },
+      ],
     },
 
     {

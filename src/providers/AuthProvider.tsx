@@ -26,7 +26,7 @@ export default function AuthProvider({
         email: user.email ?? "",
         phone:user?.phone??"",
         currency:user?.currency?.code ?? "",
-        agency_name: user.profile?.agency_name ?? null,
+        agency_name: user.b2b_user?.agency_name ?? null,
         image: user.profile?.image ?? null,
         logo:user.b2b_user?.logo??null,
         balance: user.wallet?.balance ?? user.balance ?? 0,

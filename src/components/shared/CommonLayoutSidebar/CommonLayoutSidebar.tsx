@@ -1,15 +1,9 @@
-"use client";
+﻿"use client";
 
 import React, { useMemo } from "react";
 import { Layout, Menu, ConfigProvider } from "antd";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { BiSolidCoinStack } from "react-icons/bi";
-import { AiFillHome } from "react-icons/ai";
-import { RiCalendarScheduleFill } from "react-icons/ri";
-import { MdOutlineFlightTakeoff } from "react-icons/md";
-import { FaHotel, FaBookJournalWhills } from "react-icons/fa6";
-import { BsFillPassportFill } from "react-icons/bs";
 import { navigationConfig, NavRole, NavItem } from "@/helper/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { ROLE } from "@/constant";
@@ -28,70 +22,46 @@ const roleToNavRole: Record<string, NavRole> = {
   [ROLE.B2B]: NavRole.B2B,
 };
 
-const publicMenuItems = [
-  { key: "/", label: "Home", icon: <AiFillHome size={18} /> },
-  { key: "/booking", label: "My Booking", icon: <RiCalendarScheduleFill size={18} /> },
-  { key: "/currency", label: "Currency", icon: <BiSolidCoinStack size={18} /> },
-  { key: "/flight", label: "Flight", icon: <MdOutlineFlightTakeoff size={18} /> },
-  { key: "/hotel", label: "Hotel", icon: <FaHotel size={18} /> },
-  { key: "/visa", label: "Visa", icon: <BsFillPassportFill size={18} /> },
-  { key: "/how-to-book", label: "How to Book", icon: <FaBookJournalWhills size={18} /> },
-];
-
-export default function CommonLayoutSidebar ({
+export default function CommonLayoutSidebar({
   sidebarOpen,
   setSidebarOpen,
-  footerHeight = 0,
-}:SidebarProps) {
+}: SidebarProps) {
   const pathname = usePathname();
-  // const { user, isAuthenticated, loading } = useAuth();
-  const { user,isLoggedIn, isLoading, clearUser } = useAuthStore();
-  // return <>
-  // <h1>{JSON.stringify(user)}</h1>
-  // </>
+  const { user, isLoggedIn, isLoading } = useAuthStore();
+
   const { menuItems, defaultOpenKeys } = useMemo(() => {
     if (isLoading) return { menuItems: [], defaultOpenKeys: [] };
 
-    if (!isLoggedIn || !user) {
-      return {
-        menuItems: publicMenuItems.map((item) => ({
-          key: item.key,
-          icon: item.icon,
-          label: (
-            <Link
-              href={item.key}
-              onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
-              className="w-full text-xs font-medium"
-            >
-              {item.label}
-            </Link>
-          ),
-        })),
-        defaultOpenKeys: [],
-      };
-    }
-
-    const navRole = roleToNavRole[user.role] ?? NavRole.B2B;
+    const navRole: NavRole =
+      roleToNavRole[user?.role as string] ?? NavRole.B2B;
     const navItems = navigationConfig[navRole] ?? [];
     const pathPrefix = `/console/${navRole}`;
-    const isSuperAdmin = user.role === ROLE.SUPER_ADMIN;
+    const isSuperAdmin = user?.role === ROLE.SUPER_ADMIN;
 
-    const userDepartments = (user.departments || "")
+    const userDepartments = (user?.departments || "")
       .split(",")
       .map((d) => d.trim())
       .filter(Boolean);
 
+    const canAccess = (route: NavItem) => {
+      if (isSuperAdmin) return true;
+      const allowed = [
+        ...(route.departments ?? []),
+        ...(route.readOnlyDepartments ?? []),
+      ];
+      if (!allowed.length) return true;
+      return allowed.some((dept) => userDepartments.includes(dept));
+    };
+
     const filterItems = (routes: NavItem[]): NavItem[] => {
       const result: NavItem[] = [];
       for (const route of routes) {
-        if (
-          !isSuperAdmin &&
-          route.departments?.length &&
-          !route.departments.some((dept) => userDepartments.includes(dept))
-        ) {
+        if (!canAccess(route)) {
           continue;
         }
-        const children = route.children ? filterItems(route.children) : undefined;
+        const children = route.children
+          ? filterItems(route.children)
+          : undefined;
         if (route.children?.length && children?.length === 0) {
           continue;
         }
@@ -106,7 +76,6 @@ export default function CommonLayoutSidebar ({
       return `${base}${cleanPath}`.replace(/\/+/g, "/");
     };
 
-    const items: any[] = [];
     const openKeys: string[] = [];
 
     const buildItems = (routes: NavItem[], basePath: string): any[] =>
@@ -136,7 +105,9 @@ export default function CommonLayoutSidebar ({
           label: (
             <Link
               href={fullPath}
-              onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
+              onClick={() =>
+                window.innerWidth < 1024 && setSidebarOpen(false)
+              }
               className="w-full text-xs font-medium"
             >
               {route.label}
@@ -145,8 +116,7 @@ export default function CommonLayoutSidebar ({
         };
       });
 
-    const filteredItems = filterItems(navItems);
-    const menuItems = buildItems(filteredItems, pathPrefix);
+    const menuItems = buildItems(filterItems(navItems), pathPrefix);
 
     return { menuItems, defaultOpenKeys: openKeys };
   }, [user, isLoggedIn, isLoading, pathname, setSidebarOpen]);
@@ -164,7 +134,7 @@ export default function CommonLayoutSidebar ({
           },
           Menu: {
             itemBg: "#ffffff",
-            subMenuItemBg: "#ffffff",
+            subMenuItemBg: "transparent",
             itemColor: "#555555",
             itemHoverColor: "#00a550",
             itemHoverBg: "rgba(0, 165, 80, 0.06)",
@@ -177,7 +147,7 @@ export default function CommonLayoutSidebar ({
     >
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-black/40 z-40 transition-opacity"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -185,26 +155,18 @@ export default function CommonLayoutSidebar ({
       <Sider
         theme="light"
         trigger={null}
-        collapsible
-        collapsed={sidebarOpen}
-        collapsedWidth={56}
-        width={180}
-        style={{
-          backgroundColor: "#ffffff",
-          height: `calc(100vh - 64px - ${footerHeight}px)`,
-          top: "64px",
-        }}
+        width={220}
+        style={{ backgroundColor: "#ffffff" }}
         className={`
-          bg-white!
-          border! border-gray-200!
-          rounded-l-lg!
-          shadow-md
-          transition-all duration-300
-          fixed right-0 top-0 z-50
-          ${sidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
-          lg:relative lg:top-0 lg:right-0 lg:z-auto
-          [&_.ant-layout-sider-children]:bg-white!
-          [&_.ant-layout-sider-children]:h-max!
+          bg-[#ffffff]!
+          border-l! border-gray-200!
+          shadow-lg py-2
+          transition-transform duration-300
+          fixed right-0 top-0 h-screen z-50 overflow-hidden
+          ${sidebarOpen ? "translate-x-0" : "translate-x-full"}
+          [&_.ant-layout-sider-children]:bg-[#ffffff]!
+          [&_.ant-layout-sider-children]:h-full!
+          [&_.ant-layout-sider-children]:overflow-y-auto!
         `}
       >
         <Menu
@@ -213,9 +175,9 @@ export default function CommonLayoutSidebar ({
           selectedKeys={[pathname]}
           defaultOpenKeys={defaultOpenKeys}
           items={menuItems}
-          className="border-none py-2 px-1 bg-white!"
+          className="border-none py-2 px-1 bg-[#ffffff]!"
         />
       </Sider>
     </ConfigProvider>
   );
-};
+}

@@ -133,6 +133,65 @@ export const ROUTE_DEPARTMENT: { pattern: RegExp; departments: string[] }[] = [
   },
 ];
 
+export const ADMIN_DEPARTMENT_ROUTES: {
+  pattern: RegExp;
+  departments: string[];
+  readOnlyDepartments?: string[];
+}[] = [
+  {
+    pattern: /^\/console\/admin\/air-tickets\/flown(\/|$)/,
+    departments: ["OPERATION", "RESERVATION", "ACCOUNTS"],
+  },
+  {
+    pattern: /^\/console\/admin\/transactions\/sales-statement(\/|$)/,
+    departments: ["OPERATION", "ACCOUNTS"],
+  },
+  {
+    pattern: /^\/console\/admin\/transactions\/agent-statement(\/|$)/,
+    departments: ["OPERATION", "ACCOUNTS"],
+  },
+  {
+    pattern: /^\/console\/admin\/transactions\/ssr-payments(\/|$)/,
+    departments: ["OPERATION", "RESERVATION", "MARKETING"],
+    readOnlyDepartments: ["MARKETING"],
+  },
+  {
+    pattern: /^\/console\/admin\/transactions\/adm(\/|$)/,
+    departments: ["OPERATION", "RESERVATION", "MARKETING"],
+    readOnlyDepartments: ["MARKETING"],
+  },
+  {
+    pattern: /^\/console\/admin\/support(\/|$)/,
+    departments: ["OPERATION", "RESERVATION", "MARKETING"],
+    readOnlyDepartments: ["MARKETING"],
+  },
+  {
+    pattern: /^\/console\/admin\/agencies(\/|$)/,
+    departments: ["OPERATION", "MARKETING"],
+  },
+  {
+    pattern: /^\/console\/admin\/admins(\/|$)/,
+    departments: ["OPERATION"],
+  },
+  {
+    pattern: /^\/console\/admin\/settings(\/|$)/,
+    departments: ["OPERATION"],
+  },
+];
+
+export const getAdminRequiredDepartments = (
+  pathname: string,
+): { departments: string[]; readOnlyDepartments?: string[] } | null => {
+  const match = ADMIN_DEPARTMENT_ROUTES.find(({ pattern }) =>
+    pattern.test(pathname),
+  );
+  if (!match) return null;
+  return {
+    departments: match.departments,
+    readOnlyDepartments: match.readOnlyDepartments,
+  };
+};
+
 export const getRequiredDepartments = (pathname: string): string[] | null => {
   const match = ROUTE_DEPARTMENT.find(({ pattern }) => pattern.test(pathname));
   return match?.departments ?? null;
@@ -143,6 +202,27 @@ export const canAccessRoute = (
   userDepartments: string[],
 ): boolean => {
   const requiredDepts = getRequiredDepartments(pathname);
-  if (!requiredDepts || requiredDepts.length === 0) return true;
-  return requiredDepts.some((dept) => userDepartments.includes(dept));
+  if (requiredDepts && requiredDepts.length > 0) {
+    return requiredDepts.some((dept) => userDepartments.includes(dept));
+  }
+
+  const adminDeptRule = getAdminRequiredDepartments(pathname);
+  if (adminDeptRule) {
+    return adminDeptRule.departments.some((dept) =>
+      userDepartments.includes(dept),
+    );
+  }
+
+  return true;
+};
+
+export const isAdminReadOnlyView = (
+  pathname: string,
+  userDepartments: string[],
+): boolean => {
+  const adminDeptRule = getAdminRequiredDepartments(pathname);
+  if (!adminDeptRule?.readOnlyDepartments) return false;
+  return adminDeptRule.readOnlyDepartments.some((dept) =>
+    userDepartments.includes(dept),
+  );
 };

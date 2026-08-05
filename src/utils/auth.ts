@@ -15,6 +15,9 @@ export {
   ROUTE_DEPARTMENT,
   getRequiredDepartments,
   canAccessRoute,
+  ADMIN_DEPARTMENT_ROUTES,
+  getAdminRequiredDepartments,
+  isAdminReadOnlyView,
 } from "./routes";
 
 export interface TokenPayload {

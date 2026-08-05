@@ -4,6 +4,7 @@ import React from "react";
 import type { Itinerary } from "@/interface/flight";
 import dayjs from "dayjs";
 import { FaPlane } from "react-icons/fa";
+import Image from "next/image";
 
 function formatTime(iso: string): string {
   return dayjs(iso).format("HH:mm");
@@ -51,6 +52,14 @@ const BookingFlightInfo: React.FC<BookingFlightInfoProps> = ({ itinerary }) => {
     itinerary?.saleCurrencyAmount ?? {};
   const currency = itinerary?.passengerFareBreakDown?.[0]?.currency ?? "BDT";
   const displayTotal = Math.max(offerAmount, totalAmount);
+  console.log(
+    "BookingFlightInfo itinerary flightDetails:",
+    itinerary?.flightDetails?.[0],
+  );
+  console.log(
+    "BookingFlightInfo itinerary: schedules",
+    itinerary.flightDetails.at(0)?.schedules,
+  );
 
   if (!first) {
     return (
@@ -60,14 +69,26 @@ const BookingFlightInfo: React.FC<BookingFlightInfoProps> = ({ itinerary }) => {
 
   return (
     <div className="flex items-center gap-4 text-sm">
-      <span className="hidden min-w-[3.5rem] text-xs font-semibold tracking-wide text-gray-400 sm:block">
-        {first.marketingCarrierCode || ""}
-      </span>
+      <div className="flex flex-col items-center gap-1">
+        <Image
+          src={`/api/v1/uploads/files/images/public/airlines_logo/${first?.marketingCarrierCode}.svg`}
+          alt={`${first.marketingCarrierCode}`}
+          width={30}
+          height={30}
+        />
+        <span className="hidden min-w-[3.5rem] text-xs font-semibold tracking-wide text-gray-400 sm:block text-center">
+          {first.marketingCarrierCode || ""}
+        </span>
+      </div>
 
       <div className="flex items-center gap-2">
         <div className="text-right">
-          <p className="font-extrabold text-primary">{first.departure.airport}</p>
-          <p className="text-xs text-gray-500">{formatTime(first.departureDateTime)}</p>
+          <p className="font-extrabold text-primary">
+            {first.departure.airport}
+          </p>
+          <p className="text-xs text-gray-500">
+            {formatTime(first.departureDateTime)}
+          </p>
         </div>
 
         <div className="flex flex-col items-center px-1">
@@ -85,7 +106,9 @@ const BookingFlightInfo: React.FC<BookingFlightInfoProps> = ({ itinerary }) => {
 
         <div>
           <p className="font-extrabold text-primary">{last!.arrival.airport}</p>
-          <p className="text-xs text-gray-500">{formatTime(last!.arrivalDateTime)}</p>
+          <p className="text-xs text-gray-500">
+            {formatTime(last!.arrivalDateTime)}
+          </p>
         </div>
       </div>
 

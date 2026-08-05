@@ -86,7 +86,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
   return (
     <div className="grid grid-cols-12 gap-4">
       {/* Left Segment Column: Multi-city interactive legs tracking layout */}
-      <div className="col-span-12 lg:col-span-10 flex flex-col gap-4">
+      <div className="col-span-12 lg:col-span-9 flex flex-col gap-4">
         {data.map((row, index) => (
           <div
             key={index}
@@ -133,7 +133,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
       </div>
 
       {/* Right Segment Column: Traveler breakdown controller and segment row controls */}
-      <div className="col-span-12 lg:col-span-2 flex flex-col gap-4">
+      <div className="col-span-12 lg:col-span-3 flex flex-col gap-4">
         <TravelerCalculate value={traveler} onChange={changeTraveler} />
 
         {/* Dynamic Multi-City Row Modification Anchors */}

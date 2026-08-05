@@ -47,7 +47,7 @@ const SearchCountdown: React.FC<Props> = ({ expiresAt, onExpire }) => {
           ? "bg-red-100 text-red-600"
           : low
             ? "bg-red-50 text-red-500 animate-pulse"
-            : "bg-gray-100 text-gray-600"
+            : "bg-gray-100 text-brand"
       }`}
     >
       <MdOutlineTimer size={14} />
