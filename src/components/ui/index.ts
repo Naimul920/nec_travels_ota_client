@@ -9,3 +9,4 @@ export { default as UploadFile } from "./UploadFile/UploadFile";
 export { default as NotFound } from "./NotFound/NotFound";
 export { default as Tabs } from "./Tabs/Tabs";
 export { default as TabPane } from "./Tabs/TabPan";
+export { default as OtpInput } from "./Otp/OtpInput";

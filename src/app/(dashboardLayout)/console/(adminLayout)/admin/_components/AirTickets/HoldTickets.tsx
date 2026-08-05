@@ -7,7 +7,6 @@ import type { IssueTicketItem } from "@/actions/issueTicket.action";
 import Table from "@/components/common/Table/Table";
 import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 import ActionButton from "@/components/common/Action/ActionButton";
-import Skeleton from "@/components/common/Skeleton/Skeleton";
 
 const HoldTickets: React.FC = () => {
   const searchParams = useSearchParams();
@@ -38,16 +37,13 @@ const HoldTickets: React.FC = () => {
 
   const filteredData = useSearch(mappedData, searchString);
 
-  if (isLoading) {
-    return <Skeleton rows={7} />;
-  }
-
   return (
     <Table
       title="Hold Tickets"
+      loading={isLoading}
       columns={holdTicketsColumns}
       pagination={{ pageSize: 20 }}
-      dataSource={filteredData?.map((data) => ({
+      dataSource={(filteredData?.map((data) => ({
         ...data,
         action: (
           <div className="flex items-center justify-center">
@@ -56,7 +52,7 @@ const HoldTickets: React.FC = () => {
             />
           </div>
         ),
-      }))}
+      })) ?? [])}
       rowKey="key"
     />
   );

@@ -1,10 +1,24 @@
-﻿import SettingsPanel from "../../_components/Settings/SettingsPanel";
+﻿"use client";
 
-export default function EditAgencyPage() {
+import Table from "@/components/common/Table/Table";
+import { getCrudConfig } from "@/constant/crudPages";
+import { useTablePageData } from "@/hooks/useTablePageData";
+
+export default function Page() {
+  const config = getCrudConfig("/console/admin/settings/edit-agency");
+  const { data, loading } = useTablePageData(config);
+
   return (
-    <SettingsPanel
-      title="Edit Agency"
-      description="Update your agency name, contact details and configuration."
+    <Table
+      className="p-3 md:p-0 md:pt-2"
+      loading={loading}
+      title={config.title}
+      columns={config.columns as never}
+      dataSource={data}
+      rowKey={config.rowKey ?? "id"}
+      createButtonText={config.createButtonText ?? "Create"}
+      createFields={config.fields}
     />
   );
 }
+

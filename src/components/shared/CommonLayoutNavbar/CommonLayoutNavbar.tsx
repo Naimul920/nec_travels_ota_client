@@ -80,9 +80,7 @@ export default function CommonLayoutNavbar({
 
         {/* Right Actions */}
         <div
-          className={`flex items-center gap-3 ${
-            showSidebarToggle ? "pr-11 sm:pr-12" : ""
-          }`}
+          className={`flex items-center gap-3 `}
         >
           {isLoading ? (
             <div className="h-9 w-20 animate-pulse rounded-full bg-gray-100" />
