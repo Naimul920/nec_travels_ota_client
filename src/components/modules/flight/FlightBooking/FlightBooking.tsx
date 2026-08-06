@@ -283,6 +283,8 @@ const FlightBooking: React.FC = () => {
   const itinerary = searchData?.data?.itinDetails?.[itineraryIndex];
 
   const isB2C = user?.role === ROLE.B2C;
+  const isB2B = user?.role === ROLE.B2B;
+  const canConfirmBooking = !!user && (isB2C || isB2B);
 
   const handleBack = () => {
     const query = new URLSearchParams(searchParamsHook.toString());
@@ -370,6 +372,12 @@ const FlightBooking: React.FC = () => {
   const handleSubmit = async (values: BookingFormValues) => {
     if (searchExpired) {
       message.warning("Your search session has expired. Please search again.");
+      return;
+    }
+    if (!user || !(user.role === ROLE.B2C || user.role === ROLE.B2B)) {
+      message.warning(
+        "Only B2C and B2B accounts can confirm a booking. Please sign in.",
+      );
       return;
     }
     if (!itinerary) {
@@ -578,7 +586,13 @@ const FlightBooking: React.FC = () => {
                       </span>
                     </label>
 
-                    {isB2C ? (
+                    {!canConfirmBooking ? (
+                      <div className="rounded-lg bg-gray-50 px-4 py-3 text-center text-xs font-medium text-gray-600">
+                        Booking confirmation is only available for B2C and B2B
+                        accounts. Please sign in with a B2C or B2B account to
+                        complete your booking.
+                      </div>
+                    ) : isB2C ? (
                       <div className="rounded-lg bg-amber-50 px-4 py-3 text-center text-xs font-medium text-amber-700">
                         Online payment is coming soon. Please check back shortly
                         to complete your booking.

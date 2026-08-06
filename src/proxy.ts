@@ -146,6 +146,11 @@ export async function proxy(request: NextRequest) {
     }
 
     if (routeOwner === null) {
+      if (isLoggedIn && userRole && userRole !== "B2C") {
+        return NextResponse.redirect(
+          new URL(getDefaultDashboardRoute(userRole as any), request.url),
+        );
+      }
       return NextResponse.next();
     }
 

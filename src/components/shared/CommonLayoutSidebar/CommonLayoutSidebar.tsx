@@ -147,7 +147,7 @@ export default function CommonLayoutSidebar({
     >
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 transition-opacity"
+          className="fixed inset-0 z-30"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -156,13 +156,19 @@ export default function CommonLayoutSidebar({
         theme="light"
         trigger={null}
         width={220}
-        style={{ backgroundColor: "#ffffff" }}
+        style={{
+          backgroundColor: "#ffffff",
+          position: "fixed",
+          top: "4rem",
+          right: 0,
+          height: "calc(100vh - 4rem)",
+          zIndex: 50,
+        }}
         className={`
           bg-[#ffffff]!
           border-l! border-gray-200!
-          shadow-lg py-2
+          shadow-lg
           transition-transform duration-300
-          fixed right-0 top-0 h-screen z-50 overflow-hidden
           ${sidebarOpen ? "translate-x-0" : "translate-x-full"}
           [&_.ant-layout-sider-children]:bg-[#ffffff]!
           [&_.ant-layout-sider-children]:h-full!

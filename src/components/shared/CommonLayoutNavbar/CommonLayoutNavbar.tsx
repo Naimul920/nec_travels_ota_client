@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { logoutAction } from "@/actions/auth.action";
 import { ROLE } from "@/constant";
 import { NavRole } from "@/helper/navigation";
+import Image from "next/image";
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -64,8 +65,26 @@ export default function CommonLayoutNavbar({
     <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/95 shadow-xs backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-2 sm:px-4">
         {/* Logo */}
+        {/* <Link
+          href={(isLoggedIn && user?.role != ROLE.B2C) ? `/console/${roleLower}` : "/"}
+          className="flex shrink-0 items-center"
+        >
+          <img
+            src={headerLogo}
+            alt={isB2B && user?.logo ? "Agency logo" : "NEC Fly"}
+            width={130}
+            height={40}
+            className="object-contain"
+            style={{ width: "auto", height: 50 }}
+          />
+        </Link> */}
+
         <Link
-          href={isLoggedIn ? `/console/${roleLower}` : "/"}
+          href={
+            isLoggedIn && user?.role !== ROLE.B2C
+              ? `/console/${roleLower}`
+              : "/"
+          }
           className="flex shrink-0 items-center"
         >
           <img
@@ -79,9 +98,7 @@ export default function CommonLayoutNavbar({
         </Link>
 
         {/* Right Actions */}
-        <div
-          className={`flex items-center gap-3 `}
-        >
+        <div className={`flex items-center gap-3 `}>
           {isLoading ? (
             <div className="h-9 w-20 animate-pulse rounded-full bg-gray-100" />
           ) : !isLoggedIn || !user ? (
@@ -182,7 +199,7 @@ export default function CommonLayoutNavbar({
                       My Profile
                     </Link>
 
-                    {(user?.role == NavRole.SUPER_ADMIN || user?.role == NavRole.ADMIN) && (
+                    {user?.role == ROLE.B2C && (
                       <Link
                         href={bookingsLink}
                         onClick={() => setDropdownOpen(false)}

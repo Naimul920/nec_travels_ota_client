@@ -12,6 +12,7 @@ import { decoding, encoding } from "@/utils";
 import { modifySearch } from "@/store/flight.store";
 import detectDomesticType from "@/utils/searchFlightSug/detactedDomesticType";
 import { useAuthStore } from "@/store/auth.store";
+import { ROLE } from "@/constant";
 
 type TripType = "oneway" | "roundtrip" | "multicity";
 type TripField = "from" | "to" | "departure" | "return";
@@ -23,7 +24,7 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const { user } = useAuthStore();
+  const { user, isLoggedIn } = useAuthStore();
   // console.log(user)
   const roleLower = user?.role?.toLowerCase();
  
@@ -335,7 +336,25 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
   //     router.push(SearchRoute);
   // };
 
-  const handleSubmit = (e: React.FormEvent) => {
+//   const handleSubmit = (e: React.FormEvent) => {
+//   e.preventDefault();
+
+//   if (useFlight === "search") {
+//     modifySearch();
+//   }
+
+//   const query = buildSearchQuery();
+
+//   if (!query) return;
+//   // Replaced navigate() with Next.js router.push() API
+//   const encodedQuery = encoding(query);
+//   const searchRoute = user?.role === ROLE.B2C 
+//     ? `/flight-search?q=${encodedQuery}` 
+//     : `/flight-search?q=${encodedQuery}`;
+
+//   router.push(searchRoute);
+// };
+const handleSubmit = (e: React.FormEvent) => {
   e.preventDefault();
 
   if (useFlight === "search") {
@@ -346,11 +365,13 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
 
   if (!query) return;
 
-  // Replaced navigate() with Next.js router.push() API
   const encodedQuery = encoding(query);
-  const searchRoute = user?.role 
-    ? `/console/${roleLower}/flight-search?q=${encodedQuery}` 
-    : `/flight-search?q=${encodedQuery}`;
+
+  // B2B logged-in users go to the console path; B2C and unauthenticated users go to public search
+  const searchRoute =
+    isLoggedIn && user?.role === ROLE.B2B
+      ? `/console/${roleLower}/flight-search?q=${encodedQuery}`
+      : `/flight-search?q=${encodedQuery}`;
 
   router.push(searchRoute);
 };

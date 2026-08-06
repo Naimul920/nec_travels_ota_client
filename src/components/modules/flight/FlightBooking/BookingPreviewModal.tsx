@@ -96,14 +96,11 @@ const BookingPreviewModal: React.FC<Props> = ({
     >
       <div className="space-y-5">
         {/* Flight legs */}
-        <div>
-          <LegHeader index={0} />
-          <div className="space-y-2">
-            {legs.map((leg, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-gray-100 bg-gray-50/60 p-4"
-              >
+        <div className="space-y-2">
+          {legs.map((leg, i) => (
+            <div key={i}>
+              <LegHeader index={i} />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
                 <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
                   <span className="font-semibold text-gray-700">
                     {leg.flightName || `${leg.carrierCode} ${leg.flightNumber}`}
@@ -140,8 +137,8 @@ const BookingPreviewModal: React.FC<Props> = ({
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
         {/* Travelers */}

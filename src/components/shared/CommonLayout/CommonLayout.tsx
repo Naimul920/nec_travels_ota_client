@@ -39,7 +39,13 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
         </main>
 
         {showSidebar && (
-          <aside className="sticky top-15 h-[calc(100vh-3.75rem)] z-30 pointer-events-auto">
+          <aside
+            aria-hidden={!sidebarOpen}
+            className={clsx(
+              "fixed inset-0 z-40",
+              sidebarOpen ? "pointer-events-auto" : "pointer-events-none",
+            )}
+          >
             <CommonLayoutSidebar
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}

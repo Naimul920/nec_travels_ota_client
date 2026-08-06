@@ -4,7 +4,7 @@ import Table from "@/components/common/Table/Table";
 import { getCrudConfig } from "@/constant/crudPages";
 import { useTablePageData } from "@/hooks/useTablePageData";
 
-export default function Page() {
+export default function ApprovalPage() {
   const config = getCrudConfig("/console/super_admin/agencies/approvals");
   const { data, loading } = useTablePageData(config);
 
