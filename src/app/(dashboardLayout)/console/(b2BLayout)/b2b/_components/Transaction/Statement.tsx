@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { DatePicker, Card, Row, Col } from "antd";
-import { FileSearchOutlined, DownloadOutlined } from "@ant-design/icons";
+import FileSearchOutlined from "@ant-design/icons/es/icons/FileSearchOutlined";
+import DownloadOutlined from "@ant-design/icons/es/icons/DownloadOutlined";
 import { Dayjs } from "dayjs";
 import Table from "@/components/common/Table/Table";
 import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";

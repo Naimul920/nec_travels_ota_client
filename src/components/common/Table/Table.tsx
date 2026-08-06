@@ -13,7 +13,7 @@ import {
   Table as AntTable,
   type TableProps,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import PlusOutlined from "@ant-design/icons/es/icons/PlusOutlined";
 import TableHeader from "@/components/common/Table/TableHeader";
 import clsx from "clsx";
 

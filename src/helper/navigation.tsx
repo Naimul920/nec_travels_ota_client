@@ -62,49 +62,54 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
   // =====================================================
 
   [NavRole.SUPER_ADMIN]: [
+    // {
+    //   path: "",
+    //   label: "Home",
+    //   icon: <FaHome />,
+    // },
     {
-      path: "",
-      label: "Home",
-      icon: <FaHome />,
-    },
-    {
-      path: "/dashboard",
+      path: "/",
       label: "Dashboard",
       icon: <FaTachometerAlt />,
     },
 
-    {
-      path: "/agencies",
-      label: "Agencies",
-      icon: <FaUserTie />,
-      children: [
-        {
-          path: "/all",
-          label: "All Agencies",
-          icon: <FaUsers />,
-        },
-        {
-          path: "/approvals",
-          label: "Approvals",
-          icon: <FaShieldAlt />,
-        },
-        {
-          path: "/credit-limits",
-          label: "Credit Limits",
-          icon: <FaRegCreditCard />,
-        },
-      ],
-    },
+    // {
+    //   path: "/agencies",
+    //   label: "Agencies",
+    //   icon: <FaUserTie />,
+    //   children: [
+    //     {
+    //       path: "/all",
+    //       label: "All Agencies",
+    //       icon: <FaUsers />,
+    //     },
+    //     {
+    //       path: "/approvals",
+    //       label: "Approvals",
+    //       icon: <FaShieldAlt />,
+    //     },
+    //     {
+    //       path: "/credit-limits",
+    //       label: "Credit Limits",
+    //       icon: <FaRegCreditCard />,
+    //     },
+    //   ],
+    // },
 
     {
       path: "/bookings",
-      label: "Bookings",
+      label: "Air Tickets",
       icon: <FaTicketAlt />,
       children: [
         {
           path: "/hold",
-          label: "Hold Bookings",
+          label: "Hold Tickets",
           icon: <FaFileInvoiceDollar />,
+        },
+        {
+          path: "/voided",
+          label: "Voided Tickets",
+          icon: <FaRegIdBadge />,
         },
         {
           path: "/issued",
@@ -112,60 +117,23 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
           icon: <FaRegIdBadge />,
         },
         {
-          path: "/cancel-requests",
-          label: "Cancel Requests",
+          path: "/refunded-tickets",
+          label: "Refunded Tickets",
           icon: <FaUndo />,
         },
+        {
+          path: "/flown-tickets",
+          label: "Flown Tickets",
+          icon: <FaUndo />,
+        },
+        // {
+        //   path: "/cancel-requests",
+        //   label: "Cancel Requests",
+        //   icon: <FaUndo />,
+        // },
       ],
     },
-
-    {
-      path: "/finance",
-      label: "Finance",
-      icon: <FaMoneyCheckAlt />,
-      children: [
-        {
-          path: "/payments",
-          label: "Payments",
-          icon: <FaMoneyCheckAlt />,
-        },
-        {
-          path: "/credits",
-          label: "Credit Management",
-          icon: <FaRegCreditCard />,
-        },
-        {
-          path: "/debit-vouchers",
-          label: "Debit Vouchers",
-          icon: <FaFileInvoiceDollar />,
-        },
-        {
-          path: "/ledger",
-          label: "Master Ledger",
-          icon: <FaBalanceScale />,
-        },
-      ],
-    },
-
-    {
-      path: "/integrations",
-      label: "Integrations",
-      icon: <FaCogs />,
-      children: [
-        {
-          path: "/gds",
-          label: "GDS Configuration",
-          icon: <FaCogs />,
-        },
-        {
-          path: "/markups",
-          label: "Markups",
-          icon: <FaCoins />,
-        },
-      ],
-    },
-
-    {
+{
       path: "/support",
       label: "Support",
       icon: <FaHeadset />,
@@ -192,96 +160,143 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
         },
       ],
     },
-
     {
-      path: "/banks",
-      label: "Banks",
-      icon: <FaUniversity />,
+      path: "/transaction",
+      label: "Transaction",
+      icon: <FaMoneyCheckAlt />,
       children: [
         {
-          path: "/all",
-          label: "All Banks",
-          icon: <FaUniversity />,
+          path: "/payments",
+          label: "Payments",
+          icon: <FaMoneyCheckAlt />,
         },
         {
-          path: "/add",
-          label: "Add Bank",
-          icon: <FaPlusCircle />,
+          path: "/credits",
+          label: "Credit Management",
+          icon: <FaRegCreditCard />,
+        },
+        {
+          path: "/debit-vouchers",
+          label: "Debit Vouchers",
+          icon: <FaFileInvoiceDollar />,
+        },
+        {
+          path: "/ledger",
+          label: "Master Ledger",
+          icon: <FaBalanceScale />,
         },
       ],
     },
 
-    {
-      path: "/deposits",
-      label: "Deposits",
-      icon: <FaArrowDown />,
-      children: [
-        {
-          path: "/all",
-          label: "All Deposits",
-          icon: <FaArrowDown />,
-        },
-        {
-          path: "/pending",
-          label: "Pending Deposits",
-          icon: <FaClock />,
-        },
-      ],
-    },
+    // {
+    //   path: "/integrations",
+    //   label: "Integrations",
+    //   icon: <FaCogs />,
+    //   children: [
+    //     {
+    //       path: "/gds",
+    //       label: "GDS Configuration",
+    //       icon: <FaCogs />,
+    //     },
+    //     {
+    //       path: "/markups",
+    //       label: "Markups",
+    //       icon: <FaCoins />,
+    //     },
+    //   ],
+    // },
 
-    {
-      path: "/notices",
-      label: "Notices",
-      icon: <FaBullhorn />,
-      children: [
-        {
-          path: "/all",
-          label: "All Notices",
-          icon: <FaBullhorn />,
-        },
-        {
-          path: "/create",
-          label: "Create Notice",
-          icon: <FaPlusCircle />,
-        },
-      ],
-    },
+    
 
-    {
-      path: "/notifications",
-      label: "Notifications",
-      icon: <FaBell />,
-      children: [
-        {
-          path: "/all",
-          label: "All Notifications",
-          icon: <FaBell />,
-        },
-        {
-          path: "/send",
-          label: "Send Notification",
-          icon: <FaPlusCircle />,
-        },
-      ],
-    },
+    // {
+    //   path: "/banks",
+    //   label: "Banks",
+    //   icon: <FaUniversity />,
+    //   children: [
+    //     {
+    //       path: "/all",
+    //       label: "All Banks",
+    //       icon: <FaUniversity />,
+    //     },
+    //     {
+    //       path: "/add",
+    //       label: "Add Bank",
+    //       icon: <FaPlusCircle />,
+    //     },
+    //   ],
+    // },
 
-    {
-      path: "/newsletter",
-      label: "Newsletter",
-      icon: <FaNewspaper />,
-      children: [
-        {
-          path: "/subscribers",
-          label: "Subscribers",
-          icon: <FaUsers />,
-        },
-        {
-          path: "/campaigns",
-          label: "Campaigns",
-          icon: <FaNewspaper />,
-        },
-      ],
-    },
+    // {
+    //   path: "/deposits",
+    //   label: "Deposits",
+    //   icon: <FaArrowDown />,
+    //   children: [
+    //     {
+    //       path: "/all",
+    //       label: "All Deposits",
+    //       icon: <FaArrowDown />,
+    //     },
+    //     {
+    //       path: "/pending",
+    //       label: "Pending Deposits",
+    //       icon: <FaClock />,
+    //     },
+    //   ],
+    // },
+
+    // {
+    //   path: "/notices",
+    //   label: "Notices",
+    //   icon: <FaBullhorn />,
+    //   children: [
+    //     {
+    //       path: "/all",
+    //       label: "All Notices",
+    //       icon: <FaBullhorn />,
+    //     },
+    //     {
+    //       path: "/create",
+    //       label: "Create Notice",
+    //       icon: <FaPlusCircle />,
+    //     },
+    //   ],
+    // },
+
+    // {
+    //   path: "/notifications",
+    //   label: "Notifications",
+    //   icon: <FaBell />,
+    //   children: [
+    //     {
+    //       path: "/all",
+    //       label: "All Notifications",
+    //       icon: <FaBell />,
+    //     },
+    //     {
+    //       path: "/send",
+    //       label: "Send Notification",
+    //       icon: <FaPlusCircle />,
+    //     },
+    //   ],
+    // },
+
+    // {
+    //   path: "/newsletter",
+    //   label: "Newsletter",
+    //   icon: <FaNewspaper />,
+    //   children: [
+    //     {
+    //       path: "/subscribers",
+    //       label: "Subscribers",
+    //       icon: <FaUsers />,
+    //     },
+    //     {
+    //       path: "/campaigns",
+    //       label: "Campaigns",
+    //       icon: <FaNewspaper />,
+    //     },
+    //   ],
+    // },
 
     {
       path: "/commissions",
@@ -307,13 +322,23 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       icon: <FaUsers />,
       children: [
         {
-          path: "/all",
-          label: "All Users",
+          path: "/admin",
+          label: "Admin",
           icon: <FaUsers />,
         },
         {
-          path: "/roles",
-          label: "Roles & Permissions",
+          path: "/agency",
+          label: "Agency",
+          icon: <FaUserCog />,
+        },
+         {
+          path: "/customer",
+          label: "Customer",
+          icon: <FaUserCog />,
+        },
+         {
+          path: "/agency",
+          label: "Pending Approval",
           icon: <FaUserCog />,
         },
       ],
@@ -337,41 +362,51 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       ],
     },
 
-    {
-      path: "/currencies",
-      label: "Currency",
-      icon: <FaMoneyBillWave />,
-      children: [
-        {
-          path: "/list",
-          label: "Currency List",
-          icon: <FaMoneyBillWave />,
-        },
-        {
-          path: "/rates",
-          label: "Exchange Rates",
-          icon: <FaBalanceScale />,
-        },
-      ],
-    },
+    // {
+    //   path: "/currencies",
+    //   label: "Currency",
+    //   icon: <FaMoneyBillWave />,
+    //   children: [
+    //     {
+    //       path: "/list",
+    //       label: "Currency List",
+    //       icon: <FaMoneyBillWave />,
+    //     },
+    //     {
+    //       path: "/rates",
+    //       label: "Exchange Rates",
+    //       icon: <FaBalanceScale />,
+    //     },
+    //   ],
+    // },
 
-    {
-      path: "/settings",
-      label: "Settings",
-      icon: <FaUserCog />,
-      children: [
-        {
-          path: "/profile",
-          label: "Profile",
-          icon: <FaUserCog />,
-        },
-        {
-          path: "/notices",
-          label: "Notices",
-          icon: <FaBullhorn />,
-        },
-      ],
-    },
+    // {
+    //   path: "/settings",
+    //   label: "Settings",
+    //   icon: <FaUserCog />,
+    //   children: [
+    //     // {
+    //     //   path: "/profile",
+    //     //   label: "Profile",
+    //     //   icon: <FaUserCog />,
+    //     // },
+    //     // {
+    //     //   path: "/notices",
+    //     //   label: "Notices",
+    //     //   icon: <FaBullhorn />,
+    //     // },
+    //     {
+    //       path: "/package",
+    //       label: "Package",
+    //       icon: <FaBullhorn />,
+    //     },
+    //     {
+    //       path: "/commission",
+    //       label: "Commission",
+    //       icon: <FaBullhorn />,
+    //     },
+    //   ],
+    // },
   ],
 
   // =====================================================

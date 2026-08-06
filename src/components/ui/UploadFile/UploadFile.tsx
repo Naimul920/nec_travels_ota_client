@@ -1,7 +1,7 @@
 import React from "react";
 import { Upload, App } from "antd";
 import type { UploadProps } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import InboxOutlined from "@ant-design/icons/es/icons/InboxOutlined";
 import clsx from "clsx";
 
 const { Dragger } = Upload;
