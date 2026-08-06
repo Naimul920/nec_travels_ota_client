@@ -2,7 +2,7 @@
 
 import Bank from "../_components/Bank/Bank";
 
-function page() {
+function BanksPage() {
   return (
     <>
       <Bank />
@@ -10,4 +10,4 @@ function page() {
   );
 }
 
-export default page;
+export default BanksPage;

@@ -1,11 +1,7 @@
 "use client"; // 1. Next.js 16 Client Component Boundary
 
 import React from "react";
-import { Button } from "@/components/ui";
 import { Divider } from "antd";
-// 2. Swapped React Router hook with Next.js App Router navigation utility
-import { useRouter } from "next/navigation";
-import { encoding } from "@/utils";
 import Image from "next/image";
 
 interface Props {
@@ -14,9 +10,6 @@ interface Props {
 
 const BankInfoCard: React.FC<Props> = ({ data }) => {
   const isMobile = data.type === "MOBILE";
-
-  // 3. Initialized Next.js router engine
-  const router = useRouter();
 
   return (
     <div className="bg-white rounded-xl border border-primary shadow p-5 space-y-3 hover:shadow-sm transition">
@@ -73,22 +66,6 @@ const BankInfoCard: React.FC<Props> = ({ data }) => {
           </p>
         )}
       </div>
-
-      {/* Action */}
-      <Button
-        onClick={() =>
-          // 4. Converted navigate call to router.push
-          router.push(
-            `/bank-info/${encoding(
-              JSON.stringify({ id: data.id, type: data.type }, null, 2),
-            )}`,
-          )
-        }
-        variant="primary"
-        className="w-fit h-9 text-sm"
-      >
-        Deposit Request
-      </Button>
     </div>
   );
 };

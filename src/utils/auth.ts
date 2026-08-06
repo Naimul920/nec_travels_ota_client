@@ -12,6 +12,7 @@ export {
   getRouteOwner,
   getDefaultDashboardRoute,
   isValidRedirectForRole,
+  resolvePostLoginRedirect,
   ROUTE_DEPARTMENT,
   getRequiredDepartments,
   canAccessRoute,

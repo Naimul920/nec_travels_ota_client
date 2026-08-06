@@ -1,5 +1,5 @@
-﻿import PaymentsRequest from "../../_components/Transaction/PaymentsRequest";
+﻿import DepositTable from "@/components/modules/deposit/DepositTable";
 
 export default function PaymentsPage() {
-  return <PaymentsRequest />;
+  return <DepositTable />;
 }

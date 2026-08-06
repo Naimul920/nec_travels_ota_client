@@ -1,13 +1,5 @@
-// import Payment from "@/app/(dashboard)/b2b/_components/Transaction/Payment";
+import DepositTable from "@/components/modules/deposit/DepositTable";
 
-import Payment from "../../_components/Transaction/Payment";
-
-function page() {
-  return (
-    <>
-      <Payment />
-    </>
-  );
+export default function Page() {
+  return <DepositTable />;
 }
-
-export default page;

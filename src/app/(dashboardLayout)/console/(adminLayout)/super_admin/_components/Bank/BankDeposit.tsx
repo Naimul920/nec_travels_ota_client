@@ -3,9 +3,10 @@ import React from "react";
 import { DatePicker } from "antd";
 import { useFormik } from "formik";
 import { Button, Input, UploadFile } from "@/components/ui";
+import type { BankItem } from "@/interface/bank";
 
 interface Props {
-  data: any;
+  data: BankItem;
 }
 
 const BankDeposit: React.FC<Props> = ({ data }) => {
@@ -20,7 +21,7 @@ const BankDeposit: React.FC<Props> = ({ data }) => {
       console.log({
         ...values,
         bankId: data.id,
-        depositType: data.accountType,
+        depositType: data.account_type,
       });
     },
   });
@@ -36,21 +37,21 @@ const BankDeposit: React.FC<Props> = ({ data }) => {
         <Input
           label="Bank Name"
           className="rounded-sm border-primary"
-          value={data.bankName}
+          value={data.bank_name}
           disabled
         />
 
         <Input
           label="Account Number"
           className="rounded-sm border-primary"
-          value={data.accountNumber}
+          value={data.account_number}
           disabled
         />
 
         <Input
           label="Deposit Type"
           className="rounded-sm border-primary"
-          value={data.accountType || "Bank Deposit"}
+          value={data.account_type || "Bank Deposit"}
           disabled
         />
 

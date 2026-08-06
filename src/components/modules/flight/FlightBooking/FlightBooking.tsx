@@ -327,6 +327,29 @@ const FlightBooking: React.FC = () => {
     itin: Itinerary,
   ): RevalidateItineraryPayload => {
     const sale = itin.saleCurrencyAmount;
+    const flightDetails = itin.flightDetails.map((detail) => ({
+      elapsedTime: detail.elapsedTime,
+      schedules: detail.schedules.map((s) => ({
+        flightName: s.flightName,
+        bookingCode: s.bookingCode,
+        cabinCode: s.cabinCode,
+        seatsAvailable: s.seatsAvailable,
+        marketingCarrierCode: s.marketingCarrierCode,
+        operatingCarrierCode: s.operatingCarrierCode,
+        marketingFlightNumber: s.marketingFlightNumber,
+        frequency: s.frequency,
+        stopCount: s.stopCount,
+        isQuoteSharedFlight: s.isQuoteSharedFlight,
+        airCraftType: s.airCraftType,
+        airCraftTypeForFirstLeg: s.airCraftTypeForFirstLeg,
+        airCraftTypeForLastLeg: s.airCraftTypeForLastLeg,
+        departure: s.departure,
+        arrival: s.arrival,
+        totalMilesFlown: s.totalMilesFlown,
+        departureDateTime: s.departureDateTime,
+        arrivalDateTime: s.arrivalDateTime,
+      })),
+    }));
     return {
       tripType: searchInfoParams.get("tripType") || "oneway",
       from:
@@ -341,7 +364,7 @@ const FlightBooking: React.FC = () => {
       noOfChildren: Number(searchInfoParams.get("child") || 0),
       noOfKids: Number(searchInfoParams.get("kid") || 0),
       noOfInfant: Number(searchInfoParams.get("infant") || 0),
-      itinDetail: { flightDetails: itin.flightDetails },
+      itinDetail: { flightDetails },
       passengerFareBreakDown: itin.passengerFareBreakDown,
       saleCurrencyAmount: {
         totalAmount:
@@ -453,7 +476,7 @@ const FlightBooking: React.FC = () => {
           leadPassenger: leadPassengerWithContact,
           total,
         });
-        message.success(result.message || "Flight booked successfully");
+        message.success("Flight booked successfully");
       } else {
         message.error(result.message || "Booking failed");
       }

@@ -159,6 +159,210 @@ export const CRUD_PAGE_CONFIGS: Record<string, CrudPageConfig> = {
     ],
   },
 
+  [`${SUPER}/bookings/voided`]: {
+    title: "Voided Tickets",
+    description: "Manage voided tickets.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "PNR", dataIndex: "pnr", key: "pnr" },
+      { title: "Passenger", dataIndex: "passenger", key: "passenger" },
+      { title: "Airline", dataIndex: "airline", key: "airline" },
+      { title: "Amount", dataIndex: "amount", key: "amount" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("pnr", "PNR", true),
+      textField("passenger", "Passenger"),
+      textField("airline", "Airline"),
+      numberField("amount", "Amount", true),
+    ],
+  },
+
+  [`${SUPER}/bookings/refunded-tickets`]: {
+    title: "Refunded Tickets",
+    description: "Manage refunded tickets.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "PNR", dataIndex: "pnr", key: "pnr" },
+      { title: "Passenger", dataIndex: "passenger", key: "passenger" },
+      { title: "Refund Amount", dataIndex: "amount", key: "amount" },
+      { title: "Date", dataIndex: "date", key: "date" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("pnr", "PNR", true),
+      textField("passenger", "Passenger"),
+      numberField("amount", "Refund Amount", true),
+      dateField("date", "Date"),
+    ],
+  },
+
+  [`${SUPER}/bookings/flown-tickets`]: {
+    title: "Flown Tickets",
+    description: "Manage flown tickets.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "PNR", dataIndex: "pnr", key: "pnr" },
+      { title: "Passenger", dataIndex: "passenger", key: "passenger" },
+      { title: "Flight", dataIndex: "flight", key: "flight" },
+      { title: "Date", dataIndex: "date", key: "date" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("pnr", "PNR", true),
+      textField("passenger", "Passenger"),
+      textField("flight", "Flight"),
+      dateField("date", "Date"),
+    ],
+  },
+
+  [`${SUPER}/transaction/payments`]: {
+    title: "Payments",
+    description: "Manage payment records.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Agency", dataIndex: "agency", key: "agency" },
+      { title: "Method", dataIndex: "method", key: "method" },
+      { title: "Amount", dataIndex: "amount", key: "amount" },
+      { title: "Date", dataIndex: "date", key: "date" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("agency", "Agency", true),
+      textField("method", "Method"),
+      numberField("amount", "Amount", true),
+      dateField("date", "Date"),
+    ],
+  },
+
+  [`${SUPER}/transaction/credits`]: {
+    title: "Credit Management",
+    description: "Manage agency credit records.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Agency", dataIndex: "agency", key: "agency" },
+      { title: "Amount", dataIndex: "amount", key: "amount" },
+      { title: "Date", dataIndex: "date", key: "date" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("agency", "Agency", true),
+      numberField("amount", "Amount", true),
+      dateField("date", "Date"),
+    ],
+  },
+
+  [`${SUPER}/transaction/debit-vouchers`]: {
+    title: "Debit Vouchers",
+    description: "Manage debit voucher records.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Agency", dataIndex: "agency", key: "agency" },
+      { title: "Amount", dataIndex: "amount", key: "amount" },
+      { title: "Date", dataIndex: "date", key: "date" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("agency", "Agency", true),
+      numberField("amount", "Amount", true),
+      dateField("date", "Date"),
+    ],
+  },
+
+  [`${SUPER}/transaction/ledger`]: {
+    title: "Master Ledger",
+    description: "View the full financial ledger.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Transaction", dataIndex: "transactionId", key: "transactionId" },
+      {
+        title: "Type",
+        dataIndex: "type",
+        key: "type",
+        valueType: "tag",
+        tagMap: { debit: "red", credit: "green" },
+      },
+      { title: "Amount", dataIndex: "amount", key: "amount" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("description", "Description"),
+      selectField("type", "Type", [
+        { label: "Credit", value: "credit" },
+        { label: "Debit", value: "debit" },
+      ], true),
+      numberField("amount", "Amount", true),
+    ],
+  },
+
+  [`${SUPER}/users/admin`]: {
+    title: "Admin Users",
+    description: "Manage admin users.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Name", dataIndex: "name", key: "name" },
+      { title: "Email", dataIndex: "email", key: "email" },
+      { title: "Phone", dataIndex: "phone", key: "phone" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("name", "Name", true),
+      textField("email", "Email", true),
+      textField("phone", "Phone"),
+    ],
+  },
+
+  [`${SUPER}/users/agency`]: {
+    title: "Agency Users",
+    description: "Manage agency users.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Name", dataIndex: "name", key: "name" },
+      { title: "Email", dataIndex: "email", key: "email" },
+      { title: "Phone", dataIndex: "phone", key: "phone" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("name", "Name", true),
+      textField("email", "Email", true),
+      textField("phone", "Phone"),
+    ],
+  },
+
+  [`${SUPER}/users/customer`]: {
+    title: "Customer Users",
+    description: "Manage customer users.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Name", dataIndex: "name", key: "name" },
+      { title: "Email", dataIndex: "email", key: "email" },
+      { title: "Phone", dataIndex: "phone", key: "phone" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("name", "Name", true),
+      textField("email", "Email", true),
+      textField("phone", "Phone"),
+    ],
+  },
+
+  [`${SUPER}/users/approvals`]: {
+    title: "Pending Approvals",
+    description: "Approve or reject pending user registrations.",
+    columns: [
+      { title: "ID", dataIndex: "id", key: "id", width: 80 },
+      { title: "Name", dataIndex: "name", key: "name" },
+      { title: "Email", dataIndex: "email", key: "email" },
+      { title: "Submitted", dataIndex: "submittedAt", key: "submittedAt" },
+      statusColumn(),
+    ],
+    fields: [
+      textField("name", "Name", true),
+      textField("email", "Email", true),
+      selectField("status", "Status", PENDING_STATUS, true),
+    ],
+  },
+
   [`${SUPER}/finance/ledger`]: {
     title: "Master Ledger",
     description: "View the full financial ledger.",

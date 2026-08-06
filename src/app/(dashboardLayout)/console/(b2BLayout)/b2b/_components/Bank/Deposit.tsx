@@ -1,20 +1,31 @@
-"use client"; // 1. Next.js 16 Client Component Boundary
+"use client";
 
-import React, { useMemo } from "react";
-// 2. Swapped React Router hook with Next.js App Router parameters utility
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { bankAccounts, mobileBankingAccounts } from "@/data/bankAccounts";
+import { getBanksAction } from "@/actions/bank.action";
+import type { BankItem } from "@/interface/bank";
 import BankDeposit from "./BankDeposit";
 import MobileDeposit from "./MobileDeposit";
 import Error from "@/components/common/Error/Error";
 import { decoding } from "@/utils";
 
 const Deposit: React.FC = () => {
-  // 3. Initialized Next.js path parameter hook
   const params = useParams();
-
-  // 4. Safely extract dynamic segment; handles Next.js Router parameter array types safely
   const id = typeof params?.id === "string" ? params.id : undefined;
+
+  const [banks, setBanks] = useState<BankItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const res = await getBanksAction();
+    setLoading(false);
+    if (res.success) setBanks(res.data);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const parsed = useMemo(() => {
     try {
@@ -31,11 +42,8 @@ const Deposit: React.FC = () => {
 
   const accountInfo = useMemo(() => {
     if (!parsed?.id || !parsed?.type) return null;
-
-    return parsed.type === "BANK"
-      ? bankAccounts.find((b) => b.id === parsed.id)
-      : mobileBankingAccounts.find((m) => m.id === parsed.id);
-  }, [parsed]);
+    return banks.find((b) => b.id === parsed.id) ?? null;
+  }, [parsed, banks]);
 
   if (!parsed)
     return (
@@ -43,6 +51,21 @@ const Deposit: React.FC = () => {
         title="Invalid Deposit Link"
         message="This deposit link is corrupted or expired. Please contact support."
       />
+    );
+
+  if (loading)
+    return (
+      <div className="px-5 md:px-0 py-5 space-y-4">
+        <div className="h-7 w-32 animate-pulse rounded bg-gray-200" />
+        <div className="h-64 animate-pulse rounded-xl border border-gray-200 bg-white p-5">
+          <div className="mb-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, j) => (
+              <div key={j} className="h-12 rounded bg-gray-100" />
+            ))}
+          </div>
+          <div className="h-24 rounded bg-gray-100" />
+        </div>
+      </div>
     );
 
   if (!accountInfo)
@@ -59,8 +82,8 @@ const Deposit: React.FC = () => {
         Add Payment
       </h1>
 
-      {parsed.type === "MOBILE" && <MobileDeposit data={accountInfo} />}
-      {parsed.type === "BANK" && <BankDeposit data={accountInfo} />}
+      {accountInfo.type === "MOBILE" && <MobileDeposit data={accountInfo} />}
+      {accountInfo.type === "BANK" && <BankDeposit data={accountInfo} />}
     </div>
   );
 };

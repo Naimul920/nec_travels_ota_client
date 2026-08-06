@@ -1,6 +1,6 @@
 import React from "react";
-import { getTicketAction } from "@/actions/booking.action";
-import ETicket from "@/components/common/ETicket/ETicket";
+import { getUserRole } from "@/utils/session";
+import TicketPageClient from "@/components/common/ETicket/TicketPageClient";
 
 export default async function TicketPage({
   params,
@@ -8,11 +8,9 @@ export default async function TicketPage({
   params: Promise<{ ticketId: string }>;
 }) {
   const { ticketId } = await params;
-  // const ticket = await getTicketAction(ticketId);
+  const role = await getUserRole();
+  const roleLower = (role ?? "b2c").toLowerCase();
+  const backLink = `/console/${roleLower}/bookings`;
 
-  return (
-    <div>
-      <ETicket />
-    </div>
-  );
+  return <TicketPageClient ticketId={ticketId} backLink={backLink} />;
 }

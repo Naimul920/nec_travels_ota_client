@@ -1,5 +1,6 @@
 "use server";
 
+import { AxiosError } from "axios";
 import { httpClient } from "@/lib/axios/httpClient";
 import { ROLE } from "@/constant";
 import { getUserRole } from "@/utils/session";
@@ -39,16 +40,9 @@ export async function getBookingsAction(): Promise<BookingResponse> {
       data: res.data || [],
       meta: (res as unknown as BookingResponse)?.meta,
     };
-  } catch (error: any) {
-    const backendMessage = error?.response?.data?.message;
-    return {
-      success: false,
-      statusCode: error?.response?.status || 500,
-      message: Array.isArray(backendMessage)
-        ? backendMessage.join(", ")
-        : backendMessage || error?.message || "Failed to load bookings",
-      data: [],
-    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(error, "Failed to load bookings");
+    return { success: false, statusCode, message, data: [] };
   }
 }
 
@@ -76,16 +70,12 @@ export async function getTicketAction(
       message: res.message,
       data: res.data || null,
     };
-  } catch (error: any) {
-    const backendMessage = error?.response?.data?.message;
-    return {
-      success: false,
-      statusCode: error?.response?.status || 500,
-      message: Array.isArray(backendMessage)
-        ? backendMessage.join(", ")
-        : backendMessage || error?.message || "Failed to load ticket",
-      data: null,
-    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to load ticket",
+    );
+    return { success: false, statusCode, message, data: null };
   }
 }
 
@@ -148,14 +138,15 @@ export async function getMyPassengersAction(
         total_passengers: 0,
       },
     };
-  } catch (error: any) {
-    const backendMessage = error?.response?.data?.message;
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to load passengers",
+    );
     return {
       success: false,
-      statusCode: error?.response?.status || 500,
-      message: Array.isArray(backendMessage)
-        ? backendMessage.join(", ")
-        : backendMessage || error?.message || "Failed to load passengers",
+      statusCode,
+      message,
       data: [],
       meta: {
         page: 1,
@@ -167,3 +158,22 @@ export async function getMyPassengersAction(
     };
   }
 }
+
+const extractApiError = (
+  error: unknown,
+  fallback: string,
+): { message: string; statusCode: number } => {
+  if (error instanceof AxiosError) {
+    const backendMessage = error.response?.data?.message;
+    return {
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error.message || fallback,
+      statusCode: error.response?.status || 500,
+    };
+  }
+  return {
+    message: error instanceof Error ? error.message : fallback,
+    statusCode: 500,
+  };
+};

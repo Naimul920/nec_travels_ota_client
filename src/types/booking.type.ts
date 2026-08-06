@@ -31,6 +31,7 @@ export interface BookingSegment {
 }
 
 export interface BookingPassenger {
+  id: string;
   passenger_type: string;
   title: string;
   first_name: string;
@@ -40,6 +41,7 @@ export interface BookingPassenger {
   nationality: string;
   passport_number: string;
   passport_expiry: string;
+  ticket_number: string | null;
   seat_number: string | null;
   baggage: string | null;
   meal: string | null;

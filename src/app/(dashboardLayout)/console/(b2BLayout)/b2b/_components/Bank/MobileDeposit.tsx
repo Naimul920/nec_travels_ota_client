@@ -1,29 +1,53 @@
 "use client";
 
-import React from "react";
-import { DatePicker } from "antd";
+import React, { useState } from "react";
+import { DatePicker, App } from "antd";
 import { useFormik } from "formik";
 import { Button, Input, UploadFile } from "@/components/ui";
+import { createDepositAction } from "@/actions/deposit.action";
+import type { BankItem } from "@/interface/bank";
+import type { Dayjs } from "dayjs";
 
 interface Props {
-  data: any;
+  data: BankItem;
 }
 
 const MobileDeposit: React.FC<Props> = ({ data }) => {
+  const { message } = App.useApp();
+  const [submitting, setSubmitting] = useState(false);
+
   const formik = useFormik({
     initialValues: {
-      date: null,
+      date: null as Dayjs | null,
+      senderName: "",
+      senderAccount: "",
+      transactionId: "",
       amount: "",
-      gatewayFee: "",
-      reference: "",
-      file: null,
+      note: "",
+      file: null as File | null,
     },
-    onSubmit: (values) => {
-      console.log({
-        ...values,
-        accountId: data.id,
-        type: data.type,
+    onSubmit: async (values) => {
+      setSubmitting(true);
+      const result = await createDepositAction({
+        bankId: data.id,
+        amount: Number(values.amount) || undefined,
+        senderAccount: values.senderAccount || undefined,
+        senderName: values.senderName || undefined,
+        transactionId: values.transactionId || undefined,
+        paymentDate: values.date?.isValid()
+          ? values.date.toISOString()
+          : undefined,
+        note: values.note || undefined,
+        file: values.file,
       });
+      setSubmitting(false);
+
+      if (result.success) {
+        message.success(result.message || "Deposit request created successfully");
+        formik.resetForm();
+      } else {
+        message.error(result.message || "Failed to submit deposit");
+      }
     },
   });
 
@@ -32,26 +56,23 @@ const MobileDeposit: React.FC<Props> = ({ data }) => {
       onSubmit={formik.handleSubmit}
       className="bg-white p-6 rounded-xl shadow-sm space-y-6"
     >
-      {/* Grid Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Auto fields */}
         <Input
           label="Gateway"
           className="rounded-sm border-primary"
-          value={data.bankName}
+          value={data.bank_name}
           disabled
         />
 
         <Input
           label="Account Number"
           className="rounded-sm border-primary"
-          value={data.accountNumber}
+          value={data.account_number}
           disabled
         />
 
-        {/* Date */}
         <div>
-          <label className="block mb-1 text-sm font-medium">Deposit Date</label>
+          <label className="block mb-1 text-sm font-medium">Payment Date</label>
           <DatePicker
             className="w-full h-12 border border-primary! rounded-sm"
             onChange={(d) => formik.setFieldValue("date", d)}
@@ -67,20 +88,33 @@ const MobileDeposit: React.FC<Props> = ({ data }) => {
 
         <Input
           className="rounded-sm border-primary"
-          label="Gateway Fee"
-          type="number"
-          {...formik.getFieldProps("gatewayFee")}
+          label="Sender Name"
+          placeholder="Your account holder name"
+          {...formik.getFieldProps("senderName")}
         />
 
         <Input
           className="rounded-sm border-primary"
-          label="Reference"
+          label="Sender Account"
+          placeholder="Your sending account number"
+          {...formik.getFieldProps("senderAccount")}
+        />
+
+        <Input
+          className="rounded-sm border-primary"
+          label="Transaction ID"
           placeholder="Transaction ID / Reference"
-          {...formik.getFieldProps("reference")}
+          {...formik.getFieldProps("transactionId")}
+        />
+
+        <Input
+          className="rounded-sm border-primary"
+          label="Note"
+          placeholder="Optional note"
+          {...formik.getFieldProps("note")}
         />
       </div>
 
-      {/* Upload (Full Width) */}
       <div className="md:col-span-2">
         <UploadFile
           value={formik.values.file}
@@ -88,13 +122,13 @@ const MobileDeposit: React.FC<Props> = ({ data }) => {
         />
       </div>
 
-      {/* Submit */}
       <Button
         type="submit"
         variant="primary"
+        isLoading={submitting}
         className="w-full md:w-1/9 mx-auto"
       >
-        Submit Deposit
+        {submitting ? "Submitting..." : "Submit Deposit"}
       </Button>
     </form>
   );

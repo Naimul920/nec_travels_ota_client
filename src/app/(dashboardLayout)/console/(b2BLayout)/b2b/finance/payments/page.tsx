@@ -2,7 +2,7 @@
 
 import Payment from "../../_components/Transaction/Payment";
 
-function page() {
+function PaymentPage() {
   return (
     <>
       <Payment />
@@ -10,4 +10,4 @@ function page() {
   );
 }
 
-export default page;
+export default PaymentPage;

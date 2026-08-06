@@ -5,7 +5,7 @@ import { getCrudConfig } from "@/constant/crudPages";
 import { useTablePageData } from "@/hooks/useTablePageData";
 
 export default function Page() {
-  const config = getCrudConfig("/console/super_admin/finance/debit-vouchers");
+  const config = getCrudConfig("/console/super_admin/transaction/debit-vouchers");
   const { data, loading } = useTablePageData(config);
 
   return (
@@ -21,4 +21,3 @@ export default function Page() {
     />
   );
 }
-

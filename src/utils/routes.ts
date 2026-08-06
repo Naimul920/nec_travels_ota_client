@@ -69,19 +69,35 @@ export const getRouteOwner = (
 };
 
 export const getDefaultDashboardRoute = (role: USER_ROLE) => {
-  if (role === "SUPER_ADMIN") {
-    return "/console/super_admin/dashboard";
+  return `/console/${role.toLowerCase()}`;
+};
+
+export const resolvePostLoginRedirect = (
+  redirectPath: string | undefined,
+  role: USER_ROLE,
+): string => {
+  if (!redirectPath) {
+    return getDefaultDashboardRoute(role);
   }
-  if (role === "ADMIN") {
-    return "/console/admin/dashboard";
+
+  const pathname = redirectPath.split("?")[0] || redirectPath;
+  const search = redirectPath.slice(pathname.length);
+
+  if (pathname === "/flight-booking") {
+    if (role === "B2B") {
+      return `/console/b2b/flight-booking${search}`;
+    }
+    if (role === "ADMIN" || role === "SUPER_ADMIN") {
+      return getDefaultDashboardRoute(role);
+    }
+    return redirectPath;
   }
-  if (role === "B2B") {
-    return "/console/b2b/dashboard";
+
+  if (isValidRedirectForRole(redirectPath, role)) {
+    return redirectPath;
   }
-  if (role === "B2C") {
-    return "/";
-  }
-  return "/";
+
+  return getDefaultDashboardRoute(role);
 };
 
 export const isValidRedirectForRole = (

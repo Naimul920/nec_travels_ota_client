@@ -46,11 +46,7 @@ export default function ForgotPasswordForm() {
       const result = await sendOtp(values.email);
       if (result.success) {
         setUserId(result.user_id);
-        if (result.user_id) {
-          setStep("reset");
-        } else {
-          helpers.setStatus({ success: result.message });
-        }
+        setStep("reset");
       } else {
         helpers.setStatus({ error: result.message });
       }

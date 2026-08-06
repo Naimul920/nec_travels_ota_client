@@ -11,7 +11,7 @@ import {
   deleteTokenExpiresAt,
 } from "@/utils/token";
 import { deleteCookie } from "@/utils/cookie";
-import { isValidRedirectForRole, getDefaultDashboardRoute } from "@/utils/auth";
+import { resolvePostLoginRedirect } from "@/utils/auth";
 import {
   setUserRole,
   setDepartments,
@@ -108,10 +108,10 @@ export const loginAction = async (
 
     await setDepartments(departments);
 
-    const targetPath =
-      redirectPath && isValidRedirectForRole(redirectPath, role as USER_ROLE)
-        ? redirectPath
-        : getDefaultDashboardRoute(role as USER_ROLE);
+    const targetPath = resolvePostLoginRedirect(
+      redirectPath,
+      role as USER_ROLE,
+    );
 
     return {
       success: true,
@@ -208,22 +208,24 @@ export const isLoginAction = async (): Promise<ILoginStatus> => {
 
 export const forgotPasswordAction = async (email: string) => {
   try {
-    const res = await httpClient.post<{ user_id: string }>(
+    const res = await httpClient.post<{ user_id?: string | number }>(
       "/auth/forgot-password",
       { email },
     );
+    const user_id =
+      res.data?.user_id != null ? String(res.data.user_id) : undefined;
     return {
       success: true,
       message: res.message || "OTP sent to your email",
-      user_id: res.data?.user_id,
+      user_id,
     };
   } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
     return {
       success: false,
-      message:
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to send OTP",
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error?.message || "Failed to send OTP",
     };
   }
 };

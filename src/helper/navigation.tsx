@@ -133,7 +133,7 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
         // },
       ],
     },
-{
+    {
       path: "/support",
       label: "Support",
       icon: <FaHeadset />,
@@ -165,9 +165,14 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       label: "Transaction",
       icon: <FaMoneyCheckAlt />,
       children: [
+        // {
+        //   path: "/payments",
+        //   label: "Payments",
+        //   icon: <FaMoneyCheckAlt />,
+        // },
         {
           path: "/payments",
-          label: "Payments",
+          label: "Deposit request",
           icon: <FaMoneyCheckAlt />,
         },
         {
@@ -206,25 +211,11 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
     //   ],
     // },
 
-    
-
-    // {
-    //   path: "/banks",
-    //   label: "Banks",
-    //   icon: <FaUniversity />,
-    //   children: [
-    //     {
-    //       path: "/all",
-    //       label: "All Banks",
-    //       icon: <FaUniversity />,
-    //     },
-    //     {
-    //       path: "/add",
-    //       label: "Add Bank",
-    //       icon: <FaPlusCircle />,
-    //     },
-    //   ],
-    // },
+    {
+      path: "/banks",
+      label: "Banks",
+      icon: <FaUniversity />,
+    },
 
     // {
     //   path: "/deposits",
@@ -304,18 +295,39 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       icon: <FaCoins />,
       children: [
         {
-          path: "/rules",
-          label: "Commission Rules",
+          path: "/all-commission",
+          label: "All commission",
           icon: <FaCoins />,
         },
+        // {
+        //   path: "/rules",
+        //   label: "Commission Rules",
+        //   icon: <FaCoins />,
+        // },
+        // {
+        //   path: "/history",
+        //   label: "Commission History",
+        //   icon: <FaFileInvoiceDollar />,
+        // },
+      ],
+    },
+    {
+      path: "/packages",
+      label: "Packages",
+      icon: <FaBoxOpen />,
+      children: [
         {
-          path: "/history",
-          label: "Commission History",
-          icon: <FaFileInvoiceDollar />,
+          path: "/all",
+          label: "All Packages",
+          icon: <FaBoxOpen />,
+        },
+        {
+          path: "/create",
+          label: "Create Package",
+          icon: <FaPlusCircle />,
         },
       ],
     },
-
     {
       path: "/users",
       label: "Users",
@@ -331,33 +343,15 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
           label: "Agency",
           icon: <FaUserCog />,
         },
-         {
+        {
           path: "/customer",
           label: "Customer",
           icon: <FaUserCog />,
         },
-         {
-          path: "/agency",
+        {
+          path: "/approvals",
           label: "Pending Approval",
           icon: <FaUserCog />,
-        },
-      ],
-    },
-
-    {
-      path: "/packages",
-      label: "Packages",
-      icon: <FaBoxOpen />,
-      children: [
-        {
-          path: "/all",
-          label: "All Packages",
-          icon: <FaBoxOpen />,
-        },
-        {
-          path: "/create",
-          label: "Create Package",
-          icon: <FaPlusCircle />,
         },
       ],
     },

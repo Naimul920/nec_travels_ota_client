@@ -1,6 +1,5 @@
 import React from "react";
-import { getTicketAction } from "@/actions/booking.action";
-import ETicket from "@/components/common/ETicket/ETicket";
+import TicketPageClient from "@/components/common/ETicket/TicketPageClient";
 
 export default async function TicketPage({
   params,
@@ -8,11 +7,8 @@ export default async function TicketPage({
   params: Promise<{ ticketId: string }>;
 }) {
   const { ticketId } = await params;
-  // const ticket = await getTicketAction(ticketId);
 
   return (
-    <div>
-      <ETicket />
-    </div>
+    <TicketPageClient ticketId={ticketId} backLink="/console/b2c/bookings" />
   );
 }

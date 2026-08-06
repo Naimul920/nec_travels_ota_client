@@ -1,20 +1,25 @@
-"use client"; // 1. Next.js 16 Client Component Boundary
+"use client";
 
-import React, { useMemo } from "react";
-// 2. Swapped React Router hook with Next.js App Router parameters utility
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { bankAccounts, mobileBankingAccounts } from "@/data/bankAccounts";
+import { getBanksAction } from "@/actions/bank.action";
+import type { BankItem } from "@/interface/bank";
 import BankDeposit from "./BankDeposit";
 import MobileDeposit from "./MobileDeposit";
 import Error from "@/components/common/Error/Error";
 import { decoding } from "@/utils";
 
 const Deposit: React.FC = () => {
-  // 3. Initialized Next.js path parameter hook
   const params = useParams();
-
-  // 4. Safely extract dynamic segment; handles Next.js Router parameter array types safely
   const id = typeof params?.id === "string" ? params.id : undefined;
+
+  const [banks, setBanks] = useState<BankItem[]>([]);
+
+  useEffect(() => {
+    getBanksAction().then((res) => {
+      if (res.success) setBanks(res.data);
+    });
+  }, []);
 
   const parsed = useMemo(() => {
     try {
@@ -32,10 +37,8 @@ const Deposit: React.FC = () => {
   const accountInfo = useMemo(() => {
     if (!parsed?.id || !parsed?.type) return null;
 
-    return parsed.type === "BANK"
-      ? bankAccounts.find((b) => b.id === parsed.id)
-      : mobileBankingAccounts.find((m) => m.id === parsed.id);
-  }, [parsed]);
+    return banks.find((b) => b.id === parsed.id) ?? null;
+  }, [parsed, banks]);
 
   if (!parsed)
     return (
@@ -59,8 +62,8 @@ const Deposit: React.FC = () => {
         Add Payment
       </h1>
 
-      {parsed.type === "MOBILE" && <MobileDeposit data={accountInfo} />}
-      {parsed.type === "BANK" && <BankDeposit data={accountInfo} />}
+      {accountInfo.type === "MOBILE" && <MobileDeposit data={accountInfo} />}
+      {accountInfo.type === "BANK" && <BankDeposit data={accountInfo} />}
     </div>
   );
 };
