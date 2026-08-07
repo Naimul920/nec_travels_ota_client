@@ -72,10 +72,12 @@ const LeadPassengerPrefill: React.FC = () => {
     if ((!user && !country) || !lead || applied.current) return;
 
     const patch: Partial<Passenger> = {};
-    if (!lead.firstname && user?.first_name) patch.firstname = user.first_name;
-    if (!lead.lastname && user?.last_name) patch.lastname = user.last_name;
-    if (!lead.email && user?.email) patch.email = user.email;
-    if (!lead.phone && user?.phone) patch.phone = user.phone;
+    const isB2C = user?.role === ROLE.B2C;
+    if (isB2C) {
+      if (!lead.firstname && user?.first_name) patch.firstname = user.first_name;
+      if (!lead.lastname && user?.last_name) patch.lastname = user.last_name;
+      if (!lead.email && user?.email) patch.email = user.email;
+    }
     if (!lead.country && country) patch.country = country;
 
     if (Object.keys(patch).length > 0) {

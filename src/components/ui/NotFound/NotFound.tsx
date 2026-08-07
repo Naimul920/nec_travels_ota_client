@@ -19,11 +19,11 @@ interface NotFoundProps {
   className?: string;
 }
 
-const NotFound: React.FC<NotFoundProps> = ({
+export const NotFound: React.FC<NotFoundProps> = ({
   statusCode,
   title,
   description,
-  image = "/assets/images/flight.png",
+  image,
   showBack = false,
   showHome = false,
   showReload = false,
@@ -31,54 +31,70 @@ const NotFound: React.FC<NotFoundProps> = ({
   className,
 }) => {
   const router = useRouter();
-
   const hasActions = showBack || showHome || showReload;
 
   return (
     <div
       className={clsx(
-        "flex flex-col items-center justify-center px-6 text-center",
-        className ?? "min-h-[60vh]",
+        "relative flex w-full flex-col items-center justify-center overflow-hidden px-4 py-12 text-center sm:px-6 md:py-20",
+        className ?? "min-h-[70vh]"
       )}
     >
-      {statusCode && (
-        <h1 className="text-7xl md:text-8xl font-extrabold text-primary select-none">
-          {statusCode}
-        </h1>
-      )}
+      {/* Background Subtle Accent Blur */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl"
+      />
 
-      {image && !statusCode && (
-        <div className="mb-6 flex items-center justify-center w-full">
+      {/* Image Display */}
+      {image && (
+        <div className="relative mb-6 flex w-full max-w-sm items-center justify-center">
           <Image
             src={image}
-            alt="Not Found"
-            width={500}
-            height={300}
+            alt="Not Found Illustration"
+            width={400}
+            height={260}
             draggable={false}
-            className="md:w-2/4 h-auto opacity-90 object-contain"
+            className="h-auto w-auto object-contain transition-transform duration-500 hover:scale-105"
             priority
           />
         </div>
       )}
 
-      <div className="max-w-md">
-        <h2 className="text-xl md:text-3xl font-bold text-gray-900">
+      {/* Status Code with Gradient Styling */}
+      {statusCode && (
+        <div className="relative select-none">
+          <span className="bg-gradient-to-b from-primary via-primary/80 to-primary/40 bg-clip-text text-8xl font-black tracking-tighter text-transparent sm:text-9xl">
+            {statusCode}
+          </span>
+          <div className="mx-auto -mt-4 w-max rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary">
+            Error
+          </div>
+        </div>
+      )}
+
+      {/* Title & Description Container */}
+      <div className="mt-6 max-w-lg space-y-2">
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
           {title}
         </h2>
 
         {description && (
-          <p className="mt-2 text-xs md:text-sm text-gray-500">{description}</p>
+          <p className="text-sm text-gray-500 sm:text-base leading-relaxed">
+            {description}
+          </p>
         )}
       </div>
 
+      {/* Action Buttons */}
       {hasActions && (
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           {showReload && (
             <Button
               onClick={onReload}
-              className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg shadow-md transition"
+              className="h-11 px-6 font-medium bg-primary text-white hover:bg-primary/90 shadow-sm transition-all hover:shadow hover:-translate-y-0.5 rounded-lg"
             >
-              Reload
+              Reload Page
             </Button>
           )}
 
@@ -86,7 +102,7 @@ const NotFound: React.FC<NotFoundProps> = ({
             <Button
               variant="secondary"
               onClick={() => router.back()}
-              className="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 transition hover:bg-gray-100"
+              className="h-11 px-6 font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm transition-all hover:-translate-y-0.5 rounded-lg"
             >
               Go Back
             </Button>
@@ -95,9 +111,9 @@ const NotFound: React.FC<NotFoundProps> = ({
           {showHome && (
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary/90 hover:shadow hover:-translate-y-0.5"
             >
-              Go Home
+              Back to Home
             </Link>
           )}
         </div>

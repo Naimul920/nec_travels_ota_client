@@ -309,6 +309,33 @@ export const verifyEmailAction = async (payload: {
   }
 };
 
+export const resendOtpAction = async (payload: {
+  email: string;
+  type?: string;
+}) => {
+  try {
+    const res = await httpClient.post<{ message: string }>(
+      "/auth/resend-otp",
+      {
+        email: payload.email,
+        type: payload.type || "EMAIL",
+      },
+    );
+    return {
+      success: true,
+      message: res.message || "A new verification code has been sent.",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Could not resend OTP. Please try again.",
+    };
+  }
+};
+
 export const b2bRegisterAction = async (formData: FormData) => {
   console.log("b2bRegisterAction called with formData:", formData);
   try {

@@ -12,7 +12,11 @@ import Step4 from "./Step4";
 import Stepper from "./Stepper";
 import { fullSchema, stepSchemas } from "./validation";
 import { B2BSignUpFormValues, TOTAL_STEPS } from "./types";
-import { b2bRegisterAction, verifyEmailAction } from "@/actions/auth.action";
+import {
+  b2bRegisterAction,
+  resendOtpAction,
+  verifyEmailAction,
+} from "@/actions/auth.action";
 import { verifyEmailSchema } from "@/validations/auth.validation";
 import { OtpInput } from "@/components/ui";
 import { useCurrencyStore } from "@/store/currency.store";
@@ -204,6 +208,25 @@ export default function B2BSignUp() {
     setCurrentStep((step) => Math.max(1, step - 1));
   };
 
+  const [resending, setResending] = useState(false);
+
+  const handleResendOtp = async () => {
+    if (!registeredEmail || resending) return;
+    setResending(true);
+    verifyFormik.setStatus(null);
+    try {
+      const result = await resendOtpAction({ email: registeredEmail });
+      verifyFormik.setStatus({
+        success: result.success,
+        error: result.success ? undefined : result.message,
+      });
+    } catch {
+      verifyFormik.setStatus({ error: "Failed to resend OTP. Please try again." });
+    } finally {
+      setResending(false);
+    }
+  };
+
   if (step === "verify") {
     return (
       <div className="mx-auto w-full max-w-4xl p-4">
@@ -258,6 +281,18 @@ export default function B2BSignUp() {
           >
             {verifyFormik.isSubmitting ? "Verifying..." : "Verify email"}
           </button>
+
+          <p className="text-center text-sm text-slate-500">
+            Didn&apos;t receive it?{" "}
+            <button
+              type="button"
+              onClick={handleResendOtp}
+              disabled={resending}
+              className="font-semibold text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {resending ? "Sending..." : "Resend OTP"}
+            </button>
+          </p>
         </form>
       </div>
     );

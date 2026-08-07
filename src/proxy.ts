@@ -146,6 +146,26 @@ export async function proxy(request: NextRequest) {
     }
 
     if (routeOwner === null) {
+      if (pathname === "/flight-booking") {
+        if (!isLoggedIn) {
+          return NextResponse.next();
+        }
+        if (userRole === "B2B") {
+          return NextResponse.redirect(
+            new URL(
+              `/console/b2b/flight-booking${request.nextUrl.search}`,
+              request.url,
+            ),
+          );
+        }
+        if (userRole === "ADMIN" || userRole === "SUPER_ADMIN") {
+          return NextResponse.redirect(
+            new URL(getDefaultDashboardRoute(userRole as any), request.url),
+          );
+        }
+        return NextResponse.next();
+      }
+
       if (isLoggedIn && userRole && userRole !== "B2C") {
         return NextResponse.redirect(
           new URL(getDefaultDashboardRoute(userRole as any), request.url),

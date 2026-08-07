@@ -7,7 +7,7 @@ export default function NotFoundPage() {
     <NotFound
       statusCode={404}
       title="Page Not Found"
-      description="Sorry, the page you are looking for does not exist."
+      description="The page you are looking for might have been removed, had its name changed, or is temporarily unavailable."
       showBack
       showHome
     />

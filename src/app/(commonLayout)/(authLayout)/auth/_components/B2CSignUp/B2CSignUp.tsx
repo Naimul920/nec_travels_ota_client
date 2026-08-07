@@ -7,7 +7,7 @@ import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
 import { OtpInput } from "@/components/ui";
-import { b2cRegisterAction, verifyEmailAction } from "@/actions/auth.action";
+import { b2cRegisterAction, resendOtpAction, verifyEmailAction } from "@/actions/auth.action";
 import {
   b2cRegisterSchema,
   verifyEmailSchema,
@@ -106,6 +106,25 @@ export default function B2CSignUp() {
     registerFormik.touched[name] && registerFormik.errors[name]
       ? registerFormik.errors[name]
       : undefined;
+
+  const [resending, setResending] = useState(false);
+
+  const handleResendOtp = async () => {
+    if (!registeredEmail || resending) return;
+    setResending(true);
+    verifyFormik.setStatus(null);
+    try {
+      const result = await resendOtpAction({ email: registeredEmail });
+      verifyFormik.setStatus({
+        success: result.success,
+        error: result.success ? undefined : result.message,
+      });
+    } catch {
+      verifyFormik.setStatus({ error: "Failed to resend OTP. Please try again." });
+    } finally {
+      setResending(false);
+    }
+  };
 
   useEffect(() => {
     if (registerFormik.values.currency_Id || !selectedCurrencyId) return;
@@ -265,10 +284,11 @@ export default function B2CSignUp() {
             Didn&apos;t receive it?{" "}
             <button
               type="button"
-              onClick={() => setStep("register")}
-              className="font-semibold text-brand hover:underline"
+              onClick={handleResendOtp}
+              disabled={resending}
+              className="font-semibold text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Try again
+              {resending ? "Sending..." : "Resend OTP"}
             </button>
           </p>
         </form>

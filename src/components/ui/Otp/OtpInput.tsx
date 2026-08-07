@@ -47,25 +47,27 @@ const OtpInput: React.FC<OtpInputProps> = ({
   return (
     <div className={clsx("w-full", className)}>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+        <label className="mb-1.5 block text-center text-sm font-medium text-gray-700">
           {label}
         </label>
       )}
-      <Input.OTP
-        length={length}
-        value={value}
-        onChange={onChange}
-        onInput={onInput}
-        disabled={disabled}
-        status={effectiveStatus}
-        mask={mask}
-        size={size}
-        separator={separator}
-        autoComplete={autoComplete}
-        style={style}
-      />
+      <div className="flex justify-center">
+        <Input.OTP
+          length={length}
+          value={value}
+          onChange={onChange}
+          onInput={onInput}
+          disabled={disabled}
+          status={effectiveStatus}
+          mask={mask}
+          size={size}
+          separator={separator}
+          autoComplete={autoComplete}
+          style={style}
+        />
+      </div>
       {error && errorMessage && (
-        <p className="mt-1 text-sm text-red-500">{errorMessage}</p>
+        <p className="mt-1 text-center text-sm text-red-500">{errorMessage}</p>
       )}
     </div>
   );

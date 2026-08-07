@@ -9,7 +9,11 @@ import { FiEye, FiEyeOff, FiLock, FiMail, FiSend } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
 import { OtpInput } from "@/components/ui";
-import { loginAction, verifyEmailAction } from "@/actions/auth.action";
+import {
+  loginAction,
+  resendOtpAction,
+  verifyEmailAction,
+} from "@/actions/auth.action";
 import { useAuthStore } from "@/store/auth.store";
 import {
   loginValidationSchema,
@@ -86,6 +90,7 @@ export default function SignIn({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
 
   const { mutateAsync: login, isPending } = useMutation({
     mutationFn: (payload: SignInFormValues) =>
@@ -122,6 +127,25 @@ export default function SignIn({
       }
     },
   });
+
+  const handleResendOtp = async () => {
+    if (!verifyEmail || resending) return;
+    setResending(true);
+    verifyFormik.setStatus(null);
+    try {
+      const result = await resendOtpAction({ email: verifyEmail });
+      verifyFormik.setStatus({
+        success: result.success,
+        error: result.success ? undefined : result.message,
+      });
+    } catch {
+      verifyFormik.setStatus({
+        error: "Failed to resend OTP. Please try again.",
+      });
+    } finally {
+      setResending(false);
+    }
+  };
 
   const formik = useFormik<SignInFormValues>({
     initialValues,
@@ -345,6 +369,15 @@ export default function SignIn({
               </button>
 
               <p className="text-center text-sm text-[#5B6B7A]">
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={resending}
+                  className="font-semibold text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {resending ? "Sending..." : "Resend OTP"}
+                </button>
+                <span className="mx-2 text-[#C7CED6]">•</span>
                 <button
                   type="button"
                   onClick={() => {
