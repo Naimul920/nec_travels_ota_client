@@ -24,7 +24,7 @@ interface Props {
   ) => void;
 }
 
-const MAX_TRAVELERS = 7;
+const MAX_TRAVELERS = 9;
 
 const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);

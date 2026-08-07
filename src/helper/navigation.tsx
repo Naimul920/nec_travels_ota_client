@@ -320,12 +320,12 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
           path: "/all",
           label: "All Packages",
           icon: <FaBoxOpen />,
-        },
-        {
-          path: "/create",
-          label: "Create Package",
-          icon: <FaPlusCircle />,
-        },
+        }
+        // {
+        //   path: "/create",
+        //   label: "Create Package",
+        //   icon: <FaPlusCircle />,
+        // },
       ],
     },
     {

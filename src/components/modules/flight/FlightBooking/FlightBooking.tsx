@@ -42,19 +42,23 @@ import FlightCard from "../Card/FlightCard";
 import { getSearchExpiry } from "@/utils/searchCountdown";
 import { FaArrowLeft, FaEye } from "react-icons/fa";
 
-const PASSENGER_TYPE_MAP: Record<string, string> = {
-  adult: "ADT",
-  child: "C07",
-  kid: "C03",
-  infant: "INF",
-};
-
 const TYPE_LABEL: Record<string, string> = {
   adult: "Adult",
   child: "Child",
   kid: "Kid",
   infant: "Infant",
 };
+
+// Passenger type keys used throughout — single source of truth so we never
+// destructure a key that doesn't exist on `values`.
+const PASSENGER_TYPES = ["adult", "child", "kid", "infant"] as const;
+type PassengerTypeKey = (typeof PASSENGER_TYPES)[number];
+
+/** Safely read a passenger array off form values, defaulting to []. */
+const safeList = (
+  values: BookingFormValues | undefined,
+  type: PassengerTypeKey,
+): Passenger[] => values?.[type] ?? [];
 
 const LeadPassengerPrefill: React.FC = () => {
   const { values, setFieldValue } = useFormikContext<BookingFormValues>();
@@ -63,23 +67,25 @@ const LeadPassengerPrefill: React.FC = () => {
   const applied = useRef(false);
 
   useEffect(() => {
-    const lead = values.adult?.[0];
+    const lead = safeList(values, "adult")[0];
     const country = geo?.countryCode;
     if ((!user && !country) || !lead || applied.current) return;
+
     const patch: Partial<Passenger> = {};
     if (!lead.firstname && user?.first_name) patch.firstname = user.first_name;
     if (!lead.lastname && user?.last_name) patch.lastname = user.last_name;
     if (!lead.email && user?.email) patch.email = user.email;
     if (!lead.phone && user?.phone) patch.phone = user.phone;
     if (!lead.country && country) patch.country = country;
+
     if (Object.keys(patch).length > 0) {
       Object.entries(patch).forEach(([key, val]) =>
         setFieldValue(`adult.0.${key}`, val),
       );
     }
 
-    (["adult", "child", "kid", "infant"] as const).forEach((type) => {
-      values[type].forEach((p, i) => {
+    PASSENGER_TYPES.forEach((type) => {
+      safeList(values, type).forEach((p, i) => {
         if (!p.country && country) {
           setFieldValue(`${type}.${i}.country`, country);
         }
@@ -87,7 +93,7 @@ const LeadPassengerPrefill: React.FC = () => {
     });
 
     applied.current = true;
-  }, [user, geo, values.adult, setFieldValue]);
+  }, [user, geo, values, setFieldValue]);
 
   return null;
 };
@@ -95,8 +101,8 @@ const LeadPassengerPrefill: React.FC = () => {
 const validateBooking = (values: BookingFormValues) => {
   const errors: Record<string, string> = {};
 
-  (["adult", "child", "kid", "infant"] as const).forEach((type) => {
-    values[type].forEach((p, index) => {
+  PASSENGER_TYPES.forEach((type) => {
+    safeList(values, type).forEach((p, index) => {
       const base = `${type}.${index}`;
       const label = TYPE_LABEL[type];
       const age = calculateAge(p.date_of_birth);
@@ -120,6 +126,11 @@ const validateBooking = (values: BookingFormValues) => {
       } else if (range.max !== null && age !== null && age > range.max) {
         errors[`${base}.date_of_birth`] =
           `${label} must be at most ${range.max} years old`;
+      }
+
+      if (type === "adult" && index === 0 && age !== null && age < 18) {
+        errors[`${base}.date_of_birth`] =
+          "Lead passenger must be 18 years or older";
       }
 
       if (!p.country)
@@ -309,9 +320,11 @@ const FlightBooking: React.FC = () => {
     };
   }, [searchInfoParams]);
 
-  const buildSegments = (itin: Itinerary): BookingSegment[] => {
+  /** Guards against itineraries missing flightDetails/schedules (undefined.length / undefined.map). */
+  const buildSegments = (itin: Itinerary | undefined): BookingSegment[] => {
+    if (!itin?.flightDetails) return [];
     return itin.flightDetails.flatMap((fd) =>
-      fd.schedules.map((s) => ({
+      (fd.schedules ?? []).map((s) => ({
         origin: s.departure.airport,
         destination: s.arrival.airport,
         departure_date_time: s.departureDateTime,
@@ -325,11 +338,12 @@ const FlightBooking: React.FC = () => {
 
   const buildRevalidatePayload = (
     itin: Itinerary,
+    values: BookingFormValues,
   ): RevalidateItineraryPayload => {
     const sale = itin.saleCurrencyAmount;
-    const flightDetails = itin.flightDetails.map((detail) => ({
+    const flightDetails = (itin.flightDetails ?? []).map((detail) => ({
       elapsedTime: detail.elapsedTime,
-      schedules: detail.schedules.map((s) => ({
+      schedules: (detail.schedules ?? []).map((s) => ({
         flightName: s.flightName,
         bookingCode: s.bookingCode,
         cabinCode: s.cabinCode,
@@ -350,22 +364,24 @@ const FlightBooking: React.FC = () => {
         arrivalDateTime: s.arrivalDateTime,
       })),
     }));
+    const fareBreakDown = itin.passengerFareBreakDown ?? [];
+
     return {
       tripType: searchInfoParams.get("tripType") || "oneway",
       from:
         searchInfoParams.get("from") ||
-        itin.flightDetails[0]?.schedules[0]?.departure.airport ||
+        itin.flightDetails?.[0]?.schedules?.[0]?.departure.airport ||
         "",
       to:
         searchInfoParams.get("to") ||
-        itin.flightDetails[0]?.schedules[0]?.arrival.airport ||
+        itin.flightDetails?.[0]?.schedules?.[0]?.arrival.airport ||
         "",
-      noOfAdult: Number(searchInfoParams.get("adult") || 1),
-      noOfChildren: Number(searchInfoParams.get("child") || 0),
-      noOfKids: Number(searchInfoParams.get("kid") || 0),
-      noOfInfant: Number(searchInfoParams.get("infant") || 0),
+      noOfAdult: safeList(values, "adult").length,
+      noOfChildren: safeList(values, "child").length,
+      noOfKids: safeList(values, "kid").length,
+      noOfInfant: safeList(values, "infant").length,
       itinDetail: { flightDetails },
-      passengerFareBreakDown: itin.passengerFareBreakDown,
+      passengerFareBreakDown: fareBreakDown,
       saleCurrencyAmount: {
         totalAmount:
           sale?.offerAmount ?? sale?.totalAmount ?? sale?.baseAmount ?? 0,
@@ -409,13 +425,10 @@ const FlightBooking: React.FC = () => {
     }
 
     const allPassengers: BookingPassenger[] = [];
-    (["adult", "child", "kid", "infant"] as const).forEach((type) => {
-      values[type].forEach((p) => {
+    PASSENGER_TYPES.forEach((type) => {
+      safeList(values, type).forEach((p) => {
         const age = calculateAge(p.date_of_birth);
-        const typeCode =
-          type === "child" || type === "kid"
-            ? getPassengerTypeByAge(age)
-            : PASSENGER_TYPE_MAP[type];
+        const typeCode = getPassengerTypeByAge(age);
         allPassengers.push(toBookingPassenger(p, typeCode));
       });
     });
@@ -427,14 +440,14 @@ const FlightBooking: React.FC = () => {
     }
     const leadPassengerWithContact: LeadPassenger = {
       ...leadPassenger,
-      email: values.adult[0]?.email,
-      phone: values.adult[0]?.phone,
+      email: safeList(values, "adult")[0]?.email,
+      phone: safeList(values, "adult")[0]?.phone,
     };
 
     setIsBooking(true);
     try {
       const revalidateResult = await revalidateItineraryAction(
-        buildRevalidatePayload(itinerary),
+        buildRevalidatePayload(itinerary, values),
       );
       if (!revalidateResult.success || !revalidateResult.data?.quoteId) {
         message.error(
@@ -553,16 +566,18 @@ const FlightBooking: React.FC = () => {
         validateOnChange={false}
         onSubmit={handleSubmit}
       >
-        {({ values, submitForm }) => {
+        {({ values }) => {
           const travelerSummary = [
-            { n: values.adult.length, label: "Adult" },
-            { n: values.child.length, label: "Child" },
-            { n: values.kid.length, label: "Kid" },
-            { n: values.infant.length, label: "Infant" },
+            { n: safeList(values, "adult").length, label: "Adult" },
+            { n: safeList(values, "child").length, label: "Child" },
+            { n: safeList(values, "kid").length, label: "Kid" },
+            { n: safeList(values, "infant").length, label: "Infant" },
           ].filter((t) => t.n > 0);
 
           return (
             <Form>
+              <LeadPassengerPrefill />
+
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
                 <div className="space-y-6 lg:col-span-2">
                   <TravelersForm />
@@ -615,15 +630,9 @@ const FlightBooking: React.FC = () => {
                         accounts. Please sign in with a B2C or B2B account to
                         complete your booking.
                       </div>
-                    ) : isB2C ? (
-                      <div className="rounded-lg bg-amber-50 px-4 py-3 text-center text-xs font-medium text-amber-700">
-                        Online payment is coming soon. Please check back shortly
-                        to complete your booking.
-                      </div>
                     ) : (
                       <Button
                         type="submit"
-                        onClick={submitForm}
                         disabled={!acceptedTerms}
                         isLoading={isBooking}
                         className="w-full py-3 !text-sm"

@@ -204,7 +204,7 @@ const BookingSuccess: React.FC<Props> = ({
           <FiHome /> Back to Home
         </Link>
         <Link
-          href="/flight-search"
+          href="/"
           className="inline-flex h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-700 transition hover:border-gray-400"
         >
           <FiSearch /> Search Another Flight

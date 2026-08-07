@@ -9,9 +9,9 @@ export const AGE_RANGES: Record<
   { min: number | null; max: number | null; label: string }
 > = {
   adult: { min: 12, max: null, label: "12 years & above" },
-  child: { min: 7, max: 11, label: "7 to 11 years" },
-  kid: { min: 2, max: 6, label: "2 to 6 years" },
-  infant: { min: 0, max: 2, label: "0 to 2 year" },
+  child: { min: 5, max: 11, label: "5 to 11 years" },
+  kid: { min: 2, max: 4, label: "2 to 4 years" },
+  infant: { min: 0, max: 1, label: "0 to 1 year" },
 };
 
 export function calculateAge(
@@ -56,8 +56,8 @@ export function getPassportExpiryDisabledDate(): (current: Dayjs) => boolean {
 
 export function getPassengerTypeByAge(age: number | null): PassengerTypeCode {
   if (age === null) return "ADT";
-  if (age < 2) return "INF";
-  if (age <= 6) return "C03";
+  if (age <= 1) return "INF";
+  if (age <= 4) return "C03";
   if (age <= 11) return "C07";
   return "ADT";
 }

@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
+import { OtpInput } from "@/components/ui";
 import { b2cRegisterAction, verifyEmailAction } from "@/actions/auth.action";
 import {
   b2cRegisterSchema,
@@ -241,29 +242,15 @@ export default function B2CSignUp() {
           )}
 
           <div>
-            <label htmlFor="otp" className="mb-1.5 block text-sm font-medium text-slate-700">
-              OTP Code
-            </label>
-            <div className="relative">
-              <FiLock
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                size={18}
-              />
-              <input
-                id="otp"
-                type="text"
-                placeholder="123456"
-                {...verifyFormik.getFieldProps("otp")}
-                className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm outline-none transition-colors ${
-                  verifyFormik.touched.otp && verifyFormik.errors.otp
-                    ? "border-rose-300 bg-rose-50"
-                    : "border-slate-200 bg-white focus:border-brand"
-                }`}
-              />
-            </div>
-            {verifyFormik.touched.otp && verifyFormik.errors.otp && (
-              <p className="mt-1 text-xs text-rose-500">{verifyFormik.errors.otp}</p>
-            )}
+            <OtpInput
+              label="OTP Code"
+              length={6}
+              value={verifyFormik.values.otp}
+              onChange={(v) => verifyFormik.setFieldValue("otp", v)}
+              onBlur={() => verifyFormik.setFieldTouched("otp", true)}
+              error={verifyFormik.touched.otp && !!verifyFormik.errors.otp}
+              errorMessage={verifyFormik.errors.otp as string | undefined}
+            />
           </div>
 
           <button

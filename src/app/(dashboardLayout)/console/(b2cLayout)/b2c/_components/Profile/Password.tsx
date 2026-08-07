@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import clsx from "clsx";
 import { App } from "antd";
 import { Button, Input } from "@/components/ui";
-import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiLock, FiEye, FiEyeOff, FiShield } from "react-icons/fi";
 import { changePasswordAction } from "@/actions/user.action";
 
 const Password: React.FC = () => {
@@ -52,122 +52,129 @@ const Password: React.FC = () => {
     },
   });
 
+  const inputClass = (hasError: boolean) =>
+    clsx(
+      "rounded-lg",
+      hasError ? "border-red-500" : "border-gray-200",
+    );
+
+  const hasError = (touched: boolean | undefined, error: string | undefined) =>
+    !!touched && !!error;
+
   return (
-    <div className="md:px-0">
-      <div className=" w-full rounded">
-        {/* Header */}
-        <div className="mb-3">
-          <h1 className="text-gray-950 md:text-2xl text-lg font-bold">
-            Change Password
-          </h1>
+    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+      {/* Header band */}
+      <div className="flex items-center gap-3 border-b border-gray-100 bg-gradient-to-r from-[#0F1B47] to-[#1B2E5F] px-6 py-5">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-[#F5C518]">
+          <FiShield size={19} />
+        </span>
+        <div>
+          <h1 className="text-lg font-bold text-white">Change Password</h1>
+          <p className="text-xs text-white/60">
+            Keep your account secure with a strong password
+          </p>
         </div>
-
-        {/* Form */}
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
-          {/* Current Password */}
-          <Input
-            type={showCurrent ? "text" : "password"}
-            placeholder="Current Password"
-            iconLeft={<FiLock />}
-            iconRight={
-              showCurrent ? (
-                <FiEyeOff
-                  onClick={() => setShowCurrent(false)}
-                  className="cursor-pointer"
-                />
-              ) : (
-                <FiEye
-                  onClick={() => setShowCurrent(true)}
-                  className="cursor-pointer"
-                />
-              )
-            }
-            className={clsx(
-              "bg-white border-primary rounded",
-              formik.touched.currentPassword &&
-                formik.errors.currentPassword &&
-                "border-red-500",
-            )}
-            error={
-              !!formik.touched.currentPassword &&
-              !!formik.errors.currentPassword
-            }
-            errorMessage={formik.errors.currentPassword}
-            {...formik.getFieldProps("currentPassword")}
-          />
-
-          {/* New Password */}
-          <Input
-            type={showNew ? "text" : "password"}
-            placeholder="New Password"
-            iconLeft={<FiLock />}
-            iconRight={
-              showNew ? (
-                <FiEyeOff
-                  onClick={() => setShowNew(false)}
-                  className="cursor-pointer"
-                />
-              ) : (
-                <FiEye
-                  onClick={() => setShowNew(true)}
-                  className="cursor-pointer"
-                />
-              )
-            }
-            className={clsx(
-              "bg-white border-primary rounded",
-              formik.touched.newPassword &&
-                formik.errors.newPassword &&
-                "border-red-500",
-            )}
-            error={!!formik.touched.newPassword && !!formik.errors.newPassword}
-            errorMessage={formik.errors.newPassword}
-            {...formik.getFieldProps("newPassword")}
-          />
-
-          {/* Confirm Password */}
-          <Input
-            type={showConfirm ? "text" : "password"}
-            placeholder="Confirm Password"
-            iconLeft={<FiLock />}
-            iconRight={
-              showConfirm ? (
-                <FiEyeOff
-                  onClick={() => setShowConfirm(false)}
-                  className="cursor-pointer"
-                />
-              ) : (
-                <FiEye
-                  onClick={() => setShowConfirm(true)}
-                  className="cursor-pointer"
-                />
-              )
-            }
-            className={clsx(
-              "bg-white border-primary rounded",
-              formik.touched.confirmPassword &&
-                formik.errors.confirmPassword &&
-                "border-red-500",
-            )}
-            error={
-              !!formik.touched.confirmPassword &&
-              !!formik.errors.confirmPassword
-            }
-            errorMessage={formik.errors.confirmPassword}
-            {...formik.getFieldProps("confirmPassword")}
-          />
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-full py-3 font-semibold rounded-lg"
-            disabled={formik.isSubmitting}
-          >
-            {formik.isSubmitting ? "Submit..." : "Submit"}
-          </Button>
-        </form>
       </div>
+
+      {/* Form */}
+      <form onSubmit={formik.handleSubmit} className="space-y-4 px-6 py-6">
+        {/* Current Password */}
+        <Input
+          type={showCurrent ? "text" : "password"}
+          placeholder="Current Password"
+          label="Current Password"
+          iconLeft={<FiLock />}
+          iconRight={
+            showCurrent ? (
+              <FiEyeOff
+                onClick={() => setShowCurrent(false)}
+                className="cursor-pointer"
+              />
+            ) : (
+              <FiEye
+                onClick={() => setShowCurrent(true)}
+                className="cursor-pointer"
+              />
+            )
+          }
+          className={inputClass(
+            hasError(formik.touched.currentPassword, formik.errors.currentPassword),
+          )}
+          error={
+            !!formik.touched.currentPassword &&
+            !!formik.errors.currentPassword
+          }
+          errorMessage={formik.errors.currentPassword}
+          {...formik.getFieldProps("currentPassword")}
+        />
+
+        {/* New Password */}
+        <Input
+          type={showNew ? "text" : "password"}
+          placeholder="New Password"
+          label="New Password"
+          iconLeft={<FiLock />}
+          iconRight={
+            showNew ? (
+              <FiEyeOff
+                onClick={() => setShowNew(false)}
+                className="cursor-pointer"
+              />
+            ) : (
+              <FiEye
+                onClick={() => setShowNew(true)}
+                className="cursor-pointer"
+              />
+            )
+          }
+          className={inputClass(
+            hasError(formik.touched.newPassword, formik.errors.newPassword),
+          )}
+          error={!!formik.touched.newPassword && !!formik.errors.newPassword}
+          errorMessage={formik.errors.newPassword}
+          {...formik.getFieldProps("newPassword")}
+        />
+
+        {/* Confirm Password */}
+        <Input
+          type={showConfirm ? "text" : "password"}
+          placeholder="Confirm Password"
+          label="Confirm Password"
+          iconLeft={<FiLock />}
+          iconRight={
+            showConfirm ? (
+              <FiEyeOff
+                onClick={() => setShowConfirm(false)}
+                className="cursor-pointer"
+              />
+            ) : (
+              <FiEye
+                onClick={() => setShowConfirm(true)}
+                className="cursor-pointer"
+              />
+            )
+          }
+          className={inputClass(
+            hasError(formik.touched.confirmPassword, formik.errors.confirmPassword),
+          )}
+          error={
+            !!formik.touched.confirmPassword &&
+            !!formik.errors.confirmPassword
+          }
+          errorMessage={formik.errors.confirmPassword}
+          {...formik.getFieldProps("confirmPassword")}
+        />
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          variant="primary"
+          className="w-full py-3 font-semibold rounded-lg"
+          disabled={formik.isSubmitting}
+        >
+          {formik.isSubmitting ? "Submitting..." : "Change Password"}
+        </Button>
+      </form>
     </div>
   );
 };

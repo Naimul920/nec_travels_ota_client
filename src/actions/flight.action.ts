@@ -57,6 +57,7 @@ export const bookFlightAction = async (
   payload: BookFlightPayload,
 ): Promise<FlightBookingResponse> => {
   try {
+    console.log("flight book payload 888888888888",JSON.stringify(payload))
     const res = await httpClient.post<FlightBookingResponse["data"]>(
       "/api/v1/flights/book",
       payload,

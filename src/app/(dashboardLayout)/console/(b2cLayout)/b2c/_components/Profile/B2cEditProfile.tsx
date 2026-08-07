@@ -3,8 +3,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card, App } from "antd";
 import Image from "next/image";
-import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose, AiOutlineUser, AiOutlineCamera } from "react-icons/ai";
-import clsx from "clsx";
+import {
+  AiOutlineEdit,
+  AiOutlineCheck,
+  AiOutlineClose,
+  AiOutlineUser,
+  AiOutlineCamera,
+  AiOutlineMail,
+  AiOutlinePhone,
+} from "react-icons/ai";
+import { FiUser, FiAtSign } from "react-icons/fi";
 import { Input } from "@/components/ui";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useAuthStore } from "@/store/auth.store";
@@ -147,93 +155,80 @@ const B2cEditProfile: React.FC = () => {
 
   const image = userProfile?.profile?.image || user?.image;
   const displayImage = previewUrl || image;
+  const fullName = `${profile.first_name} ${profile.last_name}`.trim() || "Your Name";
 
-  const renderRow = (
-    label: string,
-    value: string,
-    field: keyof ProfileData,
-    type: string = "text",
-    readOnly?: boolean,
-  ) => (
-    <tr className="border-b border-b-tertiary/10 last:border-b-0">
-      <td className="w-1/3 px-4 py-3 font-medium text-gray-600">{label}</td>
-      <td className="px-4 py-3">
-        <Input
-          type={type}
-          value={value}
-          disabled={!isEditing || readOnly}
-          onChange={(e) => handleChange(field, e.target.value)}
-          className={clsx(
-            "w-full rounded border px-3 py-2 transition",
-            isEditing && !readOnly
-              ? "border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-              : "cursor-not-allowed border-transparent bg-gray-100",
-          )}
-        />
-      </td>
-    </tr>
-  );
+  const inputClass = (isActive: boolean) =>
+    isActive
+      ? "border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+      : "cursor-default border-transparent bg-gray-50";
 
   return (
-    <Card className="w-full border! border-primary! rounded-lg md:max-w-5/6">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="line-clamp-1 text-lg font-semibold text-gray-800">
-          Profile Information
-        </h1>
+    <Card
+      className="overflow-hidden rounded-2xl border! border-gray-100! shadow-sm"
+      styles={{ body: { padding: 0 } }}
+    >
+      {/* Header band */}
+      <div className="flex items-center justify-between gap-3 border-b border-gray-100 bg-gradient-to-r from-[#0F1B47] to-[#1B2E5F] px-6 py-5">
+        <div>
+          <h1 className="text-lg font-bold text-white">Profile Information</h1>
+          <p className="text-xs text-white/60">
+            Manage your personal details and profile photo
+          </p>
+        </div>
 
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
+            className="flex items-center gap-1.5 rounded-lg bg-[#F5C518] px-4 py-2 text-sm font-bold text-[#0F1B47] transition-all hover:opacity-90"
           >
-            <AiOutlineEdit /> Edit
+            <AiOutlineEdit size={15} /> Edit
           </button>
         ) : (
           <div className="flex gap-2">
             <button
               onClick={handleUpdate}
               disabled={isUpdating}
-              className="flex items-center gap-1 text-primary hover:opacity-65 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <AiOutlineCheck /> {isUpdating ? "Updating..." : "Update"}
+              <AiOutlineCheck size={15} />
+              {isUpdating ? "Updating..." : "Update"}
             </button>
             <button
               onClick={handleCancel}
-              className="flex items-center gap-1 text-secondary hover:opacity-65"
+              className="flex items-center gap-1.5 rounded-lg bg-white/15 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-white/25"
             >
-              <AiOutlineClose /> Cancel
+              <AiOutlineClose size={15} /> Cancel
             </button>
           </div>
         )}
       </div>
 
-      <div className="mb-6 flex items-center gap-5">
-        <div className="relative">
-          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gray-100">
+      {/* Identity section */}
+      <div className="flex flex-col items-center gap-5 border-b border-gray-100 px-6 py-6 sm:flex-row sm:items-center">
+        <div className="relative shrink-0">
+          <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 border-[#DCEBF9] bg-gray-100 ring-2 ring-[#0F1B47]/5">
             {displayImage ? (
               <Image
                 src={displayImage}
                 alt="Profile"
-                width={80}
-                height={80}
+                width={96}
+                height={96}
                 className="h-full w-full object-cover"
               />
             ) : (
-              <AiOutlineUser className="text-3xl text-gray-400" />
+              <AiOutlineUser className="text-4xl text-gray-300" />
             )}
           </div>
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="absolute -bottom-0.5 -right-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-md transition-colors hover:bg-[#F7F4EC] hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isUploading ? (
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
-            ) : displayImage ? (
-              <AiOutlineCamera size={14} />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
             ) : (
-              <AiOutlineEdit size={14} />
+              <AiOutlineCamera size={15} />
             )}
           </button>
           <input
@@ -244,26 +239,71 @@ const B2cEditProfile: React.FC = () => {
             onChange={handleImageSelect}
           />
         </div>
-        <div>
-          <p className="font-medium text-gray-800">
-            {profile.first_name} {profile.last_name}
-          </p>
-          <p className="text-sm text-gray-500">{profile.email}</p>
+
+        <div className="text-center sm:text-left">
+          <p className="text-lg font-bold text-[#0F1B47]">{fullName}</p>
+          <div className="mt-1.5 flex flex-col items-center gap-1 text-sm text-[#6B7785] sm:items-start">
+            <span className="inline-flex items-center gap-1.5">
+              <FiAtSign size={13} className="text-[#8FA9BE]" />
+              {profile.email || "—"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <AiOutlinePhone size={13} className="text-[#8FA9BE]" />
+              {profile.phone || "—"}
+            </span>
+          </div>
           {selectedFile && (
-            <p className="mt-1 text-xs text-primary">{selectedFile.name}</p>
+            <p className="mt-1.5 text-xs text-primary">{selectedFile.name}</p>
           )}
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full rounded-lg border border-tertiary/10">
-          <tbody>
-            {renderRow("First Name", profile.first_name, "first_name")}
-            {renderRow("Last Name", profile.last_name, "last_name")}
-            {renderRow("Email", profile.email, "email", "email", true)}
-            {renderRow("Phone", profile.phone, "phone", "tel")}
-          </tbody>
-        </table>
+      {/* Fields */}
+      <div className="px-6 py-6">
+        <div className="mb-4 flex items-center gap-2 text-sm font-bold text-[#0F1B47]">
+          <FiUser size={15} className="text-[#8FA9BE]" />
+          Personal Details
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            label="First Name"
+            value={profile.first_name}
+            disabled={!isEditing}
+            onChange={(e) => handleChange("first_name", e.target.value)}
+            iconLeft={<FiUser />}
+            className={inputClass(isEditing)}
+          />
+          <Input
+            label="Last Name"
+            value={profile.last_name}
+            disabled={!isEditing}
+            onChange={(e) => handleChange("last_name", e.target.value)}
+            iconLeft={<FiUser />}
+            className={inputClass(isEditing)}
+          />
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Input
+            label="Email"
+            type="email"
+            value={profile.email}
+            disabled
+            onChange={(e) => handleChange("email", e.target.value)}
+            iconLeft={<AiOutlineMail />}
+            className="cursor-not-allowed border-transparent bg-gray-50 opacity-70"
+          />
+          <Input
+            label="Phone"
+            type="tel"
+            value={profile.phone}
+            disabled={!isEditing}
+            onChange={(e) => handleChange("phone", e.target.value)}
+            iconLeft={<AiOutlinePhone />}
+            className={inputClass(isEditing)}
+          />
+        </div>
       </div>
     </Card>
   );

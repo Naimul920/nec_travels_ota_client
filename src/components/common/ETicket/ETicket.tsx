@@ -76,7 +76,7 @@ function resolveImageSrc(src?: string | null): string | undefined {
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <div className="bg-emerald-800 text-white font-semibold px-4 py-2 text-sm tracking-wide">
+    <div className="bg-[#167236] text-white font-semibold px-4 py-2 text-sm tracking-wide">
       {title}
     </div>
   );
@@ -125,9 +125,12 @@ function TicketHeader({ booking }: { booking: BookingItem }) {
             className="h-16 max-w-[200px] object-contain"
           />
         ) : (
-          <div className="border border-emerald-600 rounded p-3 text-center text-emerald-700 font-bold text-sm tracking-wider">
-            {(agency?.agency_name as ReactNode) ?? "TRAVEL AGENCY"}
-          </div>
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src="/assets/images/logo.png"
+            alt="NEC Travels"
+            className="h-16 max-w-[200px] object-contain"
+          />
         )}
       </div>
     </div>
@@ -152,7 +155,7 @@ function PassengerTable({ booking }: { booking: BookingItem }) {
               <th className="px-3 py-2 border-r border-gray-300 text-center">
                 Airline PNR
               </th>
-              <th className="px-3 py-2 text-emerald-800">Ticket No</th>
+              <th className="px-3 py-2 text-[#167236]">Ticket No</th>
             </tr>
           </thead>
           <tbody>
@@ -162,7 +165,7 @@ function PassengerTable({ booking }: { booking: BookingItem }) {
 
               return (
                 <tr key={p.id ?? index} className="border-b last:border-b-0 border-gray-300">
-                  <td className="px-3 py-2 border-r border-gray-300 text-emerald-800 font-medium">
+                  <td className="px-3 py-2 border-r border-gray-300 text-[#167236] font-medium">
                     {index === 0 ? "Passenger" : "Co Passenger"}
                   </td>
                   <td className="px-3 py-2 border-r border-gray-300 font-semibold uppercase">
@@ -181,7 +184,7 @@ function PassengerTable({ booking }: { booking: BookingItem }) {
                     </td>
                   )}
 
-                  <td className="px-3 py-2 text-emerald-700 font-semibold">
+                  <td className="px-3 py-2 text-[#167236] font-semibold">
                     {(p.ticket_number as ReactNode) ?? "Pending"}
                   </td>
                 </tr>
@@ -345,7 +348,7 @@ export default function ETicket({ booking }: ETicketProps) {
         <span>
           Reservation PNR: <strong className="text-gray-900 font-bold">{(gds_pnr as ReactNode) ?? "-"}</strong>{" "}
           {isConfirmed && (
-            <span className="text-emerald-600 font-semibold ml-2 inline-flex items-center gap-1">
+            <span className="text-[#167236] font-semibold ml-2 inline-flex items-center gap-1">
               ✓ Confirmed
             </span>
           )}
