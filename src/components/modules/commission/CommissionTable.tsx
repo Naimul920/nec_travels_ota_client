@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { App, ConfigProvider, Table as AntTable, Skeleton } from "antd";
+import { App, ConfigProvider, Table as AntTable, Skeleton, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import PlusOutlined from "@ant-design/icons/es/icons/PlusOutlined";
+import { AiFillDelete, AiOutlineEdit } from "react-icons/ai";
 import { Button } from "@/components/ui";
-import ActionButton from "@/components/common/Action/ActionButton";
 import TableHeader from "@/components/common/Table/TableHeader";
 import CommissionModal from "./CommissionModal";
 import {
@@ -130,24 +130,33 @@ const CommissionTable: React.FC = () => {
       render: formatDate,
     },
     {
+      title: "Updated",
+      dataIndex: "updated_at",
+      key: "updated_at",
+      render: formatDate,
+    },
+    {
       title: "Action",
       key: "action",
       align: "center",
       width: 140,
       render: (_, record) => (
-        <ActionButton
-          editContent={
-            <CommissionModal
-              open
-              editing={record}
-              onClose={() => setEditing(null)}
-              onSaved={fetchData}
-              packageOptions={packageOptions}
-              currencyOptions={currencyOptions}
+        <div className="flex items-center justify-center gap-2">
+          <Tooltip title="Edit" color="#000">
+            <AiOutlineEdit
+              size={20}
+              className="cursor-pointer text-blue-600"
+              onClick={() => openEdit(record)}
             />
-          }
-          handleDelete={() => handleDelete(record.id)}
-        />
+          </Tooltip>
+          <Tooltip title="Delete" color="#000">
+            <AiFillDelete
+              size={20}
+              className="cursor-pointer text-red-600"
+              onClick={() => handleDelete(record.id)}
+            />
+          </Tooltip>
+        </div>
       ),
     },
   ];
@@ -155,6 +164,16 @@ const CommissionTable: React.FC = () => {
   const openCreate = () => {
     setEditing(null);
     setIsModalOpen(true);
+  };
+
+  const openEdit = (record: CommissionItem) => {
+    setEditing(record);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setEditing(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -211,16 +230,14 @@ const CommissionTable: React.FC = () => {
         )}
       </div>
 
-      {!editing && (
-        <CommissionModal
-          open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSaved={fetchData}
-          editing={null}
-          packageOptions={packageOptions}
-          currencyOptions={currencyOptions}
-        />
-      )}
+      <CommissionModal
+        open={isModalOpen}
+        onClose={closeModal}
+        onSaved={fetchData}
+        editing={editing}
+        packageOptions={packageOptions}
+        currencyOptions={currencyOptions}
+      />
     </ConfigProvider>
   );
 };

@@ -314,13 +314,10 @@ export const resendOtpAction = async (payload: {
   type?: string;
 }) => {
   try {
-    const res = await httpClient.post<{ message: string }>(
-      "/auth/resend-otp",
-      {
-        email: payload.email,
-        type: payload.type || "EMAIL",
-      },
-    );
+    const res = await httpClient.post<{ message: string }>("/auth/resend-otp", {
+      email: payload.email,
+      type: payload.type || "EMAIL",
+    });
     return {
       success: true,
       message: res.message || "A new verification code has been sent.",
@@ -337,7 +334,7 @@ export const resendOtpAction = async (payload: {
 };
 
 export const b2bRegisterAction = async (formData: FormData) => {
-  console.log("b2bRegisterAction called with formData:", formData);
+  console.log("b2bRegisterAction called with formData:", JSON.stringify(formData));
   try {
     const res = await httpClient.post<{ message: string; user_id: string }>(
       "/auth/register/b2b",
@@ -346,6 +343,7 @@ export const b2bRegisterAction = async (formData: FormData) => {
         headers: { "Content-Type": "multipart/form-data" },
       },
     );
+    console.log("res***************",res)
     return {
       success: true,
       message: res.message || "Registration submitted successfully",

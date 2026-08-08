@@ -1,5 +1,6 @@
 "use server";
 
+import { getCountryApiKey } from "@/constant";
 import { httpClient } from "@/lib/axios/httpClient";
 
 export interface CurrencyItem {
@@ -29,6 +30,7 @@ export interface UserGeo {
 export async function getCurrenciesAction(): Promise<CurrencyItem[]> {
   try {
     const res = await httpClient.get<CurrencyItem[]>("/api/v1/currency");
+    console.log("get currency from my server",res)
     return res.data || [];
   } catch (error) {
     console.error("Failed to load currencies:", error);
@@ -36,23 +38,12 @@ export async function getCurrenciesAction(): Promise<CurrencyItem[]> {
   }
 }
 
-// export async function detectUserCurrencyCode(): Promise<UserGeo | null> {
-//   try {
-//     const res = await httpClient.get<UserGeo>(
-//       "https://pro.ip-api.com/json/?key=ygX4gRsbNbvVHAu",
-//     );
-//     console.log("User Geo Data:", res.data);
-//     return res.data;
-//   } catch {
-//     return null;
-//   }
-// }
-
-export async function detectUserCurrencyCode(): Promise<UserGeo | null> {
+export async function detectUserCountry(): Promise<UserGeo | null> {
   try {
     const response = await httpClient.get<UserGeo>(
-      "https://pro.ip-api.com/json/?key=ygX4gRsbNbvVHAu",
+      `https://pro.ip-api.com/json/?key=${getCountryApiKey}`,
     );
+    console.log("response**************",response)
     return response as unknown as UserGeo;
   } catch (error) {
     console.error("Failed to detect user currency:", error);

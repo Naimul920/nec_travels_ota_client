@@ -66,7 +66,6 @@ export default function Step4({ values }: { values: B2BSignUpFormValues }) {
 
         <div className="grid gap-4 md:grid-cols-2">
           <Item icon={<FiBriefcase />} label="Agency" value={values.agency_name} />
-          <Item icon={<FiBriefcase />} label="Currency" value={values.currency} />
           <Item icon={<FiBriefcase />} label="CAAB certificate" value={values.caab_certificate_number} />
           <Item icon={<FiMapPin />} label="City" value={values.city} />
           <Item icon={<FiMapPin />} label="Postcode" value={values.postcode} />

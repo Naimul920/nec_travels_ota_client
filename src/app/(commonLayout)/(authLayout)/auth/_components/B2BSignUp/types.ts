@@ -1,4 +1,7 @@
 export interface B2BSignUpFormValues {
+  //auto fill
+  currency_Id: string;
+
   // Step 1 — Account
   first_name: string;
   last_name: string;
@@ -11,7 +14,6 @@ export interface B2BSignUpFormValues {
   agency_name: string;
   business_type: string;
   currency: string;
-  currency_Id: string;
   caab_certificate_number: string;
   caab_certificate_expiry: string;
   city: string;
@@ -40,6 +42,10 @@ export type FileFieldName = (typeof FILE_FIELDS)[number];
 export const REQUIRED_FILE_FIELDS: FileFieldName[] = [];
 
 export const MAX_FILE_SIZE_MB = 1;
-export const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+export const ACCEPTED_FILE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "application/pdf",
+];
 
 export const TOTAL_STEPS = 4;

@@ -33,7 +33,6 @@ export const b2cRegisterSchema = Yup.object({
   password_confirmation: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords do not match")
     .required("Please confirm your password"),
-  currency_Id: Yup.string(),
 });
 
 export const verifyEmailSchema = Yup.object({

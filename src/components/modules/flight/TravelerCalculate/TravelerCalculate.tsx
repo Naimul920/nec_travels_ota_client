@@ -125,7 +125,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
 
       {/* Dropdown Panel */}
       {open && (
-        <div className="absolute z-50 mt-2 right-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-xl space-y-4 w-full md:w-96">
+        <div className="absolute z-[100] mt-2 right-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-xl space-y-4 w-full md:w-96">
           {/* Header */}
           <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">

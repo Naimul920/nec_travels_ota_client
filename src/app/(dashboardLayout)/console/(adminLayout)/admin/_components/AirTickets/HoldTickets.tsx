@@ -2,8 +2,8 @@
 
 import React, { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import { useSearch, useIssueTickets } from "@/hooks";
-import type { IssueTicketItem } from "@/actions/issueTicket.action";
+import { useSearch, useHoldPassengers } from "@/hooks";
+import type { SavedPassenger } from "@/actions/booking.action";
 import Table from "@/components/common/Table/Table";
 import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
 import ActionButton from "@/components/common/Action/ActionButton";
@@ -12,25 +12,26 @@ const HoldTickets: React.FC = () => {
   const searchParams = useSearchParams();
   const searchString = searchParams.toString();
 
-  const { data, isLoading } = useIssueTickets({
+  const { data, isLoading } = useHoldPassengers({
     page: 1,
     limit: 100,
     sortBy: "created_at",
+    sortOrder: "desc",
+    status: "HOLD",
+    booking_source: "B2B",
   });
 
   const mappedData = useMemo(() => {
-    return (data?.data ?? []).map((item: IssueTicketItem, i: number) => ({
+    return (data?.data ?? []).map((item: SavedPassenger, i: number) => ({
       key: item.id ?? i,
       sl: i + 1,
-      bookingId: item.booking_reference ?? item.booking_id ?? item.pnr ?? "-",
-      origin: item.origin ?? "",
-      destination: item.destination ?? "",
-      airline: item.airline ?? "",
-      pnr: item.gds_pnr ?? item.pnr ?? "",
-      contactNo: item.contact_no ?? item.contactNo ?? "",
-      amount: item.total_amount ?? item.amount ?? "",
-      bookedOn: formatDate(item.created_at ?? item.booked_on ?? item.bookedOn),
-      travel_date: formatDate(item.travel_date),
+      passenger: formatName(item),
+      pnr: item.passport_number ?? "-",
+      gender: item.gender ?? "-",
+      nationality: item.nationality ?? "-",
+      email: item.email ?? "-",
+      contactNo: item.phone ?? "-",
+      bookedOn: formatDate(item.created_at),
       _raw: item,
     }));
   }, [data]);
@@ -58,18 +59,18 @@ const HoldTickets: React.FC = () => {
   );
 };
 
-const TicketDetails: React.FC<{ item: IssueTicketItem }> = ({ item }) => {
+const TicketDetails: React.FC<{ item: SavedPassenger }> = ({ item }) => {
   const fields = [
-    ["Booking Reference", str(item.booking_reference ?? item.booking_id)],
-    ["Status", str(item.status)],
-    ["PNR", str(item.gds_pnr ?? item.pnr)],
-    ["Airline", str(item.airline)],
-    ["Origin", str(item.origin)],
-    ["Destination", str(item.destination)],
-    ["Contact No", str(item.contact_no ?? item.contactNo)],
-    ["Amount", str(item.total_amount ?? item.amount)],
-    ["Booked On", formatDate(item.created_at ?? item.booked_on ?? item.bookedOn)],
-    ["Travel Date", formatDate(item.travel_date)],
+    ["Passenger", formatName(item)],
+    ["Passenger Type", str(item.passenger_type)],
+    ["Gender", str(item.gender)],
+    ["DOB", formatDate(item.dob)],
+    ["Nationality", str(item.nationality)],
+    ["Passport No", str(item.passport_number)],
+    ["Passport Expiry", formatDate(item.passport_expiry)],
+    ["Email", str(item.email)],
+    ["Phone", str(item.phone)],
+    ["Booked On", formatDate(item.created_at)],
   ];
 
   return (
@@ -88,6 +89,9 @@ const TicketDetails: React.FC<{ item: IssueTicketItem }> = ({ item }) => {
     </div>
   );
 };
+
+const formatName = (item: SavedPassenger): string =>
+  [item.title, item.first_name, item.last_name].filter(Boolean).join(" ") || "-";
 
 const formatDate = (value?: string): string => {
   if (!value) return "-";

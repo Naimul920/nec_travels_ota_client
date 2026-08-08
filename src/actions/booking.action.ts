@@ -81,16 +81,24 @@ export async function getTicketAction(
 
 export interface SavedPassenger {
   id: string;
+  passenger_type?: string;
   title: string;
   first_name: string;
   last_name: string;
   gender: string;
+  dob?: string;
   date_of_birth: string;
+  nationality?: string;
   country: string;
   passport_number: string;
+  passport_expiry?: string;
   passport_expire: string;
   email: string;
   phone: string;
+  seat_number?: string | null;
+  baggage?: string | null;
+  meal?: string | null;
+  created_at?: string;
 }
 
 export interface MyPassengersResponse {
@@ -142,6 +150,66 @@ export async function getMyPassengersAction(
     const { message, statusCode } = extractApiError(
       error,
       "Failed to load passengers",
+    );
+    return {
+      success: false,
+      statusCode,
+      message,
+      data: [],
+      meta: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        total_passengers: 0,
+      },
+    };
+  }
+}
+
+export interface FetchHoldPassengersParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  status?: string;
+  booking_source?: string;
+}
+
+export async function getHoldPassengersAction(
+  params: FetchHoldPassengersParams = {},
+): Promise<MyPassengersResponse> {
+  try {
+    const res = await httpClient.get<SavedPassenger[]>(
+      "/api/v1/bookings/my-passengers",
+      {
+        params: {
+          page: params.page ?? 1,
+          limit: params.limit ?? 10,
+          sortBy: params.sortBy ?? "created_at",
+          sortOrder: params.sortOrder ?? "desc",
+          status: params.status ?? "HOLD",
+          booking_source: params.booking_source ?? "B2B",
+        },
+      },
+    );
+    return {
+      success: res.success,
+      statusCode: res.statusCode,
+      message: res.message,
+      data: res.data || [],
+      meta: (res as unknown as MyPassengersResponse)?.meta ?? {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+        total_passengers: 0,
+      },
+    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to load hold passengers",
     );
     return {
       success: false,

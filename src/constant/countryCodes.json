@@ -1,0 +1,982 @@
+{
+  "AC": {
+    "currency": "SHP",
+    "dial": "+247"
+  },
+  "AD": {
+    "currency": "EUR",
+    "dial": "+376"
+  },
+  "AE": {
+    "currency": "AED",
+    "dial": "+971"
+  },
+  "AF": {
+    "currency": "AFN",
+    "dial": "+93"
+  },
+  "AG": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "AI": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "AL": {
+    "currency": "ALL",
+    "dial": "+355"
+  },
+  "AM": {
+    "currency": "AMD",
+    "dial": "+374"
+  },
+  "AO": {
+    "currency": "AOA",
+    "dial": "+244"
+  },
+  "AR": {
+    "currency": "ARS",
+    "dial": "+54"
+  },
+  "AS": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "AT": {
+    "currency": "EUR",
+    "dial": "+43"
+  },
+  "AU": {
+    "currency": "AUD",
+    "dial": "+61"
+  },
+  "AW": {
+    "currency": "AWG",
+    "dial": "+297"
+  },
+  "AX": {
+    "currency": "EUR",
+    "dial": "+358"
+  },
+  "AZ": {
+    "currency": "AZN",
+    "dial": "+994"
+  },
+  "BA": {
+    "currency": "BAM",
+    "dial": "+387"
+  },
+  "BB": {
+    "currency": "BBD",
+    "dial": "+1"
+  },
+  "BD": {
+    "currency": "BDT",
+    "dial": "+880"
+  },
+  "BE": {
+    "currency": "EUR",
+    "dial": "+32"
+  },
+  "BF": {
+    "currency": "XOF",
+    "dial": "+226"
+  },
+  "BG": {
+    "currency": "BGN",
+    "dial": "+359"
+  },
+  "BH": {
+    "currency": "BHD",
+    "dial": "+973"
+  },
+  "BI": {
+    "currency": "BIF",
+    "dial": "+257"
+  },
+  "BJ": {
+    "currency": "XOF",
+    "dial": "+229"
+  },
+  "BL": {
+    "currency": "EUR",
+    "dial": "+590"
+  },
+  "BM": {
+    "currency": "BMD",
+    "dial": "+1"
+  },
+  "BN": {
+    "currency": "BND",
+    "dial": "+673"
+  },
+  "BO": {
+    "currency": "BOB",
+    "dial": "+591"
+  },
+  "BQ": {
+    "currency": "USD",
+    "dial": "+599"
+  },
+  "BR": {
+    "currency": "BRL",
+    "dial": "+55"
+  },
+  "BS": {
+    "currency": "BSD",
+    "dial": "+1"
+  },
+  "BT": {
+    "currency": "BTN",
+    "dial": "+975"
+  },
+  "BW": {
+    "currency": "BWP",
+    "dial": "+267"
+  },
+  "BY": {
+    "currency": "BYN",
+    "dial": "+375"
+  },
+  "BZ": {
+    "currency": "BZD",
+    "dial": "+501"
+  },
+  "CA": {
+    "currency": "CAD",
+    "dial": "+1"
+  },
+  "CC": {
+    "currency": "AUD",
+    "dial": "+61"
+  },
+  "CD": {
+    "currency": "CDF",
+    "dial": "+243"
+  },
+  "CF": {
+    "currency": "XAF",
+    "dial": "+236"
+  },
+  "CG": {
+    "currency": "XAF",
+    "dial": "+242"
+  },
+  "CH": {
+    "currency": "CHF",
+    "dial": "+41"
+  },
+  "CI": {
+    "currency": "XOF",
+    "dial": "+225"
+  },
+  "CK": {
+    "currency": "NZD",
+    "dial": "+682"
+  },
+  "CL": {
+    "currency": "CLP",
+    "dial": "+56"
+  },
+  "CM": {
+    "currency": "XAF",
+    "dial": "+237"
+  },
+  "CN": {
+    "currency": "CNY",
+    "dial": "+86"
+  },
+  "CO": {
+    "currency": "COP",
+    "dial": "+57"
+  },
+  "CR": {
+    "currency": "CRC",
+    "dial": "+506"
+  },
+  "CU": {
+    "currency": "CUP",
+    "dial": "+53"
+  },
+  "CV": {
+    "currency": "CVE",
+    "dial": "+238"
+  },
+  "CW": {
+    "currency": "ANG",
+    "dial": "+599"
+  },
+  "CX": {
+    "currency": "AUD",
+    "dial": "+61"
+  },
+  "CY": {
+    "currency": "EUR",
+    "dial": "+357"
+  },
+  "CZ": {
+    "currency": "CZK",
+    "dial": "+420"
+  },
+  "DE": {
+    "currency": "EUR",
+    "dial": "+49"
+  },
+  "DJ": {
+    "currency": "DJF",
+    "dial": "+253"
+  },
+  "DK": {
+    "currency": "DKK",
+    "dial": "+45"
+  },
+  "DM": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "DO": {
+    "currency": "DOP",
+    "dial": "+1"
+  },
+  "DZ": {
+    "currency": "DZD",
+    "dial": "+213"
+  },
+  "EC": {
+    "currency": "USD",
+    "dial": "+593"
+  },
+  "EE": {
+    "currency": "EUR",
+    "dial": "+372"
+  },
+  "EG": {
+    "currency": "EGP",
+    "dial": "+20"
+  },
+  "EH": {
+    "currency": "MAD",
+    "dial": "+212"
+  },
+  "ER": {
+    "currency": "ERN",
+    "dial": "+291"
+  },
+  "ES": {
+    "currency": "EUR",
+    "dial": "+34"
+  },
+  "ET": {
+    "currency": "ETB",
+    "dial": "+251"
+  },
+  "FI": {
+    "currency": "EUR",
+    "dial": "+358"
+  },
+  "FJ": {
+    "currency": "FJD",
+    "dial": "+679"
+  },
+  "FK": {
+    "currency": "FKP",
+    "dial": "+500"
+  },
+  "FM": {
+    "currency": "USD",
+    "dial": "+691"
+  },
+  "FO": {
+    "currency": "DKK",
+    "dial": "+298"
+  },
+  "FR": {
+    "currency": "EUR",
+    "dial": "+33"
+  },
+  "GA": {
+    "currency": "XAF",
+    "dial": "+241"
+  },
+  "GB": {
+    "currency": "GBP",
+    "dial": "+44"
+  },
+  "GD": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "GE": {
+    "currency": "GEL",
+    "dial": "+995"
+  },
+  "GF": {
+    "currency": "EUR",
+    "dial": "+594"
+  },
+  "GG": {
+    "currency": "GBP",
+    "dial": "+44"
+  },
+  "GH": {
+    "currency": "GHS",
+    "dial": "+233"
+  },
+  "GI": {
+    "currency": "GIP",
+    "dial": "+350"
+  },
+  "GL": {
+    "currency": "DKK",
+    "dial": "+299"
+  },
+  "GM": {
+    "currency": "GMD",
+    "dial": "+220"
+  },
+  "GN": {
+    "currency": "GNF",
+    "dial": "+224"
+  },
+  "GP": {
+    "currency": "EUR",
+    "dial": "+590"
+  },
+  "GQ": {
+    "currency": "XAF",
+    "dial": "+240"
+  },
+  "GR": {
+    "currency": "EUR",
+    "dial": "+30"
+  },
+  "GT": {
+    "currency": "GTQ",
+    "dial": "+502"
+  },
+  "GU": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "GW": {
+    "currency": "XOF",
+    "dial": "+245"
+  },
+  "GY": {
+    "currency": "GYD",
+    "dial": "+592"
+  },
+  "HK": {
+    "currency": "HKD",
+    "dial": "+852"
+  },
+  "HN": {
+    "currency": "HNL",
+    "dial": "+504"
+  },
+  "HR": {
+    "currency": "EUR",
+    "dial": "+385"
+  },
+  "HT": {
+    "currency": "HTG",
+    "dial": "+509"
+  },
+  "HU": {
+    "currency": "HUF",
+    "dial": "+36"
+  },
+  "ID": {
+    "currency": "IDR",
+    "dial": "+62"
+  },
+  "IE": {
+    "currency": "EUR",
+    "dial": "+353"
+  },
+  "IL": {
+    "currency": "ILS",
+    "dial": "+972"
+  },
+  "IM": {
+    "currency": "GBP",
+    "dial": "+44"
+  },
+  "IN": {
+    "currency": "INR",
+    "dial": "+91"
+  },
+  "IO": {
+    "currency": "USD",
+    "dial": "+246"
+  },
+  "IQ": {
+    "currency": "IQD",
+    "dial": "+964"
+  },
+  "IR": {
+    "currency": "IRR",
+    "dial": "+98"
+  },
+  "IS": {
+    "currency": "ISK",
+    "dial": "+354"
+  },
+  "IT": {
+    "currency": "EUR",
+    "dial": "+39"
+  },
+  "JE": {
+    "currency": "GBP",
+    "dial": "+44"
+  },
+  "JM": {
+    "currency": "JMD",
+    "dial": "+1"
+  },
+  "JO": {
+    "currency": "JOD",
+    "dial": "+962"
+  },
+  "JP": {
+    "currency": "JPY",
+    "dial": "+81"
+  },
+  "KE": {
+    "currency": "KES",
+    "dial": "+254"
+  },
+  "KG": {
+    "currency": "KGS",
+    "dial": "+996"
+  },
+  "KH": {
+    "currency": "KHR",
+    "dial": "+855"
+  },
+  "KI": {
+    "currency": "AUD",
+    "dial": "+686"
+  },
+  "KM": {
+    "currency": "KMF",
+    "dial": "+269"
+  },
+  "KN": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "KP": {
+    "currency": "KPW",
+    "dial": "+850"
+  },
+  "KR": {
+    "currency": "KRW",
+    "dial": "+82"
+  },
+  "KW": {
+    "currency": "KWD",
+    "dial": "+965"
+  },
+  "KY": {
+    "currency": "KYD",
+    "dial": "+1"
+  },
+  "KZ": {
+    "currency": "KZT",
+    "dial": "+7"
+  },
+  "LA": {
+    "currency": "LAK",
+    "dial": "+856"
+  },
+  "LB": {
+    "currency": "LBP",
+    "dial": "+961"
+  },
+  "LC": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "LI": {
+    "currency": "CHF",
+    "dial": "+423"
+  },
+  "LK": {
+    "currency": "LKR",
+    "dial": "+94"
+  },
+  "LR": {
+    "currency": "LRD",
+    "dial": "+231"
+  },
+  "LS": {
+    "currency": "LSL",
+    "dial": "+266"
+  },
+  "LT": {
+    "currency": "EUR",
+    "dial": "+370"
+  },
+  "LU": {
+    "currency": "EUR",
+    "dial": "+352"
+  },
+  "LV": {
+    "currency": "EUR",
+    "dial": "+371"
+  },
+  "LY": {
+    "currency": "LYD",
+    "dial": "+218"
+  },
+  "MA": {
+    "currency": "MAD",
+    "dial": "+212"
+  },
+  "MC": {
+    "currency": "EUR",
+    "dial": "+377"
+  },
+  "MD": {
+    "currency": "MDL",
+    "dial": "+373"
+  },
+  "ME": {
+    "currency": "EUR",
+    "dial": "+382"
+  },
+  "MF": {
+    "currency": "EUR",
+    "dial": "+590"
+  },
+  "MG": {
+    "currency": "MGA",
+    "dial": "+261"
+  },
+  "MH": {
+    "currency": "USD",
+    "dial": "+692"
+  },
+  "MK": {
+    "currency": "MKD",
+    "dial": "+389"
+  },
+  "ML": {
+    "currency": "XOF",
+    "dial": "+223"
+  },
+  "MM": {
+    "currency": "MMK",
+    "dial": "+95"
+  },
+  "MN": {
+    "currency": "MNT",
+    "dial": "+976"
+  },
+  "MO": {
+    "currency": "MOP",
+    "dial": "+853"
+  },
+  "MP": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "MQ": {
+    "currency": "EUR",
+    "dial": "+596"
+  },
+  "MR": {
+    "currency": "MRU",
+    "dial": "+222"
+  },
+  "MS": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "MT": {
+    "currency": "EUR",
+    "dial": "+356"
+  },
+  "MU": {
+    "currency": "MUR",
+    "dial": "+230"
+  },
+  "MV": {
+    "currency": "MVR",
+    "dial": "+960"
+  },
+  "MW": {
+    "currency": "MWK",
+    "dial": "+265"
+  },
+  "MX": {
+    "currency": "MXN",
+    "dial": "+52"
+  },
+  "MY": {
+    "currency": "MYR",
+    "dial": "+60"
+  },
+  "MZ": {
+    "currency": "MZN",
+    "dial": "+258"
+  },
+  "NA": {
+    "currency": "NAD",
+    "dial": "+264"
+  },
+  "NC": {
+    "currency": "XPF",
+    "dial": "+687"
+  },
+  "NE": {
+    "currency": "XOF",
+    "dial": "+227"
+  },
+  "NF": {
+    "currency": "AUD",
+    "dial": "+672"
+  },
+  "NG": {
+    "currency": "NGN",
+    "dial": "+234"
+  },
+  "NI": {
+    "currency": "NIO",
+    "dial": "+505"
+  },
+  "NL": {
+    "currency": "EUR",
+    "dial": "+31"
+  },
+  "NO": {
+    "currency": "NOK",
+    "dial": "+47"
+  },
+  "NP": {
+    "currency": "NPR",
+    "dial": "+977"
+  },
+  "NR": {
+    "currency": "AUD",
+    "dial": "+674"
+  },
+  "NU": {
+    "currency": "NZD",
+    "dial": "+683"
+  },
+  "NZ": {
+    "currency": "NZD",
+    "dial": "+64"
+  },
+  "OM": {
+    "currency": "OMR",
+    "dial": "+968"
+  },
+  "PA": {
+    "currency": "PAB",
+    "dial": "+507"
+  },
+  "PE": {
+    "currency": "PEN",
+    "dial": "+51"
+  },
+  "PF": {
+    "currency": "XPF",
+    "dial": "+689"
+  },
+  "PG": {
+    "currency": "PGK",
+    "dial": "+675"
+  },
+  "PH": {
+    "currency": "PHP",
+    "dial": "+63"
+  },
+  "PK": {
+    "currency": "PKR",
+    "dial": "+92"
+  },
+  "PL": {
+    "currency": "PLN",
+    "dial": "+48"
+  },
+  "PM": {
+    "currency": "EUR",
+    "dial": "+508"
+  },
+  "PR": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "PS": {
+    "currency": "ILS",
+    "dial": "+970"
+  },
+  "PT": {
+    "currency": "EUR",
+    "dial": "+351"
+  },
+  "PW": {
+    "currency": "USD",
+    "dial": "+680"
+  },
+  "PY": {
+    "currency": "PYG",
+    "dial": "+595"
+  },
+  "QA": {
+    "currency": "QAR",
+    "dial": "+974"
+  },
+  "RE": {
+    "currency": "EUR",
+    "dial": "+262"
+  },
+  "RO": {
+    "currency": "RON",
+    "dial": "+40"
+  },
+  "RS": {
+    "currency": "RSD",
+    "dial": "+381"
+  },
+  "RU": {
+    "currency": "RUB",
+    "dial": "+7"
+  },
+  "RW": {
+    "currency": "RWF",
+    "dial": "+250"
+  },
+  "SA": {
+    "currency": "SAR",
+    "dial": "+966"
+  },
+  "SB": {
+    "currency": "SBD",
+    "dial": "+677"
+  },
+  "SC": {
+    "currency": "SCR",
+    "dial": "+248"
+  },
+  "SD": {
+    "currency": "SDG",
+    "dial": "+249"
+  },
+  "SE": {
+    "currency": "SEK",
+    "dial": "+46"
+  },
+  "SG": {
+    "currency": "SGD",
+    "dial": "+65"
+  },
+  "SH": {
+    "currency": "SHP",
+    "dial": "+290"
+  },
+  "SI": {
+    "currency": "EUR",
+    "dial": "+386"
+  },
+  "SJ": {
+    "currency": "NOK",
+    "dial": "+47"
+  },
+  "SK": {
+    "currency": "EUR",
+    "dial": "+421"
+  },
+  "SL": {
+    "currency": "SLL",
+    "dial": "+232"
+  },
+  "SM": {
+    "currency": "EUR",
+    "dial": "+378"
+  },
+  "SN": {
+    "currency": "XOF",
+    "dial": "+221"
+  },
+  "SO": {
+    "currency": "SOS",
+    "dial": "+252"
+  },
+  "SR": {
+    "currency": "SRD",
+    "dial": "+597"
+  },
+  "SS": {
+    "currency": "SSP",
+    "dial": "+211"
+  },
+  "ST": {
+    "currency": "STN",
+    "dial": "+239"
+  },
+  "SV": {
+    "currency": "USD",
+    "dial": "+503"
+  },
+  "SX": {
+    "currency": "ANG",
+    "dial": "+1"
+  },
+  "SY": {
+    "currency": "SYP",
+    "dial": "+963"
+  },
+  "SZ": {
+    "currency": "SZL",
+    "dial": "+268"
+  },
+  "TA": {
+    "currency": "GBP",
+    "dial": "+290"
+  },
+  "TC": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "TD": {
+    "currency": "XAF",
+    "dial": "+235"
+  },
+  "TG": {
+    "currency": "XOF",
+    "dial": "+228"
+  },
+  "TH": {
+    "currency": "THB",
+    "dial": "+66"
+  },
+  "TJ": {
+    "currency": "TJS",
+    "dial": "+992"
+  },
+  "TK": {
+    "currency": "NZD",
+    "dial": "+690"
+  },
+  "TL": {
+    "currency": "USD",
+    "dial": "+670"
+  },
+  "TM": {
+    "currency": "TMT",
+    "dial": "+993"
+  },
+  "TN": {
+    "currency": "TND",
+    "dial": "+216"
+  },
+  "TO": {
+    "currency": "TOP",
+    "dial": "+676"
+  },
+  "TR": {
+    "currency": "TRY",
+    "dial": "+90"
+  },
+  "TT": {
+    "currency": "TTD",
+    "dial": "+1"
+  },
+  "TV": {
+    "currency": "AUD",
+    "dial": "+688"
+  },
+  "TW": {
+    "currency": "TWD",
+    "dial": "+886"
+  },
+  "TZ": {
+    "currency": "TZS",
+    "dial": "+255"
+  },
+  "UA": {
+    "currency": "UAH",
+    "dial": "+380"
+  },
+  "UG": {
+    "currency": "UGX",
+    "dial": "+256"
+  },
+  "US": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "UY": {
+    "currency": "UYU",
+    "dial": "+598"
+  },
+  "UZ": {
+    "currency": "UZS",
+    "dial": "+998"
+  },
+  "VA": {
+    "currency": "EUR",
+    "dial": "+39"
+  },
+  "VC": {
+    "currency": "XCD",
+    "dial": "+1"
+  },
+  "VE": {
+    "currency": "VES",
+    "dial": "+58"
+  },
+  "VG": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "VI": {
+    "currency": "USD",
+    "dial": "+1"
+  },
+  "VN": {
+    "currency": "VND",
+    "dial": "+84"
+  },
+  "VU": {
+    "currency": "VUV",
+    "dial": "+678"
+  },
+  "WF": {
+    "currency": "XPF",
+    "dial": "+681"
+  },
+  "WS": {
+    "currency": "WST",
+    "dial": "+685"
+  },
+  "XK": {
+    "currency": "EUR",
+    "dial": "+383"
+  },
+  "YE": {
+    "currency": "YER",
+    "dial": "+967"
+  },
+  "YT": {
+    "currency": "EUR",
+    "dial": "+262"
+  },
+  "ZA": {
+    "currency": "ZAR",
+    "dial": "+27"
+  },
+  "ZM": {
+    "currency": "ZMW",
+    "dial": "+260"
+  },
+  "ZW": {
+    "currency": "ZWL",
+    "dial": "+263"
+  }
+}

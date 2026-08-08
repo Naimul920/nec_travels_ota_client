@@ -1,19 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
 import { OtpInput, PhoneInputField } from "@/components/ui";
-import { b2cRegisterAction, resendOtpAction, verifyEmailAction } from "@/actions/auth.action";
+import {
+  b2cRegisterAction,
+  resendOtpAction,
+  verifyEmailAction,
+} from "@/actions/auth.action";
 import {
   b2cRegisterSchema,
   verifyEmailSchema,
 } from "@/validations/auth.validation";
-import { useCurrencyStore } from "@/store/currency.store";
+import { useUserCountryInfoStore } from "@/store/user_country.store";
+import { useGetSystemCurrencies } from "@/store/currencies.store";
 import { useRouter } from "next/navigation";
+
+const DEFAULT_CURRENCY_ID = "22899850-ff1f-4e8e-aa1c-e8580a1e37aa"; // BDT
 
 interface B2CRegisterFormValues {
   email: string;
@@ -39,10 +46,23 @@ export default function B2CSignUp() {
 
   const router = useRouter();
 
+  const { geoLoading, selectedCurrencyCode, phoneCode } =
+    useUserCountryInfoStore();
+  console.log(
+    "geoLoading, selectedCurrencyCode, phoneCode",
+    geoLoading,
+    selectedCurrencyCode,
+    phoneCode,
+  );
   const {
-    currenciesLoading,
-    selectedCurrencyId,
-  } = useCurrencyStore();
+    currencies,
+    initialized: currenciesInitialized,
+    initialize: initializeCurrencies,
+  } = useGetSystemCurrencies();
+
+  useEffect(() => {
+    if (!currenciesInitialized) initializeCurrencies();
+  }, [currenciesInitialized, initializeCurrencies]);
 
   const { mutateAsync: doRegister, isPending: isRegistering } = useMutation({
     mutationFn: (payload: B2CRegisterFormValues) => b2cRegisterAction(payload),
@@ -61,6 +81,7 @@ export default function B2CSignUp() {
       try {
         const result = await doRegister({
           ...values,
+          // currency_code: selectedCurrencyCode, implement later
           phone: values.phone,
         });
         if (result.success) {
@@ -77,6 +98,16 @@ export default function B2CSignUp() {
     },
   });
 
+  useEffect(() => {
+    if (registerFormik.values.currency_Id) return;
+    const match = currencies.find((c) => c.code === selectedCurrencyCode);
+    const fallback = currencies.find((c) => c.code === "BDT");
+    registerFormik.setFieldValue(
+      "currency_Id",
+      match?.id || fallback?.id || DEFAULT_CURRENCY_ID,
+    );
+  }, [currencies, selectedCurrencyCode, registerFormik.values.currency_Id]);
+
   const verifyFormik = useFormik({
     initialValues: { otp: "" },
     validationSchema: verifyEmailSchema,
@@ -86,7 +117,7 @@ export default function B2CSignUp() {
         const result = await doVerify({
           email: registeredEmail,
           otp: values.otp,
-        });
+                });
         if (result.success) {
           helpers.setStatus({ success: result.message });
           router.push("/auth/signin");
@@ -119,21 +150,22 @@ export default function B2CSignUp() {
         error: result.success ? undefined : result.message,
       });
     } catch {
-      verifyFormik.setStatus({ error: "Failed to resend OTP. Please try again." });
+      verifyFormik.setStatus({
+        error: "Failed to resend OTP. Please try again.",
+      });
     } finally {
       setResending(false);
     }
   };
 
-  useEffect(() => {
-    if (registerFormik.values.currency_Id || !selectedCurrencyId) return;
-    registerFormik.setFieldValue("currency_Id", selectedCurrencyId);
-  }, [selectedCurrencyId, registerFormik.values.currency_Id]);
-
   return (
     <>
       {step === "register" ? (
-        <form onSubmit={registerFormik.handleSubmit} className="space-y-6" noValidate>
+        <form
+          onSubmit={registerFormik.handleSubmit}
+          className="space-y-6"
+          noValidate
+        >
           <div className="text-center">
             <h2 className="text-2xl font-bold text-slate-900">
               Customer registration
@@ -196,7 +228,9 @@ export default function B2CSignUp() {
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                   className="text-slate-400 transition-colors hover:text-slate-600"
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
                 >
                   {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
@@ -221,10 +255,10 @@ export default function B2CSignUp() {
 
           <button
             type="submit"
-            disabled={isRegistering || currenciesLoading}
+            disabled={isRegistering || geoLoading}
             className="h-12 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {currenciesLoading
+            {geoLoading
               ? "Loading..."
               : isRegistering
                 ? "Registering..."
@@ -232,7 +266,11 @@ export default function B2CSignUp() {
           </button>
         </form>
       ) : (
-        <form onSubmit={verifyFormik.handleSubmit} className="space-y-6" noValidate>
+        <form
+          onSubmit={verifyFormik.handleSubmit}
+          className="space-y-6"
+          noValidate
+        >
           <div className="text-center">
             <h2 className="text-2xl font-bold text-slate-900">
               Verify your email

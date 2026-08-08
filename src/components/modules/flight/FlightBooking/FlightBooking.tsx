@@ -36,7 +36,7 @@ import {
   bookFlightAction,
 } from "@/actions/flight.action";
 import { useAuthStore } from "@/store/auth.store";
-import { useCurrencyStore } from "@/store/currency.store";
+import { useUserCountryInfoStore } from "@/store/user_country.store";
 import SearchCountdown from "../Card/SearchCountdown";
 import FlightCard from "../Card/FlightCard";
 import { getSearchExpiry } from "@/utils/searchCountdown";
@@ -63,7 +63,7 @@ const safeList = (
 const LeadPassengerPrefill: React.FC = () => {
   const { values, setFieldValue } = useFormikContext<BookingFormValues>();
   const { user } = useAuthStore();
-  const geo = useCurrencyStore((s) => s.geo);
+  const geo = useUserCountryInfoStore((s) => s.geo);
   const applied = useRef(false);
 
   useEffect(() => {

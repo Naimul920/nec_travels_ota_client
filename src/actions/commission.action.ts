@@ -75,10 +75,10 @@ export interface CommissionInput {
   airline?: string | null;
   origin?: string | null;
   destination?: string | null;
-  business_class_out: number;
-  economy_class_out: number;
-  business_charge_out: number;
-  economy_charge_out: number;
+  business_class_out: string | number;
+  economy_class_out: string | number;
+  business_charge_out: string | number;
+  economy_charge_out: string | number;
   api_currency_id?: string | null;
   user_currency_id?: string | null;
   package_id?: string | null;
@@ -107,12 +107,34 @@ export const createCommissionAction = async (
   }
 };
 
+export const getCommissionAction = async (
+  id: string,
+): Promise<CommissionCreateResponse> => {
+  try {
+    const res = await httpClient.get<CommissionItem>(
+      `/api/v1/commissions/${encodeURIComponent(id)}`,
+    );
+    return {
+      success: true,
+      statusCode: res.statusCode,
+      message: res.message || "Commission retrieved successfully",
+      data: res.data || null,
+    };
+  } catch (error) {
+    const { statusCode, message } = extractApiError(
+      error,
+      "Failed to load commission",
+    );
+    return { success: false, statusCode, message, data: null };
+  }
+};
+
 export const updateCommissionAction = async (
   id: string,
   payload: CommissionInput,
 ): Promise<CommissionCreateResponse> => {
   try {
-    const res = await httpClient.put<CommissionItem>(
+    const res = await httpClient.patch<CommissionItem>(
       `/api/v1/commissions/${encodeURIComponent(id)}`,
       payload,
     );

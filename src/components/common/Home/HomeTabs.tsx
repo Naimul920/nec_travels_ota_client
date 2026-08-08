@@ -27,7 +27,7 @@ export default function HomeTabs() {
             <span className="text-secondary">TRAVELS</span>
           </h1>
         </div>
-        <div className="relative mt-10 rounded-2xl  border py-5  border-white/60 bg-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_10px_40px_rgba(15,35,61,0.15)] backdrop-blur-xs md:mt-16">
+        <div className="relative z-40 mt-10 rounded-2xl  border py-5  border-white/60 bg-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_10px_40px_rgba(15,35,61,0.15)] backdrop-blur-xs md:mt-16">
           <Tabs
             activeKey={activeKey}
             onChange={(key) => setActiveKey(key)}

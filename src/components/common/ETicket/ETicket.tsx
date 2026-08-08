@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import Image from "next/image";
 import type { ReactNode } from "react";
 import type { BookingItem } from "@/actions/booking.action";
 
@@ -216,8 +215,11 @@ function FlightDetails({ booking }: { booking: BookingItem }) {
               </div>
 
               <div className="flex items-center gap-2 px-3 py-2 text-xs border-b border-gray-200">
-                <Image
-                  src={`/api/v1/uploads/files/images/public/airlines_logo/${airlineCode}.svg`}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={resolveImageSrc(
+                    `/api/v1/uploads/files/images/public/airlines_logo/${airlineCode}.svg`,
+                  )}
                   alt={airlineName}
                   width={24}
                   height={24}

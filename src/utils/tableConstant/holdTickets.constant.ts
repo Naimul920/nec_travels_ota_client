@@ -4,40 +4,32 @@ const holdTicketsColumns: Record<string, string>[] = [
     dataIndex: "sl",
   },
   {
-    title: "BookID",
-    dataIndex: "bookingId",
+    title: "Passenger",
+    dataIndex: "passenger",
   },
   {
-    title: "From",
-    dataIndex: "origin",
-  },
-  {
-    title: "To",
-    dataIndex: "destination",
-  },
-  {
-    title: "Airline",
-    dataIndex: "airline",
-  },
-  {
-    title: "PNR",
+    title: "Passport No",
     dataIndex: "pnr",
+  },
+  {
+    title: "Gender",
+    dataIndex: "gender",
+  },
+  {
+    title: "Nationality",
+    dataIndex: "nationality",
+  },
+  {
+    title: "Email",
+    dataIndex: "email",
   },
   {
     title: "Contact No",
     dataIndex: "contactNo",
   },
   {
-    title: "Amount",
-    dataIndex: "amount",
-  },
-  {
     title: "Booked On",
     dataIndex: "bookedOn",
-  },
-  {
-    title: "Travel Date",
-    dataIndex: "travel_date",
   },
   {
     title: "Action",

@@ -14,7 +14,7 @@ import examples from "libphonenumber-js/examples.mobile.json";
 import * as Flags from "country-flag-icons/react/3x2";
 import type { FlagComponent } from "country-flag-icons/react/3x2";
 import { FaChevronDown, FaSearch } from "react-icons/fa";
-import { useCurrencyStore } from "@/store/currency.store";
+import { useUserCountryInfoStore } from "@/store/user_country.store";
 
 const flagMap = Flags as unknown as Record<string, FlagComponent | undefined>;
 
@@ -86,8 +86,8 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   disabled,
   name,
 }) => {
-  const phoneCode = useCurrencyStore((s) => s.phoneCode);
-  const countryCode = useCurrencyStore((s) => s.geo?.countryCode);
+  const phoneCode = useUserCountryInfoStore((s) => s.phoneCode);
+  const countryCode = useUserCountryInfoStore((s) => s.geo?.countryCode);
   const [isTouched, setIsTouched] = useState(false);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -148,12 +148,22 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   // Check validity using libphonenumber-js
   const isValid = useMemo(() => {
     if (!value || value === dialCode) return !required;
+
+    const example = examples[selectedCountry];
+    const maxDigits =
+      typeof example === "string" ? example.replace(/\D/g, "").length : 15;
+    const nationalDigits = nationalNumber.replace(/\D/g, "").length;
+
+    // Dial code is shown separately, so cap the entered digits at the
+    // country's national number length (e.g. +880 + 10 digits for BD).
+    if (nationalDigits > maxDigits) return false;
+
     try {
       return isValidPhoneNumber(value, selectedCountry);
     } catch {
       return false;
     }
-  }, [value, dialCode, selectedCountry, required]);
+  }, [value, dialCode, selectedCountry, required, nationalNumber]);
 
   // Selected country name + example mobile number (dynamic placeholder/error)
   const selectedCountryInfo = useMemo(() => {

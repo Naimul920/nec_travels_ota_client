@@ -19,9 +19,14 @@ import {
 } from "@/actions/auth.action";
 import { verifyEmailSchema } from "@/validations/auth.validation";
 import { OtpInput } from "@/components/ui";
-import { useCurrencyStore } from "@/store/currency.store";
+import { useUserCountryInfoStore } from "@/store/user_country.store";
+import { useGetSystemCurrencies } from "@/store/currencies.store";
+
+const DEFAULT_CURRENCY_ID = "22899850-ff1f-4e8e-aa1c-e8580a1e37aa"; // BDT
 
 const initialValues: B2BSignUpFormValues = {
+  currency_Id:"", //auto fill
+
   first_name: "",
   last_name: "",
   email: "",
@@ -29,10 +34,10 @@ const initialValues: B2BSignUpFormValues = {
   password: "",
   password_confirmation: "",
 
+
   agency_name: "",
   business_type: "COMPANY_LTD",
   currency: "BDT",
-  currency_Id: "",
   caab_certificate_number: "",
   caab_certificate_expiry: "",
   city: "",
@@ -57,8 +62,14 @@ export default function B2BSignUp() {
 
   const router = useRouter();
 
-  const { geo, selectedCurrencyId, selectedCurrencyCode } =
-    useCurrencyStore();
+  const { geo, selectedCurrencyCode } =
+    useUserCountryInfoStore();
+
+  const {
+    currencies,
+    initialized: currenciesInitialized,
+    initialize: initializeCurrencies,
+  } = useGetSystemCurrencies();
 
   console.log("countryCode", geo?.countryCode);
 
@@ -164,15 +175,23 @@ export default function B2BSignUp() {
   });
 
   useEffect(() => {
-    if (formik.values.currency_Id || !selectedCurrencyId) return;
+    if (!currenciesInitialized) initializeCurrencies();
+  }, [currenciesInitialized, initializeCurrencies]);
+
+  useEffect(() => {
+    if (formik.values.currency || !selectedCurrencyCode) return;
     formik.setFieldValue("currency", selectedCurrencyCode);
-    formik.setFieldValue("currency_Id", selectedCurrencyId);
-  }, [
-    selectedCurrencyId,
-    selectedCurrencyCode,
-    formik.values.currency_Id,
-    formik,
-  ]);
+  }, [selectedCurrencyCode, formik.values.currency, formik]);
+
+  useEffect(() => {
+    if (formik.values.currency_Id) return;
+    const match = currencies.find((c) => c.code === selectedCurrencyCode);
+    const fallback = currencies.find((c) => c.code === "BDT");
+    formik.setFieldValue(
+      "currency_Id",
+      match?.id || fallback?.id || DEFAULT_CURRENCY_ID,
+    );
+  }, [currencies, selectedCurrencyCode, formik.values.currency_Id, formik]);
 
   const goToNextStep = async () => {
     const schema = stepSchemas[currentStep - 1];

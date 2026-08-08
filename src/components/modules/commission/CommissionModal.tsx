@@ -20,9 +20,6 @@ interface Props {
   currencyOptions: { label: string; value: string }[];
 }
 
-const toNumber = (v: unknown): number =>
-  typeof v === "string" && v !== "" ? Number(v) : Number(v) || 0;
-
 const CommissionModal: React.FC<Props> = ({
   open,
   onClose,
@@ -55,10 +52,10 @@ const CommissionModal: React.FC<Props> = ({
         airline: values.airline || null,
         origin: values.origin || null,
         destination: values.destination || null,
-        business_class_out: toNumber(values.business_class_out),
-        economy_class_out: toNumber(values.economy_class_out),
-        business_charge_out: toNumber(values.business_charge_out),
-        economy_charge_out: toNumber(values.economy_charge_out),
+        business_class_out: values.business_class_out || "0",
+        economy_class_out: values.economy_class_out || "0",
+        business_charge_out: values.business_charge_out || "0",
+        economy_charge_out: values.economy_charge_out || "0",
         api_currency_id: values.api_currency_id || null,
         user_currency_id: values.user_currency_id || null,
         package_id: values.package_id || null,
