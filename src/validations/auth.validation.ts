@@ -23,7 +23,7 @@ export const b2cRegisterSchema = Yup.object({
   email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
   phone: Yup.string()
     .trim()
-    .matches(/^1[3-9]\d{8}$/, "Enter a valid BD mobile number, e.g. 1700000000")
+    .matches(/^\+?\d{7,15}$/, "Invalid phone number")
     .required("Phone number is required"),
   password: Yup.string()
     .min(8, "Must be at least 8 characters")

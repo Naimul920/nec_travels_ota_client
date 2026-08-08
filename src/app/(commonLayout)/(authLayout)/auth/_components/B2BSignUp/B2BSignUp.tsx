@@ -57,7 +57,7 @@ export default function B2BSignUp() {
 
   const router = useRouter();
 
-  const { geo, phoneCode, selectedCurrencyId, selectedCurrencyCode } =
+  const { geo, selectedCurrencyId, selectedCurrencyCode } =
     useCurrencyStore();
 
   console.log("countryCode", geo?.countryCode);
@@ -86,7 +86,7 @@ export default function B2BSignUp() {
       formData.append("first_name", values.first_name);
       formData.append("last_name", values.last_name);
       formData.append("email", values.email);
-      formData.append("phone", `${phoneCode}${values.phone}`);
+      formData.append("phone", values.phone);
       formData.append("password", values.password);
       formData.append("password_confirmation", values.password_confirmation);
 

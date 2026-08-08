@@ -10,6 +10,7 @@ import {
   isValidPhoneNumber,
   type CountryCode,
 } from "libphonenumber-js";
+import examples from "libphonenumber-js/examples.mobile.json";
 import * as Flags from "country-flag-icons/react/3x2";
 import type { FlagComponent } from "country-flag-icons/react/3x2";
 import { FaChevronDown, FaSearch } from "react-icons/fa";
@@ -81,7 +82,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   value = "",
   onChange,
   onBlur,
-  placeholder = "Phone number",
+  placeholder,
   disabled,
   name,
 }) => {
@@ -98,7 +99,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   const popupRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // Determine initial country from store or fallback to 'BD'
+  // Determine initial country from geoip (pro.ip-api.com via currency store)
   const defaultCountry = useMemo<CountryCode>(() => {
     const byDial = DIAL_TO_COUNTRY[phoneCode?.replace(/^\+/, "") || ""];
     const byGeo =
@@ -108,7 +109,23 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
     return byDial || byGeo || "BD";
   }, [phoneCode, countryCode]);
 
+  // Detect country from the dial code present in an auto-filled value, e.g. "+9665..."
+  const valueCountry = useMemo<CountryCode | null>(() => {
+    const match = value?.match(/^\+(\d+)/);
+    if (!match) return null;
+    return DIAL_TO_COUNTRY[match[1]] || null;
+  }, [value]);
+
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>(defaultCountry);
+  const [userSelectedCountry, setUserSelectedCountry] = useState(false);
+
+  // Sync the selected country with the detected geoip country and/or the
+  // dial code already present in an auto-filled value (until the user
+  // explicitly picks a country from the dropdown).
+  useEffect(() => {
+    if (userSelectedCountry) return;
+    setSelectedCountry(valueCountry || defaultCountry);
+  }, [valueCountry, defaultCountry, userSelectedCountry]);
 
   // Get fixed non-editable dial code
   const dialCode = useMemo(() => {
@@ -138,10 +155,34 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
     }
   }, [value, dialCode, selectedCountry, required]);
 
+  // Selected country name + example mobile number (dynamic placeholder/error)
+  const selectedCountryInfo = useMemo(() => {
+    const name =
+      COUNTRIES.find((c) => c.code === selectedCountry)?.name || selectedCountry;
+    const example = examples[selectedCountry];
+    return {
+      name,
+      example: typeof example === "string" ? example : "",
+    };
+  }, [selectedCountry]);
+
+  // Dynamic placeholder based on the selected country's example number
+  const resolvedPlaceholder =
+    placeholder || selectedCountryInfo.example || "Phone number";
+
+  // Dynamic, country-aware validation message
+  const invalidMessage = useMemo(() => {
+    if (!(isTouched && !isValid)) return "";
+    if (!value) return "Phone number is required";
+    const exampleMsg = selectedCountryInfo.example
+      ? `, e.g. ${selectedCountryInfo.example}`
+      : "";
+    return `Enter a valid ${selectedCountryInfo.name} mobile number${exampleMsg}`;
+  }, [isTouched, isValid, value, selectedCountryInfo]);
+
   // Combined error state (external Formik error OR internal invalid phone error)
   const hasError = Boolean(error || (isTouched && !isValid));
-  const activeErrorMessage =
-    errorMessage || (isTouched && !isValid ? "Invalid phone number" : "");
+  const activeErrorMessage = invalidMessage || errorMessage || "";
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -206,6 +247,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   }, [open]);
 
   const selectCountry = (code: CountryCode) => {
+    setUserSelectedCountry(true);
     setSelectedCountry(code);
     closeDropdown();
     // Re-emit full number with the new dial code if digits already entered
@@ -271,7 +313,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
           value={nationalNumber}
           onChange={handleInputChange}
           onBlur={handleBlur}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           disabled={disabled}
           className="h-full flex-1 bg-transparent px-3 text-sm text-gray-800 outline-none placeholder:text-gray-400"
         />

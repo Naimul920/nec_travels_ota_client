@@ -13,7 +13,7 @@ import {
   AiOutlinePhone,
 } from "react-icons/ai";
 import { FiUser, FiAtSign } from "react-icons/fi";
-import { Input } from "@/components/ui";
+import { Input, PhoneInputField } from "@/components/ui";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useAuthStore } from "@/store/auth.store";
 import { updateUserProfile } from "@/actions/user.action";
@@ -294,13 +294,11 @@ const B2cEditProfile: React.FC = () => {
             iconLeft={<AiOutlineMail />}
             className="cursor-not-allowed border-transparent bg-gray-50 opacity-70"
           />
-          <Input
+          <PhoneInputField
             label="Phone"
-            type="tel"
             value={profile.phone}
             disabled={!isEditing}
-            onChange={(e) => handleChange("phone", e.target.value)}
-            iconLeft={<AiOutlinePhone />}
+            onChange={(v) => handleChange("phone", v)}
             className={inputClass(isEditing)}
           />
         </div>

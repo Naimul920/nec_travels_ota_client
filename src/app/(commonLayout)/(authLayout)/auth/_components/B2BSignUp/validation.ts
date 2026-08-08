@@ -4,7 +4,7 @@ import {
   MAX_FILE_SIZE_MB,
 } from "./types";
 
-const PHONE_REGEX = /^1[3-9]\d{8}$/; // BD mobile number without the +880 prefix
+const PHONE_REGEX = /^\+?\d{7,15}$/; // Phone number with optional country dial code, e.g. +8801700000000
 
 const fileSchema = (required: boolean) => {
   const schema = Yup.mixed<File>()
@@ -29,7 +29,7 @@ export const step1Schema = Yup.object({
   email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
   phone: Yup.string()
     .trim()
-    .matches(PHONE_REGEX, "Enter a valid BD mobile number, e.g. 1700000000")
+    .matches(PHONE_REGEX, "Invalid phone number")
     .required("Phone number is required"),
   password: Yup.string()
     .min(8, "Must be at least 8 characters")

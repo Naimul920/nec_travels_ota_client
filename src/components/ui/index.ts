@@ -1,6 +1,7 @@
 export { default as Input } from "./Input/Input";
 export { default as DatePicker } from "./DatePicker/DatePicker";
 export { default as PhoneInput } from "./PhoneInput/PhoneInput";
+export { default as PhoneInputField } from "./PhoneInput/PhoneInput";
 export { default as CountrySelect } from "./CountrySelect/CountrySelect";
 export { default as CountryFlag } from "./CountryFlag/CountryFlag";
 export { default as Button } from "./Button/Button";

@@ -11,7 +11,7 @@ import {
   AiOutlineCamera,
 } from "react-icons/ai";
 import clsx from "clsx";
-import { Input } from "@/components/ui";
+import { Input, PhoneInputField } from "@/components/ui";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useAuthStore } from "@/store/auth.store";
 import { updateUserProfile } from "@/actions/user.action";
@@ -160,22 +160,35 @@ const EditProfile: React.FC = () => {
     field: keyof ProfileData,
     type: string = "text",
     readOnly?: boolean,
+    isPhone?: boolean,
   ) => (
     <tr className="border-b border-b-tertiary/10 last:border-b-0">
       <td className="w-1/3 px-4 py-3 font-medium text-gray-600">{label}</td>
       <td className="px-4 py-3">
-        <Input
-          type={type}
-          value={value}
-          disabled={!isEditing || readOnly}
-          onChange={(e) => handleChange(field, e.target.value)}
-          className={clsx(
-            "w-full rounded border px-3 py-2 transition",
-            isEditing && !readOnly
-              ? "border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-              : "cursor-not-allowed border-transparent bg-gray-100",
-          )}
-        />
+        {isPhone ? (
+          <PhoneInputField
+            value={value}
+            disabled={!isEditing}
+            onChange={(v) => handleChange(field, v)}
+            className={clsx(
+              "transition",
+              !isEditing && "cursor-not-allowed opacity-60",
+            )}
+          />
+        ) : (
+          <Input
+            type={type}
+            value={value}
+            disabled={!isEditing || readOnly}
+            onChange={(e) => handleChange(field, e.target.value)}
+            className={clsx(
+              "w-full rounded border px-3 py-2 transition",
+              isEditing && !readOnly
+                ? "border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+                : "cursor-not-allowed border-transparent bg-gray-100",
+            )}
+          />
+        )}
       </td>
     </tr>
   );
@@ -267,7 +280,7 @@ const EditProfile: React.FC = () => {
             {renderRow("First Name", profile.first_name, "first_name")}
             {renderRow("Last Name", profile.last_name, "last_name")}
             {renderRow("Email", profile.email, "email", "email", true)}
-            {renderRow("Phone", profile.phone, "phone", "tel")}
+            {renderRow("Phone", profile.phone, "phone", "tel", false, true)}
           </tbody>
         </table>
       </div>

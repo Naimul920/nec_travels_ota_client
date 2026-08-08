@@ -57,7 +57,7 @@ export default function Step4({ values }: { values: B2BSignUpFormValues }) {
           <Item icon={<FiUser />} label="First name" value={values.first_name} />
           <Item icon={<FiUser />} label="Last name" value={values.last_name} />
           <Item icon={<FiMail />} label="Email" value={values.email} />
-          <Item icon={<FiPhone />} label="Phone" value={values.phone && `+880 ${values.phone}`} />
+          <Item icon={<FiPhone />} label="Phone" value={values.phone} />
         </div>
       </div>
 

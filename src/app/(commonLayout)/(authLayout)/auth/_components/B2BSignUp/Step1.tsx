@@ -5,12 +5,11 @@ import { FormikProps } from "formik";
 import { FiEye, FiEyeOff, FiLock, FiMail, FiUser } from "react-icons/fi";
 import { B2BSignUpFormValues } from "./types";
 import FormField from "./FormField";
-import { useCurrencyStore } from "@/store/currency.store";
+import { PhoneInputField } from "@/components/ui";
 
 export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormValues> }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const phoneCode = useCurrencyStore((s) => s.phoneCode);
 
   return (
     <div className="space-y-6">
@@ -49,14 +48,15 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
           {...formik.getFieldProps("email")}
         />
 
-        <FormField
+        <PhoneInputField
           label="Phone number"
-          type="tel"
-          placeholder="1700000000"
-          flag={phoneCode}
-          prefix={phoneCode}
-          error={formik.errors.phone}
-          {...formik.getFieldProps("phone")}
+          name="phone"
+          value={formik.values.phone}
+          onChange={(v) => formik.setFieldValue("phone", v)}
+          onBlur={() => formik.setFieldTouched("phone", true)}
+          error={Boolean(formik.errors.phone)}
+          errorMessage={formik.errors.phone as string | undefined}
+          required
         />
       </div>
 

@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
-import { OtpInput } from "@/components/ui";
+import { OtpInput, PhoneInputField } from "@/components/ui";
 import { b2cRegisterAction, resendOtpAction, verifyEmailAction } from "@/actions/auth.action";
 import {
   b2cRegisterSchema,
@@ -41,7 +41,6 @@ export default function B2CSignUp() {
 
   const {
     currenciesLoading,
-    phoneCode,
     selectedCurrencyId,
   } = useCurrencyStore();
 
@@ -62,7 +61,7 @@ export default function B2CSignUp() {
       try {
         const result = await doRegister({
           ...values,
-          phone: `${phoneCode}${values.phone}`,
+          phone: values.phone,
         });
         if (result.success) {
           setRegisteredEmail(values.email);
@@ -154,14 +153,15 @@ export default function B2CSignUp() {
               {...registerFormik.getFieldProps("email")}
             />
 
-            <FormField
+            <PhoneInputField
               label="Phone number"
-              type="tel"
-              placeholder="1700000000"
-              flag={phoneCode}
-              prefix={phoneCode}
-              error={getRegisterError("phone")}
-              {...registerFormik.getFieldProps("phone")}
+              name="phone"
+              value={registerFormik.values.phone}
+              onChange={(v) => registerFormik.setFieldValue("phone", v)}
+              onBlur={() => registerFormik.setFieldTouched("phone", true)}
+              error={Boolean(getRegisterError("phone"))}
+              errorMessage={getRegisterError("phone")}
+              required
             />
           </div>
 
