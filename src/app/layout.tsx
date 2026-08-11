@@ -2,7 +2,7 @@ import AppLoaderProvider from "@/providers/AppLoaderProvider";
 import QueryProviders from "@/providers/QueryProvider";
 import { Inter, Space_Grotesk, IBM_Plex_Mono, Stalemate } from "next/font/google";
 import AuthProvider from "@/providers/AuthProvider";
-import CurrencyProvider from "@/providers/CurrencyProvider";
+import GeoProvider from "@/providers/GeoProvider";
 import { App as AntdApp } from "antd";
 import { cookies } from "next/headers";
 import "./globals.css";
@@ -51,11 +51,11 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         <QueryProviders>
           <AuthProvider hasAuth={hasAuth}>
-            <CurrencyProvider>
+            <GeoProvider>
               <AntdApp>
                 <AppLoaderProvider>{children}</AppLoaderProvider>
               </AntdApp>
-            </CurrencyProvider>
+            </GeoProvider>
           </AuthProvider>
         </QueryProviders>
       </body>

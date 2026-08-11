@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserCountryInfoStore } from "@/store/user_country.store";
+import { useGeoStore } from "@/store/geo.store";
 
-export default function CurrencyProvider({
+export default function GeoProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const initialize = useUserCountryInfoStore((s) => s.initialize);
+  const initialize = useGeoStore((s) => s.initialize);
 
   useEffect(() => {
     initialize();

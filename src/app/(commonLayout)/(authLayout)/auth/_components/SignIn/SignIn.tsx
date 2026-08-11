@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FiEye, FiEyeOff, FiLock, FiMail, FiSend } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock, FiMail, FiMapPin, FiSend } from "react-icons/fi";
 
 import FormField from "../B2BSignUp/FormField";
 import { OtpInput } from "@/components/ui";
@@ -70,6 +70,17 @@ interface LoginProps {
 // Deterministic "barcode" bar widths — purely decorative
 const BARCODE_BARS = [
   2, 4, 1, 3, 5, 2, 1, 4, 3, 2, 5, 1, 3, 2, 4, 1, 5, 2, 3, 1, 4, 2,
+];
+
+// Simplified continent silhouettes (abstract, not geographically exact)
+// rendered as a dotted texture behind the ticket copy.
+const WORLD_BLOBS = [
+  "M18 96c10-22 34-30 58-24 20 5 32 20 48 18 16-2 26 10 20 26-8 20-34 24-54 20-8-2-14 4-24 2-24-4-44-18-52-38-4-2-2-2 4-4Z",
+  "M150 190c14-10 32-8 40 4 10 14 4 30-10 36-16 6-34 0-40-14-4-10 0-20 10-26Z",
+  "M60 210c18-6 40 2 46 18 6 16-4 32-22 36-20 4-40-6-46-22-4-14 4-26 22-32Z",
+  "M210 60c26-8 56 2 68 24 10 18 4 38-14 46-10 4-18 14-30 12-22-4-36-22-40-42-4-18 2-34 16-40Z",
+  "M300 110c22-4 44 8 50 26 6 18-4 34-22 40-8 2-14 10-24 8-20-4-32-20-34-38-2-16 8-30 30-36Z",
+  "M120 40c16-6 34 0 40 14 6 14-2 28-18 32-14 4-28-4-32-16-4-12 2-24 10-30Z",
 ];
 
 export default function SignIn({
@@ -217,54 +228,117 @@ export default function SignIn({
       >
         {/* Left ticket stub */}
         {!compact && (
-          <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-brand p-10 md:flex">
+          <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-[#F7F4EC] p-10 md:flex">
+            {/* Dotted world-map texture */}
+            <svg
+              className="pointer-events-none absolute inset-0 h-full w-full"
+              viewBox="0 0 400 560"
+              preserveAspectRatio="xMidYMid slice"
+              aria-hidden="true"
+            >
+              <defs>
+                <pattern
+                  id="worldDotsSignIn"
+                  width="7"
+                  height="7"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <circle cx="1.3" cy="1.3" r="1.3" fill="#12233D" />
+                </pattern>
+              </defs>
+              <g opacity="0.12">
+                {WORLD_BLOBS.map((d, i) => (
+                  <path key={i} d={d} fill="url(#worldDotsSignIn)" />
+                ))}
+              </g>
+            </svg>
+
+            {/* Logo */}
             <div className="relative z-10 flex items-center gap-2">
-              <FiSend className="rotate-45 text-white" size={18} />
-              <p className="font-plex-mono text-xs tracking-[0.25em] text-white">
+              <FiSend className="rotate-45 text-brand" size={18} />
+              <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
                 NEC TRAVELS
               </p>
             </div>
 
-            {/* Route line */}
-            <div className="relative z-10 space-y-4">
+            {/* Route + copy + ticket illustration */}
+            <div className="relative z-10 space-y-6">
               <div className="flex items-center gap-3">
                 <div className="text-left">
-                  <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
-                    DAC
-                  </p>
-                  <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
+                  <div className="flex items-center gap-1">
+                    <FiMapPin className="text-brand" size={12} />
+                    <p className="font-grotesk text-lg font-medium text-[#12233D]">
+                      DAC
+                    </p>
+                  </div>
+                  <p className="font-plex-mono text-[10px] tracking-widest text-[#5B6B7A]">
                     DHAKA
                   </p>
                 </div>
+
                 <FlightRoute />
-                {/* <div className="relative flex-1">
-                  <div className="border-t border-dashed border-[#9FB4C7]/50" />
-                  <FiSend
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-90 text-white"
-                    size={14}
-                  />
-                </div> */}
 
                 <div className="text-right">
-                  <p className="font-grotesk text-lg font-medium text-[#F7F4EC]">
-                    LHR
-                  </p>
-                  <p className="font-plex-mono text-[10px] tracking-widest text-[#9FB4C7]">
+                  <div className="flex items-center justify-end gap-1">
+                    <p className="font-grotesk text-lg font-medium text-[#12233D]">
+                      LHR
+                    </p>
+                    <FiMapPin className="text-brand" size={12} />
+                  </div>
+                  <p className="font-plex-mono text-[10px] tracking-widest text-[#5B6B7A]">
                     LONDON
                   </p>
                 </div>
               </div>
-
-              {/* <p className="font-grotesk text-2xl font-medium leading-snug text-[#F7F4EC]">
-                Track every booking,
-                <br />
-                from check-in to landing.
+{/* 
+              <p className="font-grotesk text-xl font-medium leading-6 text-[#12233D]">
+                Every flight. <br />
+                Every destination. <br />
+                <span className="text-brand">One trusted platform.</span>
               </p> */}
 
-              <p className="font-grotesk text-xl font-medium leading-6 text-[#F7F4EC]">
-                Every flight. <br /> Every destination. <br /> One trusted
-                platform.
-              </p>
+              {/* Boarding pass illustration */}
+              <div className="relative pt-2">
+                <div className="relative -rotate-3 rounded-2xl bg-white p-4 shadow-xl ring-1 ring-[#12233D]/5 transition-transform duration-300 hover:-rotate-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <FiSend className="rotate-45 text-brand" size={14} />
+                      <p className="font-plex-mono text-[10px] font-bold tracking-[0.2em] text-[#12233D]">
+                        NEC TRAVELS
+                      </p>
+                    </div>
+                    <p className="font-plex-mono text-[9px] tracking-widest text-[#9FB4C7]">
+                      BOARDING PASS
+                    </p>
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between border-t border-dashed border-[#12233D]/15 pt-3">
+                    <div>
+                      <p className="font-plex-mono text-[9px] tracking-widest text-[#9FB4C7]">
+                        FROM
+                      </p>
+                      <p className="font-grotesk text-base font-semibold text-[#12233D]">
+                        DAC
+                      </p>
+                      <p className="font-plex-mono text-[8px] tracking-widest text-[#9FB4C7]">
+                        DHAKA
+                      </p>
+                    </div>
+                    <FiSend className="mx-2 shrink-0 text-brand" size={16} />
+                    <div className="text-right">
+                      <p className="font-plex-mono text-[9px] tracking-widest text-[#9FB4C7]">
+                        TO
+                      </p>
+                      <p className="font-grotesk text-base font-semibold text-[#12233D]">
+                        LHR
+                      </p>
+                      <p className="font-plex-mono text-[8px] tracking-widest text-[#9FB4C7]">
+                        LONDON
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Barcode */}
@@ -273,12 +347,12 @@ export default function SignIn({
                 {BARCODE_BARS.map((w, i) => (
                   <div
                     key={i}
-                    className="bg-white/70"
+                    className="bg-[#12233D]/70"
                     style={{ width: `${w}px`, height: "100%" }}
                   />
                 ))}
               </div>
-              <p className="mt-2 font-plex-mono text-[10px] tracking-[0.2em] text-white">
+              <p className="mt-2 font-plex-mono text-[10px] tracking-[0.2em] text-[#12233D]">
                 SECURE SIGN-IN · PASS NO. 048
               </p>
             </div>
@@ -472,7 +546,7 @@ export default function SignIn({
                       checked={formik.values.rememberMe}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      className="h-4 w-4 rounded border-[#9FB4C7]/60! accent-red-600 focus:ring-red-600/40!"
+                      className="h-4 w-4 rounded border-[#9FB4C7]/60! accent-brand focus:ring-brand/40!"
                     />
                     Remember me
                   </label>

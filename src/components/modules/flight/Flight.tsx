@@ -387,7 +387,7 @@ const handleSubmit = (e: React.FormEvent) => {
               checked={tripType === type}
               onChange={() => setTripType(type as TripType)}
               className="w-3 h-3 appearance-none border-2 border-primary rounded-full 
-                checked:bg-secondary checked:ring-2 checked:ring-primary checked:ring-offset-2"
+                checked:bg-brand checked:ring-2 checked:ring-primary checked:ring-offset-2"
             />
             <span className="text-xs md:text-sm font-medium text-gray-700">
               {type === "oneway"

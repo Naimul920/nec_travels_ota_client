@@ -1,9 +1,9 @@
-import CancelTickets from "../../_components/AirTickets/CancelTickets";
+import AdminBookingsTable from "../../_components/AirTickets/AdminBookingsTable";
 
 function page() {
   return (
     <>
-      <CancelTickets />
+      <AdminBookingsTable status="CANCELLED" />
     </>
   );
 }

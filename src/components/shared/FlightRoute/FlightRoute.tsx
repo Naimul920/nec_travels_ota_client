@@ -9,7 +9,7 @@ export function FlightRoute() {
     >
       <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 border-t border-dashed border-white/30" />
       <FaPlane
-        className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white motion-safe:animate-[fly_16s_linear_infinite]"
+        className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-brand motion-safe:animate-[fly_16s_linear_infinite]"
         style={{ left: "-5%" }}
       />
       <style>{`

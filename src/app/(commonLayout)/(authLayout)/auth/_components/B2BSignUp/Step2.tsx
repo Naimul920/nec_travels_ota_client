@@ -21,17 +21,17 @@ export default function Step2({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2.5">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">
+        <h2 className="text-base font-bold text-slate-900">
           Business Information
         </h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="text-[11px] text-slate-500">
           Enter your Business details.
         </p>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         <FormField
           label="Agency name"
           // name="agency_name"
@@ -50,21 +50,21 @@ export default function Step2({
         />
       </div>
 
-      {/* <div className="grid gap-5 md:grid-cols-2">
+      {/* <div className="grid gap-3 md:grid-cols-2">
         
       </div> */}
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         <div>
           <label
             htmlFor="caab_certificate_expiry"
-            className="mb-1.5 block text-sm font-medium text-slate-700"
+            className="mb-1 block text-xs font-medium text-slate-700"
           >
             CAAB certificate expiry
           </label>
           <DatePicker
             id="caab_certificate_expiry"
-            size="large"
+            size="middle"
             className="w-full"
             value={
               formik.values.caab_certificate_expiry
@@ -88,7 +88,7 @@ export default function Step2({
         />
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         <FormField
           label="City"
           // name="city"

@@ -21,7 +21,6 @@ import {
   type AllUsersResponse,
   type ApproveB2BUserPayload,
 } from "@/actions/user.action";
-import { getCurrenciesAction } from "@/actions/currency.action";
 import { getPackagesAction } from "@/actions/commission.action";
 import type { AdminUser } from "@/types/user.type";
 import { ROLE } from "@/constant/enum/role";
@@ -46,7 +45,6 @@ const getDisplayName = (user: AdminUser) =>
 
 const EMPTY_APPROVE_FORM: ApproveB2BUserPayload = {
   package_id: "",
-  currency_Id: "",
   credit_limit: 0,
 };
 
@@ -68,12 +66,6 @@ export default function ApprovalsPage() {
     queryKey: ["allUsers", { status: "PENDING", role: ROLE.B2B, page, limit }],
     queryFn: () =>
       getAllUsersAction({ status: "PENDING", role: ROLE.B2B, page, limit }),
-  });
-
-  const { data: currencies = [] } = useQuery({
-    queryKey: ["currencies"],
-    queryFn: getCurrenciesAction,
-    staleTime: 5 * 60 * 1000,
   });
 
   const { data: packages = [] } = useQuery({
@@ -104,8 +96,8 @@ export default function ApprovalsPage() {
 
   const handleApprove = () => {
     if (!approvingUser) return;
-    if (!approveForm.package_id || !approveForm.currency_Id) {
-      message.error("Please select a package and currency");
+    if (!approveForm.package_id) {
+      message.error("Please select a package");
       return;
     }
     setApproving(true);
@@ -233,23 +225,6 @@ export default function ApprovalsPage() {
               }))}
               onChange={(v) =>
                 setApproveForm((f) => ({ ...f, package_id: v }))
-              }
-            />
-          </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">
-              Currency <span className="ml-0.5 text-red-500">*</span>
-            </label>
-            <Select
-              className="w-full"
-              placeholder="Select currency"
-              value={approveForm.currency_Id || undefined}
-              options={currencies.map((c) => ({
-                label: `${c.name} (${c.code})`,
-                value: c.id,
-              }))}
-              onChange={(v) =>
-                setApproveForm((f) => ({ ...f, currency_Id: v }))
               }
             />
           </div>

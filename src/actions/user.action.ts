@@ -135,7 +135,6 @@ export type UserReviewAction = "approve" | "reject" | "suspend";
 
 export interface ApproveB2BUserPayload {
   package_id: string;
-  currency_Id: string;
   credit_limit: number;
 }
 
@@ -159,7 +158,7 @@ export async function reviewB2BUserAction(
   try {
     const body =
       action === "approve"
-        ? (payload ?? { package_id: "", currency_Id: "", credit_limit: 0 })
+        ? (payload ?? { package_id: "", credit_limit: 0 })
         : {};
     const res = await httpClient.patch<{ message: string }>(
       `${USER_ACTION_ENDPOINTS[action]}${encodeURIComponent(id)}`,

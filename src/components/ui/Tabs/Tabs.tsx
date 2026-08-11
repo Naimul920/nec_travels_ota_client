@@ -46,7 +46,7 @@ const Tabs: React.FC<TabsProps> = ({
               className={clsx(
                 "flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold transition-all duration-300 rounded-full whitespace-nowrap shrink-0",
                 isActive
-                  ? "bg-secondary text-white shadow-lg shadow-secondary/30"
+                  ? "bg-brand text-white shadow-lg shadow-brand/30"
                   : "bg-transparent text-slate-700! hover:text-slate-900! hover:bg-gray-100!",
                 isDisabled &&
                   "opacity-40 cursor-not-allowed pointer-events-none grayscale"

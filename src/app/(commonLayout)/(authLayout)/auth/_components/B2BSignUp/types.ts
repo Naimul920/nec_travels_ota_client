@@ -1,7 +1,4 @@
 export interface B2BSignUpFormValues {
-  //auto fill
-  currency_Id: string;
-
   // Step 1 — Account
   first_name: string;
   last_name: string;
@@ -13,9 +10,9 @@ export interface B2BSignUpFormValues {
   // Step 2 — Company
   agency_name: string;
   business_type: string;
-  currency: string;
-  caab_certificate_number: string;
-  caab_certificate_expiry: string;
+  country: string;
+  caab_certificate_number?: string;
+  caab_certificate_expiry?: string;
   city: string;
   postcode: string;
   address: string;

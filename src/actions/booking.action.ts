@@ -46,6 +46,46 @@ export async function getBookingsAction(): Promise<BookingResponse> {
   }
 }
 
+export interface FetchAdminBookingsParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  status?: string;
+}
+
+export async function getAdminBookingsAction(
+  params: FetchAdminBookingsParams = {},
+): Promise<BookingResponse> {
+  try {
+    const res = await httpClient.get<BookingItem[]>(
+      "/api/v1/bookings/admin/all-bookings",
+      {
+        params: {
+          page: params.page ?? 1,
+          limit: params.limit ?? 10,
+          sortBy: params.sortBy ?? "created_at",
+          sortOrder: params.sortOrder ?? "desc",
+          ...(params.status ? { status: params.status } : {}),
+        },
+      },
+    );
+    return {
+      success: res.success,
+      statusCode: res.statusCode,
+      message: res.message,
+      data: res.data || [],
+      meta: (res as unknown as BookingResponse)?.meta,
+    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to load bookings",
+    );
+    return { success: false, statusCode, message, data: [] };
+  }
+}
+
 export interface TicketResponse {
   success: boolean;
   statusCode: number;

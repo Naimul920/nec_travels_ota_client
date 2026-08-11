@@ -17,7 +17,6 @@ interface Props {
   onSaved: () => void;
   editing?: CommissionItem | null;
   packageOptions: { label: string; value: string }[];
-  currencyOptions: { label: string; value: string }[];
 }
 
 const CommissionModal: React.FC<Props> = ({
@@ -26,7 +25,6 @@ const CommissionModal: React.FC<Props> = ({
   onSaved,
   editing,
   packageOptions,
-  currencyOptions,
 }) => {
   const { message } = App.useApp();
   const [submitting, setSubmitting] = useState(false);
@@ -161,33 +159,6 @@ const CommissionModal: React.FC<Props> = ({
             value={String(formik.values.economy_charge_out)}
             onChange={formik.handleChange}
             placeholder="e.g. 8"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Select
-            label="API Currency"
-            name="api_currency_id"
-            value={formik.values.api_currency_id ?? ""}
-            onChange={formik.handleChange}
-            options={
-              currencyOptions.length
-                ? currencyOptions
-                : [{ label: "No currencies", value: "" }]
-            }
-            placeholder="Select currency"
-          />
-          <Select
-            label="User Currency"
-            name="user_currency_id"
-            value={formik.values.user_currency_id ?? ""}
-            onChange={formik.handleChange}
-            options={
-              currencyOptions.length
-                ? currencyOptions
-                : [{ label: "No currencies", value: "" }]
-            }
-            placeholder="Select currency"
           />
         </div>
 

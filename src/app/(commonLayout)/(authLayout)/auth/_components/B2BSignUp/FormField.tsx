@@ -27,12 +27,12 @@ export default function FormField({
 
   return (
     <div>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium text-slate-700">
+      <label htmlFor={name} className="mb-1 block text-[11px] font-medium text-slate-700">
         {label}
       </label>
 
       <div
-        className={`flex items-center rounded-xl border bg-white px-4 py-3 transition-colors focus-within:border-[#8c181f] focus-within:ring-2 focus-within:ring-[#8c181f]/10 ${
+        className={`flex items-center rounded-lg border bg-white px-3 py-1.5 transition-colors focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10 ${
           error ? "border-rose-400" : "border-slate-200"
         }`}
       >
@@ -42,7 +42,7 @@ export default function FormField({
             className="mr-2 h-4 w-6 rounded-[2px] object-cover"
           />
         ) : (
-          icon && <span className="mr-3 shrink-0 text-slate-400">{icon}</span>
+          icon && <span className="mr-2 shrink-0 text-slate-400">{icon}</span>
         )}
 
         {prefix && (
@@ -54,7 +54,7 @@ export default function FormField({
         <input
           id={name}
           name={name}
-          className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+          className="w-full bg-transparent text-[13px] text-slate-900 outline-none placeholder:text-slate-400"
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
           {...inputProps}

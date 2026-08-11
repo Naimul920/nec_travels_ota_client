@@ -1,9 +1,9 @@
-import IssueTickets from "../../_components/AirTickets/IssueTickets";
+import AdminBookingsTable from "../../_components/AirTickets/AdminBookingsTable";
 
 function page() {
   return (
     <>
-      <IssueTickets />
+      <AdminBookingsTable status="CONFIRMED" />
     </>
   );
 }

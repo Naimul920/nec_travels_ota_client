@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { HiChevronDown } from "react-icons/hi2";
-import { FiUser, FiList, FiLogOut } from "react-icons/fi";
+import { FiUser, FiList, FiLogOut, FiLogIn } from "react-icons/fi";
 import { useAuthStore } from "@/store/auth.store";
 import { logoutAction } from "@/actions/auth.action";
 import { ROLE } from "@/constant";
@@ -62,8 +62,8 @@ export default function CommonLayoutNavbar({
   const bookingsLink = `/console/${roleLower}/bookings`;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/95 shadow-xs backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-2 sm:px-4">
+    <header className="sticky top-0 z-[999] w-full border-b border-gray-200/70 bg-white/85 shadow-[0_4px_20px_rgba(15,23,42,0.06)] backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         {/* Logo */}
         {/* <Link
           href={(isLoggedIn && user?.role != ROLE.B2C) ? `/console/${roleLower}` : "/"}
@@ -85,27 +85,27 @@ export default function CommonLayoutNavbar({
               ? `/console/${roleLower}`
               : "/"
           }
-          className="flex shrink-0 items-center"
+          className="flex shrink-0 items-center transition-opacity duration-200 hover:opacity-80"
         >
           <img
             src={headerLogo}
             alt={isB2B && user?.logo ? "Agency logo" : "NEC Fly"}
             width={130}
             height={40}
-            className="object-contain"
-            style={{ width: "auto", height: 50 }}
+            className="h-[50px] w-auto object-contain"
           />
         </Link>
 
         {/* Right Actions */}
-        <div className={`flex items-center gap-3 `}>
+        <div className={`flex items-center gap-3`}>
           {isLoading ? (
-            <div className="h-9 w-20 animate-pulse rounded-full bg-gray-100" />
+            <div className="h-9 w-24 animate-pulse rounded-full bg-gray-100" />
           ) : !isLoggedIn || !user ? (
             <Link
               href="/auth/signin"
-              className="flex h-9 cursor-pointer items-center justify-center rounded-full bg-brand px-5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-brand/90 hover:shadow-md"
+              className="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand/90 hover:shadow-md hover:shadow-brand/25 active:scale-95"
             >
+              <FiLogIn className="h-3.5 w-3.5" />
               Sign In
             </Link>
           ) : (
@@ -160,7 +160,7 @@ export default function CommonLayoutNavbar({
                 </button>
 
                 {dropdownOpen && (
-                  <div className="animate-dropdown-pop absolute right-0 mt-2 w-60 origin-top-right overflow-hidden rounded-xl border border-gray-100 bg-white py-1.5 shadow-xl ring-1 ring-black/5">
+                  <div className="animate-dropdown-pop absolute right-0 z-50 mt-2 w-60 origin-top-right overflow-hidden rounded-xl border border-gray-100 bg-white py-1.5 shadow-xl ring-1 ring-black/5">
                     {/* Header */}
                     <div className="flex items-center gap-3 border-b border-gray-100 px-4 py-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-brand to-emerald-600 text-white">

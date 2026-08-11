@@ -36,7 +36,7 @@ import {
   bookFlightAction,
 } from "@/actions/flight.action";
 import { useAuthStore } from "@/store/auth.store";
-import { useUserCountryInfoStore } from "@/store/user_country.store";
+import { useGeoStore, getGeoCountryCode } from "@/store/geo.store";
 import SearchCountdown from "../Card/SearchCountdown";
 import FlightCard from "../Card/FlightCard";
 import { getSearchExpiry } from "@/utils/searchCountdown";
@@ -63,13 +63,13 @@ const safeList = (
 const LeadPassengerPrefill: React.FC = () => {
   const { values, setFieldValue } = useFormikContext<BookingFormValues>();
   const { user } = useAuthStore();
-  const geo = useUserCountryInfoStore((s) => s.geo);
+  const country = useGeoStore((s) => getGeoCountryCode(s.geo));
   const applied = useRef(false);
 
   useEffect(() => {
     const lead = safeList(values, "adult")[0];
-    const country = geo?.countryCode;
-    if ((!user && !country) || !lead || applied.current) return;
+    if (!user && !country) return;
+    if (!lead || applied.current) return;
 
     const patch: Partial<Passenger> = {};
     const isB2C = user?.role === ROLE.B2C;
@@ -95,7 +95,7 @@ const LeadPassengerPrefill: React.FC = () => {
     });
 
     applied.current = true;
-  }, [user, geo, values, setFieldValue]);
+  }, [user, country, values, setFieldValue]);
 
   return null;
 };

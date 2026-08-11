@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
@@ -16,18 +16,14 @@ import {
   b2cRegisterSchema,
   verifyEmailSchema,
 } from "@/validations/auth.validation";
-import { useUserCountryInfoStore } from "@/store/user_country.store";
-import { useGetSystemCurrencies } from "@/store/currencies.store";
 import { useRouter } from "next/navigation";
-
-const DEFAULT_CURRENCY_ID = "22899850-ff1f-4e8e-aa1c-e8580a1e37aa"; // BDT
+import { showAlert } from "@/components/common/Alert/ShowAlert";
 
 interface B2CRegisterFormValues {
   email: string;
   phone: string;
   password: string;
   password_confirmation: string;
-  currency_Id: string;
 }
 
 const registerInitialValues: B2CRegisterFormValues = {
@@ -35,7 +31,6 @@ const registerInitialValues: B2CRegisterFormValues = {
   phone: "",
   password: "",
   password_confirmation: "",
-  currency_Id: "",
 };
 
 export default function B2CSignUp() {
@@ -45,24 +40,6 @@ export default function B2CSignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
-
-  const { geoLoading, selectedCurrencyCode, phoneCode } =
-    useUserCountryInfoStore();
-  console.log(
-    "geoLoading, selectedCurrencyCode, phoneCode",
-    geoLoading,
-    selectedCurrencyCode,
-    phoneCode,
-  );
-  const {
-    currencies,
-    initialized: currenciesInitialized,
-    initialize: initializeCurrencies,
-  } = useGetSystemCurrencies();
-
-  useEffect(() => {
-    if (!currenciesInitialized) initializeCurrencies();
-  }, [currenciesInitialized, initializeCurrencies]);
 
   const { mutateAsync: doRegister, isPending: isRegistering } = useMutation({
     mutationFn: (payload: B2CRegisterFormValues) => b2cRegisterAction(payload),
@@ -87,26 +64,32 @@ export default function B2CSignUp() {
         if (result.success) {
           setRegisteredEmail(values.email);
           setStep("verify");
+          showAlert({
+            title: "Registration successful",
+            text: result.message || "Please verify your email to continue.",
+            variant: "success",
+            confirmText: "Continue",
+          });
         } else {
-          helpers.setStatus({ error: result.message });
+          showAlert({
+            title: "Registration failed",
+            text: result.message || "Something went wrong. Please try again.",
+            variant: "error",
+            confirmText: "OK",
+          });
         }
       } catch {
-        helpers.setStatus({ error: "Something went wrong. Please try again." });
+        showAlert({
+          title: "Registration failed",
+          text: "Something went wrong. Please try again.",
+          variant: "error",
+          confirmText: "OK",
+        });
       } finally {
         helpers.setSubmitting(false);
       }
     },
   });
-
-  useEffect(() => {
-    if (registerFormik.values.currency_Id) return;
-    const match = currencies.find((c) => c.code === selectedCurrencyCode);
-    const fallback = currencies.find((c) => c.code === "BDT");
-    registerFormik.setFieldValue(
-      "currency_Id",
-      match?.id || fallback?.id || DEFAULT_CURRENCY_ID,
-    );
-  }, [currencies, selectedCurrencyCode, registerFormik.values.currency_Id]);
 
   const verifyFormik = useFormik({
     initialValues: { otp: "" },
@@ -120,12 +103,28 @@ export default function B2CSignUp() {
                 });
         if (result.success) {
           helpers.setStatus({ success: result.message });
+          showAlert({
+            title: "Email verified",
+            text: result.message || "Your email has been verified successfully.",
+            variant: "success",
+            confirmText: "Continue",
+          });
           router.push("/auth/signin");
         } else {
-          helpers.setStatus({ error: result.message });
+          showAlert({
+            title: "Verification failed",
+            text: result.message || "Please check the OTP and try again.",
+            variant: "error",
+            confirmText: "OK",
+          });
         }
       } catch {
-        helpers.setStatus({ error: "Verification failed. Please try again." });
+        showAlert({
+          title: "Verification failed",
+          text: "Verification failed. Please try again.",
+          variant: "error",
+          confirmText: "OK",
+        });
       } finally {
         helpers.setSubmitting(false);
       }
@@ -142,16 +141,29 @@ export default function B2CSignUp() {
   const handleResendOtp = async () => {
     if (!registeredEmail || resending) return;
     setResending(true);
-    verifyFormik.setStatus(null);
     try {
       const result = await resendOtpAction({ email: registeredEmail });
-      verifyFormik.setStatus({
-        success: result.success,
-        error: result.success ? undefined : result.message,
-      });
+      if (result.success) {
+        showAlert({
+          title: "OTP sent",
+          text: result.message || "A new verification code has been sent.",
+          variant: "success",
+          confirmText: "OK",
+        });
+      } else {
+        showAlert({
+          title: "Failed to resend OTP",
+          text: result.message || "Please try again.",
+          variant: "error",
+          confirmText: "OK",
+        });
+      }
     } catch {
-      verifyFormik.setStatus({
-        error: "Failed to resend OTP. Please try again.",
+      showAlert({
+        title: "Failed to resend OTP",
+        text: "Failed to resend OTP. Please try again.",
+        variant: "error",
+        confirmText: "OK",
       });
     } finally {
       setResending(false);
@@ -163,19 +175,19 @@ export default function B2CSignUp() {
       {step === "register" ? (
         <form
           onSubmit={registerFormik.handleSubmit}
-          className="space-y-6"
+          className="space-y-3"
           noValidate
         >
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-base font-bold text-slate-900">
               Customer registration
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="text-[11px] text-slate-500">
               Create your customer account.
             </p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2">
             <FormField
               label="Email address"
               type="email"
@@ -197,7 +209,7 @@ export default function B2CSignUp() {
             />
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2">
             <FormField
               label="Password"
               type={showPassword ? "text" : "password"}
@@ -239,64 +251,33 @@ export default function B2CSignUp() {
             />
           </div>
 
-          <p className="text-xs text-slate-400">
+          <p className="text-[11px] text-slate-400">
             Use at least 8 characters, including one uppercase letter and one
             number.
           </p>
 
-          {registerFormik.status?.error && (
-            <div
-              role="alert"
-              className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
-            >
-              {registerFormik.status.error}
-            </div>
-          )}
-
           <button
             type="submit"
-            disabled={isRegistering || geoLoading}
-            className="h-12 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isRegistering}
+            className="h-11 w-full rounded-xl bg-brand font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {geoLoading
-              ? "Loading..."
-              : isRegistering
-                ? "Registering..."
-                : "Register"}
+            {isRegistering ? "Registering..." : "Register"}
           </button>
         </form>
       ) : (
         <form
           onSubmit={verifyFormik.handleSubmit}
-          className="space-y-6"
+          className="space-y-4"
           noValidate
         >
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-base font-bold text-slate-900">
               Verify your email
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               Enter the OTP sent to <strong>{registeredEmail}</strong>
             </p>
           </div>
-
-          {verifyFormik.status?.error && (
-            <div
-              role="alert"
-              className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
-            >
-              {verifyFormik.status.error}
-            </div>
-          )}
-
-          {verifyFormik.status?.success && (
-            <div
-              role="alert"
-              className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700"
-            >
-              {verifyFormik.status.success}
-            </div>
-          )}
 
           <div>
             <OtpInput

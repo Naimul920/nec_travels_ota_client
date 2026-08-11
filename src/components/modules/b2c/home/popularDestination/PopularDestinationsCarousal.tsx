@@ -2,6 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import { IoIosAirplane } from "react-icons/io";
+import {
+  AirplaneIcon,
+  DashedLineSvg,
+  BottomAirplanesSvg,
+} from "@/components/shared/icons/decorative";
 
 interface Destination {
   id: string;
@@ -37,7 +43,13 @@ const DESTINATIONS: Destination[] = [
   },
 ];
 
-export default function PopularDestinationsCarousel() {
+
+
+const BARCODE_BARS = [
+  2, 4, 1, 3, 5, 2, 1, 4, 3, 2, 5, 1, 3, 2, 4, 1, 5, 2, 3, 1, 4, 2, 1, 3, 5, 2,
+];
+
+export function PopularDestinationsCarousal() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [email, setEmail] = useState("");
 
@@ -55,134 +67,74 @@ export default function PopularDestinationsCarousel() {
     const offset = (index - currentIndex + total) % total;
 
     if (offset === 0) {
-      return `
-        z-30
-        w-[250px] h-[350px]
-        md:w-[320px] md:h-[460px]
-        xl:w-[380px] xl:h-[520px]
-        scale-100 opacity-100
-        translate-x-0
-        shadow-2xl
-      `;
+      return "z-30 w-[250px] h-[350px] md:w-[320px] md:h-[460px] xl:w-[380px] xl:h-[520px] scale-100 opacity-100 translate-x-0 shadow-[0_25px_60px_rgba(0,0,0,0.7)] ring-2 ring-brand/80";
     }
 
     if (offset === 1 || offset === total - 1) {
       const isRight = offset === 1;
+      const translation = isRight
+        ? "translate-x-[180px] md:translate-x-[280px] xl:translate-x-[360px]"
+        : "-translate-x-[180px] md:-translate-x-[280px] xl:-translate-x-[360px]";
 
-      return `
-        ${
-          isRight
-            ? "translate-x-[180px] md:translate-x-[280px] xl:translate-x-[360px]"
-            : "-translate-x-[180px] md:-translate-x-[280px] xl:-translate-x-[360px]"
-        }
-        z-20
-        w-[190px] h-[280px]
-        md:w-[260px] md:h-[380px]
-        xl:w-[300px] xl:h-[440px]
-        scale-95
-        opacity-90
-        shadow-xl
-        brightness-95
-      `;
+      return `${translation} z-20 w-[190px] h-[280px] md:w-[260px] md:h-[380px] xl:w-[300px] xl:h-[440px] scale-95 opacity-80 shadow-xl brightness-90`;
     }
 
     if (offset === 2 || offset === total - 2) {
       const isRight = offset === 2;
+      const translation = isRight
+        ? "translate-x-[300px] md:translate-x-[460px] xl:translate-x-[650px]"
+        : "-translate-x-[300px] md:-translate-x-[460px] xl:-translate-x-[650px]";
 
-      return `
-        ${
-          isRight
-            ? "translate-x-[300px] md:translate-x-[460px] xl:translate-x-[650px]"
-            : "-translate-x-[300px] md:-translate-x-[460px] xl:-translate-x-[650px]"
-        }
-        z-10
-        w-[150px] h-[220px]
-        md:w-[200px] md:h-[300px]
-        xl:w-[240px] xl:h-[370px]
-        scale-90
-        opacity-80
-        shadow-lg
-        brightness-90
-      `;
+      return `${translation} z-10 w-[150px] h-[220px] md:w-[200px] md:h-[300px] xl:w-[240px] xl:h-[370px] scale-90 opacity-60 shadow-lg brightness-75`;
     }
 
     return "opacity-0 pointer-events-none scale-50 z-0";
   };
 
   return (
-    <section className="relative overflow-hidden bg-[#1A1A1A] py-16">
-      {/* Green Background */}
-      <div className="absolute inset-x-0 top-0 h-225 overflow-hidden bg-[#00A550]">
-        <svg
-          className="absolute top-0 left-0 h-35 w-full fill-current text-white"
-          viewBox="0 0 1440 140"
-          preserveAspectRatio="none"
-        >
-          <path d="M0,0 L0,70 C180,-10 540,-10 720,70 C900,150 1260,150 1440,70 L1440,0 Z" />
-        </svg>
-
-        <svg
-          className="absolute bottom-0 left-0 h-45 w-full fill-current text-[#0B1F30]"
-          viewBox="0 0 1440 180"
-          preserveAspectRatio="none"
-        >
-          <path d="M0,96L120,117.3C240,139,480,181,720,181.3C960,181,1200,139,1320,117.3L1440,96L1440,320L1320,320C1200,320,960,320,720,320C480,320,240,320,120,320L0,320Z" />
-        </svg>
-      </div>
-
-      {/* Carousel */}
-      <div className="relative z-10 mx-auto my-10 flex h-87.5 w-full max-w-[1580px] items-center justify-center md:h-115 xl:h-130">
-        {/* Left Button */}
+    <div className="w-full">
+      {/* 3D Carousel Stack */}
+      <div className="relative z-10 mx-auto my-6 flex h-[350px] w-full max-w-[1580px] items-center justify-center md:h-[460px] xl:h-[520px]">
+        {/* Navigation Buttons */}
         <button
           onClick={handlePrev}
-          aria-label="Previous"
-          className="absolute left-[4%] z-40 flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-black/40 text-white backdrop-blur-md transition hover:scale-110 hover:bg-black/70 md:left-[10%] xl:left-[28%]"
+          aria-label="Previous destination"
+          className="absolute left-[4%] z-40 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-brand hover:bg-brand/10 hover:text-brand md:left-[10%] xl:left-[28%]"
         >
           <svg
             className="h-6 w-6 fill-none stroke-current"
             strokeWidth="2.5"
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 19l-7-7 7-7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
-        {/* Right Button */}
         <button
           onClick={handleNext}
-          aria-label="Next"
-          className="absolute right-[4%] z-40 flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-black/40 text-white backdrop-blur-md transition hover:scale-110 hover:bg-black/70 md:right-[10%] xl:right-[28%]"
+          aria-label="Next destination"
+          className="absolute right-[4%] z-40 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-brand hover:bg-brand/10 hover:text-brand md:right-[10%] xl:right-[28%]"
         >
           <svg
             className="h-6 w-6 fill-none stroke-current"
             strokeWidth="2.5"
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 5l7 7-7 7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
         {/* Cards */}
-        <div className="relative flex h-full w-full items-center justify-center perspective-[1000px]">
+        <div className="perspective-[1000px] relative flex h-full w-full items-center justify-center">
           {DESTINATIONS.map((item, index) => {
             const cardClass = getCardStyle(index);
-
-            const isCenter =
-              (index - currentIndex + total) % total === 0;
+            const isCenter = (index - currentIndex + total) % total === 0;
 
             return (
               <div
                 key={item.id}
                 onClick={() => setCurrentIndex(index)}
-                className={`absolute cursor-pointer overflow-hidden rounded-3xl shadow-lg shadow-green-900 transition-all duration-500 ease-out ${cardClass}`}
+                className={`absolute cursor-pointer overflow-hidden rounded-3xl backdrop-blur-sm ring-1 ring-slate-200/70 transition-all duration-500 ease-out ${cardClass}`}
               >
                 <Image
                   src={item.image}
@@ -190,15 +142,24 @@ export default function PopularDestinationsCarousel() {
                   fill
                   priority={isCenter}
                   sizes="(max-width: 768px) 250px, (max-width: 1280px) 320px, 380px"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-700 ease-out hover:scale-105"
                 />
 
                 {isCenter && (
-                  <div className="absolute inset-x-0 top-0 flex h-25 items-start justify-center bg-linear-to-b from-blue-700/70 via-blue-500/30 to-transparent pt-5">
-                    <h3 className="text-center text-2xl font-bold tracking-wide text-white drop-shadow-md md:text-3xl xl:text-[38px]">
-                      {item.name}
-                    </h3>
-                  </div>
+                  <>
+                    <div className="absolute inset-x-0 top-0 flex h-28 items-start justify-center bg-gradient-to-b from-[#0E1A2E]/90 via-[#0E1A2E]/40 to-transparent pt-6">
+                      <h3 className="text-center text-2xl font-bold tracking-wide text-white drop-shadow-md md:text-3xl xl:text-[36px]">
+                        {item.name}
+                      </h3>
+                    </div>
+
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-gradient-to-t from-[#0E1A2E]/95 via-[#0E1A2E]/60 to-transparent pb-5 pt-10">
+                      <IoIosAirplane className="-rotate-45 text-brand" size={16} />
+                      <span className="font-plex-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">
+                        Explore Destination
+                      </span>
+                    </div>
+                  </>
                 )}
               </div>
             );
@@ -206,39 +167,73 @@ export default function PopularDestinationsCarousel() {
         </div>
       </div>
 
-      {/* Newsletter */}
-      <div className="relative z-20 mx-auto mt-12 flex w-297.5 max-w-[95%] flex-col items-center justify-between gap-8 rounded-md bg-white px-6 py-8 shadow-2xl lg:flex-row lg:px-12">
-        <div className="text-center lg:text-left">
-          <h2 className="text-2xl font-semibold text-[#1C233D] md:text-4xl">
-            Subscribe Newsletter
-          </h2>
+      {/* Boarding Pass Newsletter Card */}
+      <div className="relative z-20 mx-auto mt-20 flex w-[1120px] max-w-[92%] flex-col overflow-hidden rounded-2xl border border-brand/20 bg-white shadow-[0_25px_60px_-15px_rgba(0,165,80,0.25)] lg:flex-row">
+        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-80" />
 
-          <p className="mt-2 text-sm text-gray-500">
-            &amp; get exclusive offer updates
+        <div className="flex flex-1 flex-col justify-center gap-2 px-8 py-10 text-center lg:px-12 lg:text-left">
+          <p className="font-plex-mono text-xs font-semibold tracking-[0.3em] text-brand">
+            STAY UPDATED
+          </p>
+          <h2 className="font-grotesk text-2xl font-bold text-slate-900 md:text-3xl xl:text-4xl">
+            Subscribe to our newsletter
+          </h2>
+          <p className="text-sm text-slate-500">
+            Fare drops and exclusive travel offers, straight to your inbox.
           </p>
         </div>
 
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="flex w-full max-w-140 flex-col gap-3 sm:flex-row"
-        >
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-14 flex-1 border border-gray-200 px-4 outline-none focus:border-[#00A550]"
-            required
-          />
+        <div className="relative hidden w-px shrink-0 border-l border-dashed border-brand/30 lg:block">
+          <span className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-[#F0F6F3]" />
+          <span className="absolute -bottom-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-[#F0F6F3]" />
+        </div>
+        <div className="relative border-t border-dashed border-brand/30 lg:hidden">
+          <span className="absolute -left-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-[#F0F6F3]" />
+          <span className="absolute -right-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-[#F0F6F3]" />
+        </div>
 
-          <button
-            type="submit"
-            className="h-14 bg-[#00A550] px-8 font-semibold text-white transition hover:bg-[#008f45]"
+        <div className="flex flex-1 flex-col justify-center gap-4 px-8 py-10 lg:px-12">
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex w-full flex-col gap-3 sm:flex-row"
           >
-            Subscribe Now
-          </button>
-        </form>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-14 w-full shrink-0 rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-brand focus:bg-white focus:ring-2 focus:ring-brand/40 sm:flex-1"
+              required
+            />
+
+            <button
+              type="submit"
+              className="group flex h-14 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-brand px-8 font-semibold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg hover:shadow-brand/25 sm:w-auto"
+            >
+              Subscribe
+              <IoIosAirplane
+                className="-rotate-45 transition-transform duration-300 group-hover:translate-x-1"
+                size={18}
+              />
+            </button>
+          </form>
+
+          <div>
+            <div className="flex h-5 items-end gap-[2px]">
+              {BARCODE_BARS.map((w, i) => (
+                <div
+                  key={i}
+                  className="bg-brand/40"
+                  style={{ width: `${w}px`, height: "100%" }}
+                />
+              ))}
+            </div>
+            <p className="mt-1 font-plex-mono text-[9px] tracking-[0.25em] text-slate-400">
+              NEC TRAVELS · BOARDING PASS
+            </p>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

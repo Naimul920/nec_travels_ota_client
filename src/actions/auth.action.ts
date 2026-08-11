@@ -261,7 +261,6 @@ export const b2cRegisterAction = async (payload: {
   password: string;
   password_confirmation: string;
   phone: string;
-  currency_Id: string;
 }) => {
   try {
     const res = await httpClient.post<{ user_id: string; email: string }>(

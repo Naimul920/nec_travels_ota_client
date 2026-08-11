@@ -44,21 +44,21 @@ export const step1Schema = Yup.object({
 export const step2Schema = Yup.object({
   agency_name: Yup.string().trim().min(2, "Too short").required("Agency name is required"),
   business_type: Yup.string().required("Business type is required"),
-  currency_Id: Yup.string().required("Currency is required"),
-  caab_certificate_number: Yup.string().trim(),
-  caab_certificate_expiry: Yup.string().nullable(),
-  city: Yup.string().trim(),
-  postcode: Yup.string().trim(),
-  address: Yup.string().trim(),
+  country: Yup.string().required("Country is required"),
+  caab_certificate_number: Yup.string().trim().optional(),
+  caab_certificate_expiry: Yup.string().nullable().optional(),
+  city: Yup.string().trim().required("City is required"),
+  postcode: Yup.string().trim().required("Postcode is required"),
+  address: Yup.string().trim().required("Address is required"),
   // hear_about_us: Yup.string(),
 });
 
 export const step3Schema = Yup.object({
-  logo: fileSchema(false),
+  logo: fileSchema(true),
   trade_license: fileSchema(false),
   caab_certificate: fileSchema(false),
   nid: fileSchema(false),
-  business_card: fileSchema(false),
+  business_card: fileSchema(true),
 });
 
 // Full schema, used as a final safety check before submit on step 4

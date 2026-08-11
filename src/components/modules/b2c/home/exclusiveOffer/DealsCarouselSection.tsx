@@ -302,7 +302,7 @@ export default function DealsCarouselSection() {
                 onClick={() => handleTabChange(tab)}
                 className={`flex h-[44px] flex-1 items-center justify-center rounded-full text-xs font-semibold transition-all duration-300 sm:text-[15px] ${
                   isActive
-                    ? "scale-[1.02] bg-[#FF0000] text-white shadow-md"
+                    ? "scale-[1.02] bg-brand text-white shadow-md"
                     : "text-[#1C233D] hover:bg-black/5 hover:text-black"
                 }`}
               >

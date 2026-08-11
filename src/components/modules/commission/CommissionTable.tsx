@@ -13,7 +13,6 @@ import {
   getCommissionsAction,
   getPackagesAction,
 } from "@/actions/commission.action";
-import { getCurrenciesAction } from "@/actions/currency.action";
 import type { CommissionItem } from "@/interface/commission";
 
 const formatDate = (v?: string) =>
@@ -26,9 +25,6 @@ const CommissionTable: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editing, setEditing] = useState<CommissionItem | null>(null);
   const [packageOptions, setPackageOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [currencyOptions, setCurrencyOptions] = useState<
     { label: string; value: string }[]
   >([]);
 
@@ -49,14 +45,6 @@ const CommissionTable: React.FC = () => {
         packages.map((p) => ({
           label: p.package_name || p.id,
           value: p.id,
-        })),
-      );
-    });
-    getCurrenciesAction().then((currencies) => {
-      setCurrencyOptions(
-        currencies.map((c) => ({
-          label: `${c.code} — ${c.name}`,
-          value: c.id,
         })),
       );
     });
@@ -236,7 +224,6 @@ const CommissionTable: React.FC = () => {
         onSaved={fetchData}
         editing={editing}
         packageOptions={packageOptions}
-        currencyOptions={currencyOptions}
       />
     </ConfigProvider>
   );

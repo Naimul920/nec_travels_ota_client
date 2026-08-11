@@ -14,7 +14,7 @@ import examples from "libphonenumber-js/examples.mobile.json";
 import * as Flags from "country-flag-icons/react/3x2";
 import type { FlagComponent } from "country-flag-icons/react/3x2";
 import { FaChevronDown, FaSearch } from "react-icons/fa";
-import { useUserCountryInfoStore } from "@/store/user_country.store";
+import { useGeoStore, getGeoCountryCode } from "@/store/geo.store";
 
 const flagMap = Flags as unknown as Record<string, FlagComponent | undefined>;
 
@@ -86,8 +86,6 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   disabled,
   name,
 }) => {
-  const phoneCode = useUserCountryInfoStore((s) => s.phoneCode);
-  const countryCode = useUserCountryInfoStore((s) => s.geo?.countryCode);
   const [isTouched, setIsTouched] = useState(false);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -99,15 +97,13 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   const popupRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // Determine initial country from geoip (pro.ip-api.com via currency store)
+  // Default country from client-side geo detection (api.necfly.com/geo)
+  const geoCountryCode = useGeoStore((s) => getGeoCountryCode(s.geo));
   const defaultCountry = useMemo<CountryCode>(() => {
-    const byDial = DIAL_TO_COUNTRY[phoneCode?.replace(/^\+/, "") || ""];
-    const byGeo =
-      countryCode && /^[A-Za-z]{2}$/.test(countryCode)
-        ? (countryCode.toUpperCase() as CountryCode)
-        : null;
-    return byDial || byGeo || "BD";
-  }, [phoneCode, countryCode]);
+    return /^[A-Za-z]{2}$/.test(geoCountryCode)
+      ? (geoCountryCode.toUpperCase() as CountryCode)
+      : "BD";
+  }, [geoCountryCode]);
 
   // Detect country from the dial code present in an auto-filled value, e.g. "+9665..."
   const valueCountry = useMemo<CountryCode | null>(() => {

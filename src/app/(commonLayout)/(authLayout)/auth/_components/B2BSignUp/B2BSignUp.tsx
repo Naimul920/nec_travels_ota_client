@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import { FiArrowLeft, FiArrowRight, FiCheck } from "react-icons/fi";
@@ -19,14 +19,10 @@ import {
 } from "@/actions/auth.action";
 import { verifyEmailSchema } from "@/validations/auth.validation";
 import { OtpInput } from "@/components/ui";
-import { useUserCountryInfoStore } from "@/store/user_country.store";
-import { useGetSystemCurrencies } from "@/store/currencies.store";
-
-const DEFAULT_CURRENCY_ID = "22899850-ff1f-4e8e-aa1c-e8580a1e37aa"; // BDT
+import { useGeoStore, getGeoCountryCode } from "@/store/geo.store";
+import { showAlert } from "@/components/common/Alert/ShowAlert";
 
 const initialValues: B2BSignUpFormValues = {
-  currency_Id:"", //auto fill
-
   first_name: "",
   last_name: "",
   email: "",
@@ -34,10 +30,9 @@ const initialValues: B2BSignUpFormValues = {
   password: "",
   password_confirmation: "",
 
-
   agency_name: "",
   business_type: "COMPANY_LTD",
-  currency: "BDT",
+  country: "",
   caab_certificate_number: "",
   caab_certificate_expiry: "",
   city: "",
@@ -61,23 +56,25 @@ export default function B2BSignUp() {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
 
   const router = useRouter();
+  const geo = useGeoStore((s) => s.geo);
+  const countryCode = getGeoCountryCode(geo);
 
-  const { geo, selectedCurrencyCode } =
-    useUserCountryInfoStore();
-
-  const {
-    currencies,
-    initialized: currenciesInitialized,
-    initialize: initializeCurrencies,
-  } = useGetSystemCurrencies();
-
-  console.log("countryCode", geo?.countryCode);
+  // Renamed refs so validators always read the latest step (Formik can
+  // invoke onSubmit with a stale closure) and rapid clicks can't double-advance.
+  const currentStepRef = useRef(currentStep);
+  currentStepRef.current = currentStep;
+  const stepNavLockRef = useRef(false);
 
   const formik = useFormik<B2BSignUpFormValues>({
     initialValues,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values, { setSubmitting }) => {
+      if (currentStepRef.current !== TOTAL_STEPS) {
+        setSubmitting(false);
+        return;
+      }
+
       setSubmitStatus(null);
 
       try {
@@ -103,19 +100,14 @@ export default function B2BSignUp() {
 
       formData.append("agency_name", values.agency_name);
       formData.append("business_type", values.business_type);
-      formData.append("currency_Id", values.currency_Id);
-      formData.append(
-        "caab_certificate_number",
-        values.caab_certificate_number,
-      );
-      formData.append(
-        "caab_certificate_expiry",
-        values.caab_certificate_expiry,
-      );
+      formData.append("country", values.country);
+      if (values.caab_certificate_number)
+        formData.append("caab_certificate_number", values.caab_certificate_number);
+      if (values.caab_certificate_expiry)
+        formData.append("caab_certificate_expiry", values.caab_certificate_expiry);
       formData.append("city", values.city);
       formData.append("postcode", values.postcode);
       formData.append("address", values.address);
-      formData.append("country", geo?.countryCode || "");
 
       if (values.logo) formData.append("logo", values.logo);
       if (values.trade_license)
@@ -132,17 +124,27 @@ export default function B2BSignUp() {
         if (result.success) {
           setRegisteredEmail(values.email);
           setStep("verify");
+          showAlert({
+            title: "Registration submitted",
+            text: result.message || "Please verify your email to continue.",
+            variant: "success",
+            confirmText: "Continue",
+          });
         } else {
-          setSubmitStatus({
-            type: "error",
-            message: result.message,
+          showAlert({
+            title: "Registration failed",
+            text: result.message || "Something went wrong. Please try again.",
+            variant: "error",
+            confirmText: "OK",
           });
         }
       } catch (error) {
         console.error("Submission failed:", error);
-        setSubmitStatus({
-          type: "error",
-          message: "Something went wrong while submitting. Please try again.",
+        showAlert({
+          title: "Registration failed",
+          text: "Something went wrong while submitting. Please try again.",
+          variant: "error",
+          confirmText: "OK",
         });
       } finally {
         setSubmitting(false);
@@ -162,12 +164,28 @@ export default function B2BSignUp() {
         });
         if (result.success) {
           helpers.setStatus({ success: result.message });
+          showAlert({
+            title: "Email verified",
+            text: result.message || "Your email has been verified successfully.",
+            variant: "success",
+            confirmText: "Continue",
+          });
           router.push("/auth/signin");
         } else {
-          helpers.setStatus({ error: result.message });
+          showAlert({
+            title: "Verification failed",
+            text: result.message || "Please check the OTP and try again.",
+            variant: "error",
+            confirmText: "OK",
+          });
         }
       } catch {
-        helpers.setStatus({ error: "Verification failed. Please try again." });
+        showAlert({
+          title: "Verification failed",
+          text: "Verification failed. Please try again.",
+          variant: "error",
+          confirmText: "OK",
+        });
       } finally {
         helpers.setSubmitting(false);
       }
@@ -175,50 +193,43 @@ export default function B2BSignUp() {
   });
 
   useEffect(() => {
-    if (!currenciesInitialized) initializeCurrencies();
-  }, [currenciesInitialized, initializeCurrencies]);
-
-  useEffect(() => {
-    if (formik.values.currency || !selectedCurrencyCode) return;
-    formik.setFieldValue("currency", selectedCurrencyCode);
-  }, [selectedCurrencyCode, formik.values.currency, formik]);
-
-  useEffect(() => {
-    if (formik.values.currency_Id) return;
-    const match = currencies.find((c) => c.code === selectedCurrencyCode);
-    const fallback = currencies.find((c) => c.code === "BDT");
-    formik.setFieldValue(
-      "currency_Id",
-      match?.id || fallback?.id || DEFAULT_CURRENCY_ID,
-    );
-  }, [currencies, selectedCurrencyCode, formik.values.currency_Id, formik]);
+    if (formik.values.country === countryCode) return;
+    formik.setFieldValue("country", countryCode);
+  }, [countryCode, formik.values.country, formik]);
 
   const goToNextStep = async () => {
-    const schema = stepSchemas[currentStep - 1];
-
-    if (!schema) {
-      setCurrentStep((prev) => Math.min(TOTAL_STEPS, prev + 1));
-      return;
-    }
+    if (stepNavLockRef.current) return;
+    stepNavLockRef.current = true;
 
     try {
-      await schema.validate(formik.values, { abortEarly: false });
+      const schema = stepSchemas[currentStepRef.current - 1];
 
-      formik.setErrors({});
-      setCurrentStep((prev) => Math.min(TOTAL_STEPS, prev + 1));
-    } catch (error: any) {
-      const validationErrors: Record<string, string> = {};
-      const touchedFields: Record<string, boolean> = {};
+      if (!schema) {
+        setCurrentStep((prev) => Math.min(TOTAL_STEPS, prev + 1));
+        return;
+      }
 
-      error.inner?.forEach((err: { path?: string; message: string }) => {
-        if (err.path) {
-          validationErrors[err.path] = err.message;
-          touchedFields[err.path] = true;
-        }
-      });
+      try {
+        await schema.validate(formik.values, { abortEarly: false });
 
-      formik.setErrors(validationErrors);
-      formik.setTouched(touchedFields);
+        formik.setErrors({});
+        setCurrentStep((prev) => Math.min(TOTAL_STEPS, prev + 1));
+      } catch (error: any) {
+        const validationErrors: Record<string, string> = {};
+        const touchedFields: Record<string, boolean> = {};
+
+        error.inner?.forEach((err: { path?: string; message: string }) => {
+          if (err.path) {
+            validationErrors[err.path] = err.message;
+            touchedFields[err.path] = true;
+          }
+        });
+
+        formik.setErrors(validationErrors);
+        formik.setTouched(touchedFields);
+      }
+    } finally {
+      stepNavLockRef.current = false;
     }
   };
 
@@ -232,15 +243,30 @@ export default function B2BSignUp() {
   const handleResendOtp = async () => {
     if (!registeredEmail || resending) return;
     setResending(true);
-    verifyFormik.setStatus(null);
     try {
       const result = await resendOtpAction({ email: registeredEmail });
-      verifyFormik.setStatus({
-        success: result.success,
-        error: result.success ? undefined : result.message,
-      });
+      if (result.success) {
+        showAlert({
+          title: "OTP sent",
+          text: result.message || "A new verification code has been sent.",
+          variant: "success",
+          confirmText: "OK",
+        });
+      } else {
+        showAlert({
+          title: "Failed to resend OTP",
+          text: result.message || "Please try again.",
+          variant: "error",
+          confirmText: "OK",
+        });
+      }
     } catch {
-      verifyFormik.setStatus({ error: "Failed to resend OTP. Please try again." });
+      showAlert({
+        title: "Failed to resend OTP",
+        text: "Failed to resend OTP. Please try again.",
+        variant: "error",
+        confirmText: "OK",
+      });
     } finally {
       setResending(false);
     }
@@ -248,38 +274,20 @@ export default function B2BSignUp() {
 
   if (step === "verify") {
     return (
-      <div className="mx-auto w-full max-w-4xl p-4">
+      <div className="mx-auto w-full max-w-2xl">
         <form
           onSubmit={verifyFormik.handleSubmit}
-          className="mt-8 space-y-6"
+          className="mt-6 space-y-4"
           noValidate
         >
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-lg font-bold text-slate-900">
               Verify your email
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500">
               Enter the OTP sent to <strong>{registeredEmail}</strong>
             </p>
           </div>
-
-          {verifyFormik.status?.error && (
-            <div
-              role="alert"
-              className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700"
-            >
-              {verifyFormik.status.error}
-            </div>
-          )}
-
-          {verifyFormik.status?.success && (
-            <div
-              role="alert"
-              className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700"
-            >
-              {verifyFormik.status.success}
-            </div>
-          )}
 
           <div>
             <OtpInput
@@ -318,10 +326,18 @@ export default function B2BSignUp() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl p-4">
+    <div className="mx-auto w-full max-w-2xl">
       <Stepper currentStep={currentStep} />
 
-      <form onSubmit={formik.handleSubmit} className="mt-8" noValidate>
+      <form
+        onSubmit={formik.handleSubmit}
+        noValidate
+        onKeyDown={(e) => {
+          if (currentStep < TOTAL_STEPS && e.key === "Enter") {
+            e.preventDefault();
+          }
+        }}
+      >
         {currentStep === 1 && <Step1 formik={formik} />}
         {currentStep === 2 && <Step2 formik={formik} />}
         {currentStep === 3 && <Step3 formik={formik} />}
@@ -330,7 +346,7 @@ export default function B2BSignUp() {
         {submitStatus && (
           <div
             role="alert"
-            className={`mt-6 rounded-xl border p-4 text-sm ${
+            className={`mt-3 rounded-xl border p-3 text-sm ${
               submitStatus.type === "success"
                 ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                 : "border-rose-200 bg-rose-50 text-brand/70"
@@ -340,12 +356,12 @@ export default function B2BSignUp() {
           </div>
         )}
 
-        <div className="mt-10 flex items-center justify-between">
+        <div className="mt-4 flex items-center justify-between">
           <button
             type="button"
             onClick={goToPreviousStep}
             disabled={currentStep === 1}
-            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <FiArrowLeft />
             Back
@@ -354,8 +370,12 @@ export default function B2BSignUp() {
           {currentStep < TOTAL_STEPS ? (
             <button
               type="button"
-              onClick={goToNextStep}
-              className="flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                goToNextStep();
+              }}
+              className="flex items-center gap-2 rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand"
             >
               Continue
               <FiArrowRight />
@@ -364,7 +384,7 @@ export default function B2BSignUp() {
             <button
               type="submit"
               disabled={formik.isSubmitting}
-              className="flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {formik.isSubmitting ? "Submitting..." : "Submit registration"}
               <FiCheck />

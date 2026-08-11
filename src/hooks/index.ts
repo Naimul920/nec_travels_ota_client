@@ -3,3 +3,4 @@ export { useIssueTickets } from "./useIssueTickets";
 export { useHoldPassengers } from "./useHoldPassengers";
 export { useFlightSearchMutation } from "./useFlightApi";
 export { useAllUsers } from "./useAllUsers";
+export { useAdminBookings } from "./useAdminBookings";

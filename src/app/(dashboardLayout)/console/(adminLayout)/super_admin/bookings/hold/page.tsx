@@ -1,9 +1,9 @@
-import HoldTickets from "../../_components/AirTickets/HoldTickets";
+import AdminBookingsTable from "../../_components/AirTickets/AdminBookingsTable";
 
 function page() {
   return (
     <>
-      <HoldTickets />
+      <AdminBookingsTable status="HOLD" />
     </>
   );
 }

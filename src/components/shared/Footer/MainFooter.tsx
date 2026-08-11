@@ -60,7 +60,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 
 export default function MainFooter() {
   return (
-    <footer className="w-full border-t-2 border-white bg-[#0B1F30] text-[#8FA6BC]">
+    <footer className="w-full  bg-[#0B1F30] text-[#8FA6BC]">
       <div className="mx-auto max-w-7xl px-4 pb-8 pt-12">
         {/* Main Grid */}
         <div className="grid grid-cols-1 gap-10 pb-14 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">

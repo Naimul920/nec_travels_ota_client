@@ -20,13 +20,13 @@ export default function Stepper({ currentStep }: { currentStep: number }) {
   const progressPercent = ((currentStep - 1) / (TOTAL_STEPS - 1)) * 100;
 
   return (
-    <div className="mb-10" aria-label={`Step ${currentStep} of ${TOTAL_STEPS}`}>
+    <div className="mb-4" aria-label={`Step ${currentStep} of ${TOTAL_STEPS}`}>
       <div className="relative flex justify-between">
-        {/* Background track offset by 22px (half of w-11) on both ends */}
-        <div className="absolute left-5.5 right-5.5 top-5 h-0.5 rounded-full bg-slate-200" />
+        {/* Background track offset by 18px (half of w-9) on both ends */}
+        <div className="absolute left-4.5 right-4.5 top-4 h-0.5 rounded-full bg-slate-200" />
 
         {/* Active progress bar contained within the same track width */}
-        <div className="absolute left-5.5 right-5.5 top-5 h-0.5 pointer-events-none">
+        <div className="absolute left-4.5 right-4.5 top-4 h-0.5 pointer-events-none">
           <div
             className="h-full rounded-full bg-emerald-600 transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
@@ -45,7 +45,7 @@ export default function Stepper({ currentStep }: { currentStep: number }) {
             >
               <div
                 aria-current={active ? "step" : undefined}
-                className={`flex h-11 w-11 items-center justify-center rounded-2xl border transition-all duration-300 ${
+                className={`flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-300 ${
                   completed
                     ? "border-emerald-600 bg-emerald-600 text-white"
                     : active
@@ -53,11 +53,11 @@ export default function Stepper({ currentStep }: { currentStep: number }) {
                       : "border-slate-200 bg-white text-slate-400"
                 }`}
               >
-                {completed ? <FiCheck /> : <Icon />}
+                {completed ? <FiCheck size={14} /> : <Icon size={14} />}
               </div>
 
               <span
-                className={`mt-2 text-xs font-semibold ${
+                className={`mt-1 text-[10px] font-semibold ${
                   active || completed ? "text-emerald-700" : "text-slate-400"
                 }`}
               >

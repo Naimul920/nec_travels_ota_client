@@ -12,13 +12,13 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2.5">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Account information</h2>
-        <p className="mt-1 text-sm text-slate-500">Enter your account information to continue.</p>
+        <h2 className="text-base font-bold text-slate-900">Account information</h2>
+        <p className="text-[11px] text-slate-500">Enter your account information to continue.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <FormField
           label="Given name"
           type="text"
@@ -38,7 +38,7 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <FormField
           label="Email address"
           type="email"
@@ -60,7 +60,7 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <FormField
           label="Password"
           type={showPassword ? "text" : "password"}
@@ -100,7 +100,7 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
         />
       </div>
 
-      <p className="text-xs text-slate-400">
+      <p className="text-[11px] text-slate-400">
         Use at least 8 characters, including one uppercase letter and one number.
       </p>
     </div>
