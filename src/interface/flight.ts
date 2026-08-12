@@ -25,6 +25,7 @@ export interface FlightSearchData {
   from: string;
   to: string;
   startDate: string;
+  returnDate?: string;
   ttlSeconds?: number;
   expiresAt?: string;
   noOfAdult: number;
@@ -50,6 +51,7 @@ export interface FlightDetail {
 
 export interface Schedule {
   flightName: string;
+  airlinedesignator?: string;
   bookingCode: string;
   cabinCode: string;
   seatsAvailable: number;

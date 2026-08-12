@@ -109,7 +109,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
             <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">
               Travelers & Class
             </p>
-            <p className="mt-0.5 flex items-center gap-2 text-2xl font-extrabold text-primary">
+            <p className="mt-0.5 flex items-center gap-2 text-2xl font-extrabold text-black">
               {total}
               <span className="text-sm font-semibold text-gray-600">
                 Traveler{total > 1 ? "s" : ""}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
 import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
@@ -18,10 +18,12 @@ import {
 } from "@/validations/auth.validation";
 import { useRouter } from "next/navigation";
 import { showAlert } from "@/components/common/Alert/ShowAlert";
+import { useGeoStore, getGeoCountryCode } from "@/store/geo.store";
 
 interface B2CRegisterFormValues {
   email: string;
   phone: string;
+  country: string;
   password: string;
   password_confirmation: string;
 }
@@ -29,6 +31,7 @@ interface B2CRegisterFormValues {
 const registerInitialValues: B2CRegisterFormValues = {
   email: "",
   phone: "",
+  country: "",
   password: "",
   password_confirmation: "",
 };
@@ -60,6 +63,7 @@ export default function B2CSignUp() {
           ...values,
           // currency_code: selectedCurrencyCode, implement later
           phone: values.phone,
+          country: values.country,
         });
         if (result.success) {
           setRegisteredEmail(values.email);
@@ -137,6 +141,16 @@ export default function B2CSignUp() {
       : undefined;
 
   const [resending, setResending] = useState(false);
+
+  const geo = useGeoStore((s) => s.geo);
+  const geoCountryCode = getGeoCountryCode(geo);
+
+  // Auto-fill the country from geo detection (only if the user hasn't
+  // chosen a value yet, so manual edits are preserved).
+  useEffect(() => {
+    if (!geoCountryCode || registerFormik.values.country) return;
+    registerFormik.setFieldValue("country", geoCountryCode, false);
+  }, [geoCountryCode, registerFormik.values.country, registerFormik]);
 
   const handleResendOtp = async () => {
     if (!registeredEmail || resending) return;

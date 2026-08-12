@@ -3,7 +3,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 // 2. Swapped React Router Hook for Next.js App Router Native Hook Engine
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import dayjs from "dayjs";
 import { NotFound } from "@/components/ui";
 import FlightSearchSummary from "@/components/modules/flight/FlightSearchSummary/FlightSearchSummary";
 import SearchHeaderFilter from "@/components/modules/flight/Filter/SearchHeaderFilter/SearchHeaderFilter";
@@ -14,7 +15,7 @@ import FlightCard from "@/components/modules/flight/Card/FlightCard";
 import FlightSearchSkeleton from "@/components/modules/flight/Card/FlightSearchSkeleton";
 import SearchCountdown from "@/components/modules/flight/Card/SearchCountdown";
 import { useFlightSearchMutation } from "@/hooks/useFlightApi";
-import { decoding, storeSearchExpiry } from "@/utils";
+import { decoding, storeSearchExpiry, encoding, getItineraryMaxStops } from "@/utils";
 import type {
   Itinerary,
   SearchPayload,
@@ -184,18 +185,6 @@ const FlightSearch: React.FC = () => {
     return Array.from(codes).sort();
   }, [allItins]);
 
-  const stopOptions = useMemo(() => {
-    const stops = new Set<number>();
-    allItins.forEach((itin: any) => {
-      itin?.flightDetails?.forEach((fd: any) => {
-        fd?.schedules?.forEach((s: Schedule) => {
-          stops.add(s.stopCount);
-        });
-      });
-    });
-    return Array.from(stops).sort();
-  }, [allItins]);
-
   const filteredFlights = useMemo(() => {
     let list = allItins;
     if (filters.airlines.length > 0) {
@@ -208,12 +197,14 @@ const FlightSearch: React.FC = () => {
       );
     }
     if (filters.stops.length > 0) {
-      list = list.filter((itin: any) =>
-        itin?.flightDetails?.some((fd: any) =>
-          fd?.schedules?.some((s: Schedule) =>
-            filters.stops.includes(s.stopCount),
-          ),
-        ),
+      list = list.filter(
+        (itin: any) =>
+          itin &&
+          filters.stops.some((stop) => {
+            const max = getItineraryMaxStops(itin);
+            // value 2 acts as a "2+ stops" bucket
+            return stop === 2 ? max >= 2 : max === stop;
+          }),
       );
     }
     if (filters.departureRange[0] > 0 || filters.departureRange[1] < 1440) {
@@ -257,11 +248,77 @@ const FlightSearch: React.FC = () => {
     }));
   }, []);
 
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const departureDate = searchParams.get("date");
+  const returnDate = searchParams.get("returnDate");
+
+  const multicityDates = useMemo(() => {
+    if (tripType !== "multicity") return { first: "", last: "" };
+    const segmentsStr = searchParams.get("segments") || "";
+    const dates = segmentsStr.split(",").map((seg) => {
+      const parts = seg.split("-");
+      return parts.slice(2).join("-");
+    });
+    return {
+      first: dates[0] || "",
+      last: dates[dates.length - 1] || "",
+    };
+  }, [tripType, searchParams]);
+
+  const handleDateStep = useCallback(
+    (leg: "departure" | "return", direction: number) => {
+      if (!tripType) return;
+      const updated = new URLSearchParams(searchParams.toString());
+
+      if (tripType === "multicity") {
+        const segmentsStr = updated.get("segments");
+        if (!segmentsStr) return;
+        const segments = segmentsStr.split(",").map((seg) => {
+          const parts = seg.split("-");
+          return {
+            from: parts[0],
+            to: parts[1],
+            start_date: parts.slice(2).join("-"),
+          };
+        });
+        if (segments.length === 0) return;
+        const targetIdx =
+          leg === "return" && segments.length > 1
+            ? segments.length - 1
+            : 0;
+        const current = dayjs(segments[targetIdx].start_date);
+        const nextDate = (current.isValid() ? current : dayjs())
+          .add(direction, "day")
+          .format("YYYY-MM-DD");
+        segments[targetIdx].start_date = nextDate;
+        updated.set(
+          "segments",
+          segments
+            .map((s) => `${s.from}-${s.to}-${s.start_date}`)
+            .join(","),
+        );
+      } else {
+        const key = leg === "return" ? "returnDate" : "date";
+        const current = dayjs(searchParams.get(key));
+        const nextDate = (current.isValid() ? current : dayjs())
+          .add(direction, "day")
+          .format("YYYY-MM-DD");
+        updated.set(key, nextDate);
+      }
+
+      router.push(`${pathname}?q=${encoding(updated.toString())}`);
+    },
+    [tripType, searchParams, pathname, router],
+  );
+
   const minPrice = useMemo(() => {
     if (allItins.length === 0) return 0;
-    return Math.min(
-      ...allItins.map((i: any) => i.saleCurrencyAmount.totalFare),
-    );
+    const fares = allItins
+      .map((i: any) => i.saleCurrencyAmount?.offerAmount ?? i.saleCurrencyAmount?.totalAmount)
+      .filter((f): f is number => typeof f === "number" && Number.isFinite(f));
+    return fares.length ? Math.min(...fares) : 0;
   }, [allItins]);
 
   if (!isTripTypeValid) {
@@ -324,8 +381,11 @@ const FlightSearch: React.FC = () => {
                   filters={filters}
                   onFilterChange={handleFilterChange}
                   carrierCodes={carrierCodes}
-                  stopOptions={stopOptions}
                   minPrice={minPrice}
+                  tripType={tripType ?? ""}
+                  departureDate={departureDate ?? multicityDates.first}
+                  returnDate={returnDate ?? multicityDates.last}
+                  onDateStep={handleDateStep}
                 />
               </div>
             </div>
@@ -354,8 +414,11 @@ const FlightSearch: React.FC = () => {
                   filters={filters}
                   onFilterChange={handleFilterChange}
                   carrierCodes={carrierCodes}
-                  stopOptions={stopOptions}
                   minPrice={minPrice}
+                  tripType={tripType ?? ""}
+                  departureDate={departureDate ?? multicityDates.first}
+                  returnDate={returnDate ?? multicityDates.last}
+                  onDateStep={handleDateStep}
                 />
               </div>
             </div>
@@ -385,11 +448,11 @@ const FlightSearch: React.FC = () => {
               {!isPending && !isError && totalFlights > 0 && (
                 <div className="py-2 space-y-2">
                   {filteredFlights.map(
-                    (itinerary: Itinerary, index: number) => (
+                    (itinerary: Itinerary, filteredIndex: number) => (
                       <FlightCard
-                        key={index}
+                        key={filteredIndex}
                         itinerary={itinerary}
-                        index={index}
+                        index={allItins.indexOf(itinerary)}
                         searchId={data?.data?.searchId ?? ""}
                         passengerCount={{
                           adult: data?.data?.noOfAdult ?? 0,

@@ -278,7 +278,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   return (
     <div ref={rootRef} className={clsx("w-full", className)}>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+        <label className="mb-1 block text-[11px] font-medium text-slate-700">
           {label}
           {required && <span className="ml-0.5 text-red-500">*</span>}
         </label>
@@ -286,7 +286,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
 
       <div
         className={clsx(
-          "flex h-12 w-full items-center overflow-hidden rounded-lg border-2 border-gray-200 bg-white shadow-sm transition-all duration-200",
+          "flex w-full items-center overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-200",
           "hover:border-gray-300 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/15",
           hasError &&
             "border-red-400 hover:border-red-400 focus-within:border-red-400 focus-within:ring-red-400/15",
@@ -299,7 +299,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
           type="button"
           disabled={disabled}
           onClick={() => (open ? closeDropdown() : openDropdown())}
-          className="flex select-none items-center gap-2 border-r border-gray-200 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed"
+          className="flex select-none items-center gap-2 border-r border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed"
           title="Select country code"
         >
           <Flag code={selectedCountry} className="h-4 w-6 shrink-0 rounded-[2px]" />
@@ -321,7 +321,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
           onBlur={handleBlur}
           placeholder={resolvedPlaceholder}
           disabled={disabled}
-          className="h-full flex-1 bg-transparent px-3 text-sm text-gray-800 outline-none placeholder:text-gray-400"
+          className="flex-1 bg-transparent px-3 py-1.5 text-sm text-gray-800 outline-none placeholder:text-gray-400"
         />
       </div>
 

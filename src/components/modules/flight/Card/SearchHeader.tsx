@@ -65,48 +65,6 @@ const SearchHeader: React.FC<IProps> = ({
   const router = useRouter();
   const { isLoggedIn } = useAuthStore();
 
-  const totalAdultFare = itinerary?.passengerFareBreakDown
-    .filter((f) => f.passengerType === "Adult")
-    .reduce((sum, f) => sum + f.totalFare, 0);
-
-  console.log("Total Adult Fare:", totalAdultFare, passengerCount);
-
-  // const totalFare = itinerary?.saleCurrencyAmount.baseAmount;
-  // const offerFare = itinerary?.saleCurrencyAmount.offerAmount;
-  // const { totalAmount, offerAmount, discountAmount } =
-  //   itinerary?.saleCurrencyAmount;
-  // const currency = itinerary?.passengerFareBreakDown[0]?.currency || "BDT";
-  // const taxFare = itinerary?.saleCurrencyAmount?.taxFare;
-  // const baseAmount = itinerary?.saleCurrencyAmount?.baseAmount;
-  // const grossFare = itinerary?.saleCurrencyAmount?.grossFare;
-  // const ait = itinerary?.saleCurrencyAmount?.ait;
-  // const discountAmount = itinerary?.saleCurrencyAmount?.discountAmount;
-  // const offerAmount = itinerary?.saleCurrencyAmount?.offerAmount || 0;
-  // const totalAmount = itinerary?.saleCurrencyAmount?.totalAmount || 0;
-  // const {
-  //   totalAmount = 0,
-  //   offerAmount = 0,
-  //   discountAmount = 0,
-  // } = itinerary?.saleCurrencyAmount ?? {};
-
-  // const taxFare = itinerary?.saleCurrencyAmount?.taxFare;
-  // const baseAmount = itinerary?.saleCurrencyAmount?.baseAmount;
-  // const grossFare = itinerary?.saleCurrencyAmount?.grossFare;
-  // const ait = itinerary?.saleCurrencyAmount?.ait;
-  // const discountAmount = itinerary?.saleCurrencyAmount?.discountAmount;
-  // const offerAmount = itinerary?.saleCurrencyAmount?.offerAmount || 0;
-  // const totalAmount = itinerary?.saleCurrencyAmount?.totalAmount || 0;
-
-  // const shouldRender =
-  //   totalAmount < offerAmount ||
-  //   totalAmount > offerAmount ||
-  //   totalAmount === offerAmount ||
-  //   (totalAmount === 0 && offerAmount === 0);
-
-  // const displayTotalAmount =
-  //   totalAmount < offerAmount ? offerAmount : totalAmount;
-  // const currency = itinerary?.passengerFareBreakDown[0]?.currency || "BDT";
-
   const {
     taxFare,
     baseAmount,
@@ -255,7 +213,7 @@ const SearchHeader: React.FC<IProps> = ({
           <div className="text-center">
             <div className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-semibold px-2 py-1 rounded-md mb-2">
               <FaPlane className="w-3.5 h-3.5" />
-              FLIGHTINT
+              Discounted Fare
             </div>
             <p className="text-base font-bold text-gray-900">
               {currency} {offerAmount.toLocaleString()}
@@ -286,7 +244,7 @@ const SearchHeader: React.FC<IProps> = ({
         </Button>
         <div className="text-center">
           <p className="text-xs text-secondary font-bold">{currency}</p>
-          <p className="text-sm font-bold">{totalAmount?.toLocaleString()}</p>
+          <p className="text-sm font-bold">{offerAmount.toLocaleString()}</p>
         </div>
         <Button
           onClick={() => handelFlightBooking(String(index))}

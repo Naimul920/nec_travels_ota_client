@@ -83,7 +83,7 @@ const SearchCity: React.FC<SearchCityProps> = ({
 
         <Input
           ref={inputRef}
-          className="border-none uppercase shadow-none! p-0! text-2xl! font-extrabold text-primary h-8! bg-transparent focus-visible:ring-0"
+          className="border-none uppercase shadow-none! p-0! text-2xl! font-extrabold text-black h-8! bg-transparent focus-visible:ring-0"
           type="text"
           value={query}
           placeholder={placeholder}

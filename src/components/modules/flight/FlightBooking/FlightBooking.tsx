@@ -474,7 +474,7 @@ const FlightBooking: React.FC = () => {
         passengers,
         segments: buildSegments(segmentsItinerary),
         payment_type: "CASH",
-        provider: "sb",
+        provider: itinerary.sourceProvider || "sb",
       };
 
       const result = await bookFlightAction(payload);
