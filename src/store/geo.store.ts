@@ -37,7 +37,7 @@ interface GeoState {
   initialize: () => Promise<void>;
 }
 
-const GEO_API_URL = `${process.env.NEXT_PUBLIC_API_BASE_URL}/geo`;
+const GEO_API_URL = `${process.env.NEXT_PUBLIC_API_URL}/geo`;
 
 export const useGeoStore = create<GeoState>((set, get) => ({
   geo: null,
