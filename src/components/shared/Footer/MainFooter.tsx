@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { MdPhone, MdEmail, MdLocationOn } from "react-icons/md";
 import {
   FaFacebookF,
@@ -67,12 +66,11 @@ export default function MainFooter() {
           {/* Brand */}
           <div className="flex flex-col items-start gap-5 sm:col-span-2 lg:col-span-4">
             <Link href="/" className="flex items-center gap-2">
-              <Image
+              <img
                 src="/assets/images/logo.png"
                 alt="NEC Travels Logo"
                 width={150}
                 height={40}
-                priority // Preloads image high priority
                 className="h-[40px] w-[150px] object-contain"
                 aria-label="NEC Travels"
               />

@@ -4,8 +4,14 @@ import AgencyFooter from "./AgencyFooter";
 import MainFooter from "./MainFooter";
 
 export default function Footer() {
-  const { user } = useAuthStore();
+  const { user, isLoading } = useAuthStore();
   const role = user?.role;
+
+  // Wait for the auth state to hydrate before rendering any footer, so
+  // reloads don't briefly flash the wrong variant (e.g. B2C footer for B2B).
+  if (isLoading) {
+    return null;
+  }
 
   // Render nothing for Admin & Super Admin
   if (role === ROLE.ADMIN || role === ROLE.SUPER_ADMIN) {
