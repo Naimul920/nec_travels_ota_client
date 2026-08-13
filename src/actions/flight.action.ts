@@ -56,6 +56,7 @@ export const revalidateItineraryAction = async (
 export const bookFlightAction = async (
   payload: BookFlightPayload,
 ): Promise<FlightBookingResponse> => {
+  console.log("bookFlightAction payload*****",JSON.stringify(payload))
   try {
     const res = await httpClient.post<FlightBookingResponse["data"]>(
       "/api/v1/flights/book",

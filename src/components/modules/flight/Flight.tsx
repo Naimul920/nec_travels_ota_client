@@ -20,6 +20,25 @@ interface FlightProps {
   useFlight?: "home" | "search";
 }
 
+const DEFAULT_ONEWAY = {
+  fromIata: "DAC",
+  toIata: "CXB",
+  departureDate: dayjs().format("YYYY-MM-DD"),
+};
+
+const DEFAULT_MULTICITY = [
+  {
+    fromIata: "DAC",
+    toIata: "CCU",
+    departureDate: dayjs().format("YYYY-MM-DD"),
+  },
+  {
+    fromIata: "CCU",
+    toIata: "DXB",
+    departureDate: dayjs().format("YYYY-MM-DD"),
+  },
+];
+
 const Flight: React.FC<FlightProps> = ({ useFlight }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -228,6 +247,64 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
     }));
   };
 
+  const handleTripTypeChange = (type: TripType) => {
+    if (type === tripType) return;
+
+    setFlightData((prev) => {
+      const source =
+        tripType === "roundtrip"
+          ? prev.roundtrip
+          : tripType === "multicity"
+            ? prev.multicity[0] || DEFAULT_MULTICITY[0]
+            : prev.oneway;
+
+      const fromIata = source.fromIata || DEFAULT_ONEWAY.fromIata;
+      const toIata = source.toIata || DEFAULT_ONEWAY.toIata;
+      const departureDate =
+        source.departureDate || dayjs().format("YYYY-MM-DD");
+
+      const next = { ...prev };
+
+      if (type === "oneway") {
+        next.oneway = { fromIata, toIata, departureDate };
+      } else if (type === "roundtrip") {
+        let returnDate =
+          tripType === "roundtrip"
+            ? prev.roundtrip.returnDate
+            : tripType === "multicity"
+              ? prev.multicity[prev.multicity.length - 1]?.departureDate || ""
+              : "";
+        if (
+          !returnDate ||
+          dayjs(returnDate).isBefore(dayjs(departureDate))
+        ) {
+          returnDate = dayjs(departureDate)
+            .add(1, "day")
+            .format("YYYY-MM-DD");
+        }
+        next.roundtrip = { fromIata, toIata, departureDate, returnDate };
+      } else {
+        const isRoundSource = tripType === "roundtrip";
+        const secondDate = isRoundSource
+          ? prev.roundtrip.returnDate ||
+            dayjs(departureDate).add(1, "day").format("YYYY-MM-DD")
+          : dayjs(departureDate).add(1, "day").format("YYYY-MM-DD");
+        next.multicity = [
+          { fromIata, toIata, departureDate },
+          {
+            fromIata: toIata,
+            toIata: isRoundSource ? prev.roundtrip.fromIata : "DXB",
+            departureDate: secondDate,
+          },
+        ];
+      }
+
+      return next;
+    });
+
+    setTripType(type);
+  };
+
   const handleTravelerChange = (
     field: keyof typeof traveler,
     value: unknown,
@@ -385,7 +462,7 @@ const handleSubmit = (e: React.FormEvent) => {
             <input
               type="radio"
               checked={tripType === type}
-              onChange={() => setTripType(type as TripType)}
+              onChange={() => handleTripTypeChange(type as TripType)}
               className="w-3 h-3 appearance-none border-2 border-primary rounded-full 
                 checked:bg-brand checked:ring-2 checked:ring-primary checked:ring-offset-2"
             />

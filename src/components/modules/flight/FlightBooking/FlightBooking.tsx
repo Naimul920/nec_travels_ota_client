@@ -334,6 +334,7 @@ const FlightBooking: React.FC = () => {
         flight_number: String(s.marketingFlightNumber),
         carrier_code: s.marketingCarrierCode,
         res_book_desig_code: s.bookingCode,
+        baggage: s.baggage,
       })),
     );
   };

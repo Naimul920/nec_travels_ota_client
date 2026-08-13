@@ -110,6 +110,11 @@ const BookingSuccess: React.FC<Props> = ({
                     <p className="text-xs text-gray-400">
                       {seg.origin} → {seg.destination}
                     </p>
+                    {seg.baggage && (
+                      <p className="mt-0.5 text-[11px] font-medium text-gray-500">
+                        Baggage: {seg.baggage}
+                      </p>
+                    )}
                   </div>
                 </div>
 

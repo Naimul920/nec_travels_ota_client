@@ -71,6 +71,7 @@ interface PhoneInputProps {
   placeholder?: string;
   disabled?: boolean;
   name?: string;
+  compact?: boolean;
 }
 
 const PhoneInputField: React.FC<PhoneInputProps> = ({
@@ -85,6 +86,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   placeholder,
   disabled,
   name,
+  compact = false,
 }) => {
   const [isTouched, setIsTouched] = useState(false);
   const [open, setOpen] = useState(false);
@@ -278,7 +280,14 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   return (
     <div ref={rootRef} className={clsx("w-full", className)}>
       {label && (
-        <label className="mb-1 block text-[11px] font-medium text-slate-700">
+        <label
+          className={clsx(
+            "block font-medium",
+            compact
+              ? "mb-1 text-[11px] text-slate-700"
+              : "mb-1.5 text-sm text-gray-700"
+          )}
+        >
           {label}
           {required && <span className="ml-0.5 text-red-500">*</span>}
         </label>
@@ -286,10 +295,16 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
 
       <div
         className={clsx(
-          "flex w-full items-center overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-200",
-          "hover:border-gray-300 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/15",
-          hasError &&
-            "border-red-400 hover:border-red-400 focus-within:border-red-400 focus-within:ring-red-400/15",
+          "flex w-full items-center overflow-hidden rounded-lg bg-white transition-all duration-200",
+          compact
+            ? "border py-1.5 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10 hover:border-slate-300"
+            : "border-2 border-gray-200 h-12 shadow-sm hover:border-gray-300 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/15",
+          compact
+            ? hasError
+              ? "border-rose-400 hover:border-rose-400 focus-within:border-rose-400 focus-within:ring-rose-400/10"
+              : "border-slate-200"
+            : hasError &&
+              "border-red-400 hover:border-red-400 focus-within:border-red-400 focus-within:ring-red-400/15",
           disabled && "cursor-not-allowed bg-gray-50 opacity-60"
         )}
       >
@@ -299,7 +314,7 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
           type="button"
           disabled={disabled}
           onClick={() => (open ? closeDropdown() : openDropdown())}
-          className="flex select-none items-center gap-2 border-r border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed"
+          className="flex select-none items-center gap-2 border-r border-gray-200 bg-gray-50 self-stretch px-3 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed"
           title="Select country code"
         >
           <Flag code={selectedCountry} className="h-4 w-6 shrink-0 rounded-[2px]" />
@@ -321,7 +336,12 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
           onBlur={handleBlur}
           placeholder={resolvedPlaceholder}
           disabled={disabled}
-          className="flex-1 bg-transparent px-3 py-1.5 text-sm text-gray-800 outline-none placeholder:text-gray-400"
+          className={clsx(
+            "flex-1 bg-transparent outline-none",
+            compact
+              ? "px-3 text-[13px] text-slate-900 placeholder:text-slate-400"
+              : "px-3 py-1.5 text-sm text-gray-800 placeholder:text-gray-400"
+          )}
         />
       </div>
 
@@ -377,7 +397,14 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
         )}
 
       {hasError && activeErrorMessage && (
-        <p className="mt-1 text-sm text-red-500">{activeErrorMessage}</p>
+        <p
+          className={clsx(
+            "mt-1",
+            compact ? "text-[11px] font-medium text-rose-600" : "text-sm text-red-500"
+          )}
+        >
+          {activeErrorMessage}
+        </p>
       )}
     </div>
   );

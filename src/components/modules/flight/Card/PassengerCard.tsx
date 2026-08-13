@@ -23,6 +23,7 @@ import type { SavedPassenger } from "@/actions/booking.action";
 interface Props {
   type: PassengerType;
   index: number;
+  isDomestic?: boolean;
 }
 
 const TYPE_META: Record<
@@ -55,10 +56,15 @@ const TYPE_META: Record<
   },
 };
 
-const TITLE_OPTIONS = ["Mr", "Mrs", "Ms"].map((t) => ({ label: t, value: t }));
+const getTitleOptions = () =>
+  ["Mr", "Mrs", "Ms"].map((t) => ({ label: t, value: t }));
 const GENDER_OPTIONS = ["Male", "Female"].map((g) => ({ label: g, value: g }));
 
-const PassengerCard: React.FC<Props> = ({ type, index }) => {
+const PassengerCard: React.FC<Props> = ({
+  type,
+  index,
+  isDomestic = false,
+}) => {
   const { values, errors, handleChange, setFieldValue } =
     useFormikContext<BookingFormValues>();
   const { user } = useAuthStore();
@@ -83,6 +89,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
   const baseName = `${type}.${index}`;
   const passenger = values[type][index];
   const isLeadPassenger = type === "adult" && index === 0;
+  const titleOptions = getTitleOptions();
 
   const err = (field: string) => {
     const flat = errors as Record<string, string | undefined>;
@@ -94,8 +101,9 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
   const passportExpiryDisabledDate = getPassportExpiryDisabledDate();
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const gender = e.target.value === "Mr" ? "Male" : "Female";
-    setFieldValue(`${baseName}.title`, e.target.value);
+    const title = e.target.value;
+    const gender = title === "Mr" ? "Male" : "Female";
+    setFieldValue(`${baseName}.title`, title);
     setFieldValue(`${baseName}.gender`, gender);
   };
 
@@ -130,15 +138,15 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
       </div>
 
       {/* Form Fields Grid matching exact 4-column design */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 uppercase [&_label]:normal-case">
         {/* Row 1 */}
         <Select
           label="Title"
           name={`${baseName}.title`}
           value={passenger.title}
           onChange={handleTitleChange}
-          options={TITLE_OPTIONS}
-          placeholder="Select Passenger Type"
+          options={titleOptions}
+          placeholder="Select Title"
           required
           {...err("title")}
         />
@@ -169,7 +177,7 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           value={passenger.gender}
           onChange={handleChange}
           options={GENDER_OPTIONS}
-          placeholder="Select Passenger Type"
+          placeholder="Select Gender"
           required
           {...err("gender")}
         />
@@ -180,7 +188,8 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           name={`${baseName}.date_of_birth`}
           value={passenger.date_of_birth}
           onChange={(v) => setFieldValue(`${baseName}.date_of_birth`, v)}
-          placeholder="YYYY-MM-DD"
+          placeholder="DD/MM/YYYY"
+          format="DD/MM/YYYY"
           disabledDate={dateOfBirthDisabledDate}
           required
           {...err("date_of_birth")}
@@ -196,27 +205,34 @@ const PassengerCard: React.FC<Props> = ({ type, index }) => {
           {...err("country")}
         />
 
-        {/* Row 3 */}
-        <Input
-          label="Passport Number"
-          name={`${baseName}.passport_number`}
-          value={passenger.passport_number}
-          onChange={handleChange}
-          placeholder="PASSPORT NUMBER"
-          required
-          {...err("passport_number")}
-        />
+        {/* Row 3 — passport fields are hidden for domestic flights */}
+        {!isDomestic && (
+          <>
+            <Input
+              label="Passport Number"
+              name={`${baseName}.passport_number`}
+              value={passenger.passport_number}
+              onChange={handleChange}
+              placeholder="PASSPORT NUMBER"
+              required
+              {...err("passport_number")}
+            />
 
-        <DatePicker
-          label="Passport Expiry Date"
-          name={`${baseName}.passport_expire`}
-          value={passenger.passport_expire}
-          onChange={(v) => setFieldValue(`${baseName}.passport_expire`, v)}
-          placeholder="YYYY-MM-DD"
-          disabledDate={passportExpiryDisabledDate}
-          required
-          {...err("passport_expire")}
-        />
+            <DatePicker
+              label="Passport Expiry Date"
+              name={`${baseName}.passport_expire`}
+              value={passenger.passport_expire}
+              onChange={(v) =>
+                setFieldValue(`${baseName}.passport_expire`, v)
+              }
+              placeholder="DD/MM/YYYY"
+              format="DD/MM/YYYY"
+              disabledDate={passportExpiryDisabledDate}
+              required
+              {...err("passport_expire")}
+            />
+          </>
+        )}
 
         {isLeadPassenger && (
           <>

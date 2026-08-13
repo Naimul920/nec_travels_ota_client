@@ -237,6 +237,7 @@ const SearchDetails: React.FC<Props> = ({ itinerary, passengerCount }) => {
                         <th className="py-2 px-4 font-semibold">Duration</th>
                         <th className="py-2 px-4 font-semibold">Arrival</th>
                         <th className="py-2 px-4 font-semibold">Cabin</th>
+                        <th className="py-2 px-4 font-semibold">Baggage</th>
                         <th className="py-2 px-4 font-semibold text-right">
                           Seats
                         </th>
@@ -309,6 +310,14 @@ const SearchDetails: React.FC<Props> = ({ itinerary, passengerCount }) => {
                             <td className="py-2.5 px-4 text-gray-600">
                               {s.cabinCode}
                             </td>
+                            <td className="py-2.5 px-4">
+                              <span
+                                className="block max-w-36 truncate text-gray-600"
+                                title={s.baggage}
+                              >
+                                {s.baggage}
+                              </span>
+                            </td>
                             <td className="py-2.5 px-4 text-right">
                               <span className="inline-flex items-center gap-1 text-gray-600">
                                 {s.seatsAvailable}
@@ -320,7 +329,7 @@ const SearchDetails: React.FC<Props> = ({ itinerary, passengerCount }) => {
                           </tr>
                           {sIdx < schedules.length - 1 && (
                             <tr>
-                              <td colSpan={6} className="px-4 py-1.5">
+                              <td colSpan={7} className="px-4 py-1.5">
                                 <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-amber-600 bg-amber-50 rounded px-2 py-0.5">
                                   <FaPlaneArrival size={11} />
                                   Layover at {s.arrival.airport} ·{" "}

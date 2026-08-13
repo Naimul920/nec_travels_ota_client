@@ -42,6 +42,7 @@ export interface FlightLeg {
   arriveISO?: string;
   stops: number;
   duration: string;
+  baggage?: string;
 }
 
 export function getLegs(itinerary: Itinerary): FlightLeg[] {
@@ -61,6 +62,7 @@ export function getLegs(itinerary: Itinerary): FlightLeg[] {
       flightNumber: first?.marketingFlightNumber ?? 0,
       cabinCode: first?.cabinCode ?? "",
       flightName,
+      baggage: first?.baggage,
       fromCode: first?.departure.airport ?? "--",
       toCode: last?.arrival?.airport ?? first?.arrival?.airport ?? "--",
       departISO: first?.departureDateTime,

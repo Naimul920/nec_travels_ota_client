@@ -64,6 +64,7 @@ export interface Schedule {
   airCraftType: string;
   airCraftTypeForFirstLeg: string;
   airCraftTypeForLastLeg: string;
+  baggage?: string;
   departure: AirportInfo;
   arrival: AirportInfo;
   totalMilesFlown: number;
@@ -122,6 +123,7 @@ export interface BookingSegment {
   flight_number: string;
   carrier_code: string;
   res_book_desig_code: string;
+  baggage?: string;
 }
 
 export interface LeadPassenger {

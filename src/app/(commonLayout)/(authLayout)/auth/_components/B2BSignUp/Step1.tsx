@@ -57,6 +57,7 @@ export default function Step1({ formik }: { formik: FormikProps<B2BSignUpFormVal
           error={Boolean(formik.errors.phone)}
           errorMessage={formik.errors.phone as string | undefined}
           required
+          compact
         />
       </div>
 

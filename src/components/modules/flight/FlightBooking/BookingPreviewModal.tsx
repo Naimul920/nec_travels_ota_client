@@ -109,6 +109,14 @@ const BookingPreviewModal: React.FC<Props> = ({
                     {stopLabel(leg.stops)} · {leg.duration}
                   </span>
                 </div>
+                {leg.baggage && (
+                  <p className="mb-2 text-[11px] text-gray-500">
+                    Baggage:{" "}
+                    <span className="font-semibold text-gray-700">
+                      {leg.baggage}
+                    </span>
+                  </p>
+                )}
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                   <div className="text-left">
                     <p className="text-lg font-extrabold text-gray-900">

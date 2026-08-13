@@ -42,6 +42,11 @@ const FlightLegRow: React.FC<{ leg: ReturnType<typeof getLegs>[number] }> = ({
             {leg.cabinCode} cabin
           </p>
         )}
+        {leg.baggage && (
+          <p className="text-[10px] text-gray-500">
+            Baggage: <span className="font-medium text-gray-600">{leg.baggage}</span>
+          </p>
+        )}
       </div>
     </div>
 

@@ -220,6 +220,7 @@ export default function B2CSignUp() {
               error={Boolean(getRegisterError("phone"))}
               errorMessage={getRegisterError("phone")}
               required
+              compact
             />
           </div>
 
