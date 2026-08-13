@@ -8,6 +8,7 @@ import { useSearch } from "@/hooks";
 import Table from "@/components/common/Table/Table";
 import ActionButton from "@/components/common/Action/ActionButton";
 import { getBookingsAction, BookingItem } from "@/actions/booking.action";
+import { encoding } from "@/utils";
 import {
   FiMapPin,
   FiArrowRight,
@@ -317,7 +318,7 @@ export default function HoldTickets() {
           <div className="flex items-center justify-center">
             {row?.pnr && (
               <ActionButton
-                viewLink={`/console/bookings/ticket/${row.key}`}
+                viewLink={`/console/bookings/ticket/${encoding(row.key)}`}
               />
             )}
           </div>

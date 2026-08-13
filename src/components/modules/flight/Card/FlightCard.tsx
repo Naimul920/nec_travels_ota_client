@@ -18,6 +18,7 @@ interface Props {
     kid: number;
     infant: number;
   };
+  showDiscount: boolean;
 }
 
 const FlightCard: React.FC<Props> = ({
@@ -25,6 +26,7 @@ const FlightCard: React.FC<Props> = ({
   index,
   searchId,
   passengerCount,
+  showDiscount,
 }) => {
   const [state, setState] = useState<IState>({
     isDetails: false,
@@ -38,6 +40,7 @@ const FlightCard: React.FC<Props> = ({
         index={index}
         searchId={searchId}
         passengerCount={passengerCount}
+        showDiscount={showDiscount}
       />
       {state.isDetails && (
         <SearchDetails itinerary={itinerary} passengerCount={passengerCount} />

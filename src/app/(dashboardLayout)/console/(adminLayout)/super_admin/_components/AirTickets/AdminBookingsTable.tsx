@@ -7,6 +7,7 @@ import { useAdminBookings, useSearch } from "@/hooks";
 import type { BookingItem } from "@/actions/booking.action";
 import Table from "@/components/common/Table/Table";
 import ActionButton from "@/components/common/Action/ActionButton";
+import { encoding } from "@/utils";
 
 interface AdminBookingsTableProps {
   status: string;
@@ -101,7 +102,7 @@ const AdminBookingsTable: React.FC<AdminBookingsTableProps> = ({
         dataIndex: "action",
         align: "center" as const,
         render: (_: string, row: BookingRow) => (
-          <ActionButton viewLink={`/console/bookings/ticket/${row.key}`} />
+          <ActionButton viewLink={`/console/bookings/ticket/${encoding(row.key)}`} />
         ),
       },
     ],

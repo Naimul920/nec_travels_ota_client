@@ -126,6 +126,7 @@ const SideBarFilter: React.FC<Props> = ({
     onFilterChange({
       airlines: [],
       stops: [],
+      refundable: [],
       departureRange: defaultRange,
       arrivalRange: defaultRange,
     });
@@ -134,6 +135,7 @@ const SideBarFilter: React.FC<Props> = ({
   const hasActiveFilters =
     filters.airlines.length > 0 ||
     filters.stops.length > 0 ||
+    filters.refundable.length > 0 ||
     filters.departureRange[0] > 0 ||
     filters.departureRange[1] < 1440 ||
     filters.arrivalRange[0] > 0 ||
@@ -145,17 +147,31 @@ const SideBarFilter: React.FC<Props> = ({
 
   return (
     <>
-      <div className="bg-primary text-white p-2 py-4 md:block hidden">
+      <div className="bg-primary text-white p-2 py-3 md:block hidden">
         <h3 className="text-sm font-bold">Filter By</h3>
       </div>
-
+ {/* Dates */}
+      <div className="p-2 border-b border-gray-300 space-y-3">
+        <DateStep
+          label="Departure Date"
+          date={departureDate}
+          onStep={(delta) => onDateStep("departure", delta)}
+        />
+        {showReturnDate && (
+          <DateStep
+            label="Return Date"
+            date={returnDate}
+            onStep={(delta) => onDateStep("return", delta)}
+          />
+        )}
+      </div>
       {/* Stops */}
       <div className="p-2 border-b border-gray-300">
         <table className="w-full filter-table">
           <thead>
             <tr className="text-gray-700 font-semibold">
-              <th className="text-left pb-2">Stop</th>
-              <th className="text-right pb-2">From</th>
+              <th className="text-left pb-2">Flight Stops</th>
+              {/* <th className="text-right pb-2">From</th> */}
             </tr>
           </thead>
           <tbody className="text-gray-800">
@@ -192,20 +208,38 @@ const SideBarFilter: React.FC<Props> = ({
         </table>
       </div>
 
-      {/* Dates */}
-      <div className="p-2 border-b border-gray-300 space-y-3">
-        <DateStep
-          label="Departure Date"
-          date={departureDate}
-          onStep={(delta) => onDateStep("departure", delta)}
-        />
-        {showReturnDate && (
-          <DateStep
-            label="Return Date"
-            date={returnDate}
-            onStep={(delta) => onDateStep("return", delta)}
-          />
-        )}
+     
+
+      {/* Refundability */}
+      <div className="p-2 border-b border-gray-300">
+        <p className="text-[12px] font-semibold text-gray-700 mb-2 line-clamp-1">
+          Refundable
+        </p>
+        <div className="space-y-2">
+          {[
+            { value: true, label: "Refundable", total: allItins.filter((i) => i.isRefundable).length },
+            { value: false, label: "Non-Refundable", total: allItins.filter((i) => !i.isRefundable).length },
+          ].map((item) => (
+            <label
+              key={String(item.value)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={filters.refundable.includes(item.value)}
+                onChange={() =>
+                  update({
+                    refundable: toggle(filters.refundable, item.value),
+                  })
+                }
+              />
+              <span className="line-clamp-1">
+                {item.label}
+                ({item.total})
+              </span>
+            </label>
+          ))}
+        </div>
       </div>
 
       {/* Airlines */}

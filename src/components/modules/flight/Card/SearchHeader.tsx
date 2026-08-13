@@ -4,7 +4,7 @@ import React from "react";
 import type { IState } from "@/components/modules/flight/Card/FlightCard";
 import { Button } from "@/components/ui";
 // 2. Swapped React Router Hooks for Next.js Native App Router Navigation Utilities
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { Itinerary, Schedule } from "@/interface/flight";
 import dayjs from "dayjs";
 import { FaPlane } from "react-icons/fa";
@@ -22,6 +22,7 @@ interface IProps {
     kid: number;
     infant: number;
   };
+  showDiscount: boolean;
 }
 
 function formatTime(_iso: string, timeStr: string): string {
@@ -59,11 +60,14 @@ const SearchHeader: React.FC<IProps> = ({
   index,
   searchId,
   passengerCount,
+  showDiscount,
 }) => {
   // 3. Initialized Next.js 16 Search Parameters & Native Router Hook
   const searchParams = useSearchParams();
   const router = useRouter();
   const { isLoggedIn } = useAuthStore();
+  const pathname = usePathname();
+  const isB2B = pathname.startsWith("/console/b2b");
 
   const {
     taxFare,
@@ -211,16 +215,24 @@ const SearchHeader: React.FC<IProps> = ({
           </div> */}
 
           <div className="text-center">
-            <div className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-semibold px-2 py-1 rounded-md mb-2">
-              <FaPlane className="w-3.5 h-3.5" />
-              Discounted Fare
-            </div>
-            <p className="text-base font-bold text-gray-900">
-              {currency} {offerAmount.toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-400 line-through">
-              {currency} {displayTotalAmount.toLocaleString()}
-            </p>
+            {isB2B && !showDiscount ? (
+              <p className="text-base font-bold text-gray-900">
+                {currency} {displayTotalAmount.toLocaleString()}
+              </p>
+            ) : (
+              <>
+                <div className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-semibold px-2 py-1 rounded-md mb-2">
+                  <FaPlane className="w-3.5 h-3.5" />
+                  Discounted Fare
+                </div>
+                <p className="text-base font-bold text-gray-900">
+                  {currency} {offerAmount.toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-400 line-through">
+                  {currency} {displayTotalAmount.toLocaleString()}
+                </p>
+              </>
+            )}
           </div>
 
           <Button

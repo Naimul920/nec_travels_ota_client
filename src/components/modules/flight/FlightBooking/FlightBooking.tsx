@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Formik, Form, useFormikContext } from "formik";
 import { App } from "antd";
 import Swal from "sweetalert2";
 import { useQuery } from "@tanstack/react-query";
 import { decoding } from "../../../../utils";
+import detectDomesticType from "@/utils/searchFlightSug/detactedDomesticType";
 import { Button } from "../../../ui";
 import type { BookingFormValues, Passenger } from "@/interface";
 import type {
@@ -100,7 +101,7 @@ const LeadPassengerPrefill: React.FC = () => {
   return null;
 };
 
-const validateBooking = (values: BookingFormValues) => {
+const validateBooking = (values: BookingFormValues, isDomestic = false) => {
   const errors: Record<string, string> = {};
 
   PASSENGER_TYPES.forEach((type) => {
@@ -137,10 +138,12 @@ const validateBooking = (values: BookingFormValues) => {
 
       if (!p.country)
         errors[`${base}.country`] = `${label} country is required`;
-      if (!p.passport_number)
-        errors[`${base}.passport_number`] = "Passport number is required";
-      if (!p.passport_expire)
-        errors[`${base}.passport_expire`] = "Passport expiry is required";
+      if (!isDomestic) {
+        if (!p.passport_number)
+          errors[`${base}.passport_number`] = "Passport number is required";
+        if (!p.passport_expire)
+          errors[`${base}.passport_expire`] = "Passport expiry is required";
+      }
 
       if (type === "adult" && index === 0) {
         if (!p.email) {
@@ -220,6 +223,8 @@ const buildSearchPayload = (searchInfoParams: URLSearchParams) => {
 const FlightBooking: React.FC = () => {
   const searchParamsHook = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const isB2BContext = pathname.startsWith("/console/b2b");
   const [isBooking, setIsBooking] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [searchExpired, setSearchExpired] = useState(false);
@@ -247,6 +252,28 @@ const FlightBooking: React.FC = () => {
 
   const itineraryIndex = Number(searchParams.get("i") ?? 0);
   const searchId = searchParams.get("sid") ?? "";
+
+  const isDomestic = useMemo(() => {
+    const tripType = searchInfoParams.get("tripType");
+    if (tripType === "multicity") {
+      const segmentsStr = searchInfoParams.get("segments");
+      if (!segmentsStr) return false;
+      const segments = segmentsStr.split(",").map((seg) => {
+        const parts = seg.split("-");
+        return { from: parts[0], to: parts[1] };
+      });
+      if (segments.length === 0) return false;
+      return segments.every((s) => {
+        const { bddom, npdom } = detectDomesticType(s.from, s.to);
+        return bddom || npdom;
+      });
+    }
+    const from = searchInfoParams.get("from") || "";
+    const to = searchInfoParams.get("to") || "";
+    if (!from || !to) return false;
+    const { bddom, npdom } = detectDomesticType(from, to);
+    return bddom || npdom;
+  }, [searchInfoParams]);
 
   const searchPayload = useMemo(
     () => buildSearchPayload(searchInfoParams),
@@ -283,15 +310,18 @@ const FlightBooking: React.FC = () => {
         const query = new URLSearchParams(searchParamsHook.toString());
         query.delete("i");
         query.delete("sid");
+        const searchPath = isB2BContext
+          ? "/console/b2b/flight-search"
+          : "/flight-search";
         const searchUrl = query.toString()
-          ? `/flight-search?${query.toString()}`
-          : "/";
+          ? `${searchPath}?${query.toString()}`
+          : searchPath;
         if (typeof window !== "undefined") {
           window.location.href = searchUrl;
         }
       }
     });
-  }, [searchExpired, searchParamsHook]);
+  }, [searchExpired, searchParamsHook, isB2BContext]);
 
   const itinerary = searchData?.data?.itinDetails?.[itineraryIndex];
 
@@ -303,10 +333,14 @@ const FlightBooking: React.FC = () => {
     const query = new URLSearchParams(searchParamsHook.toString());
     query.delete("i");
     query.delete("sid");
+    const searchPath = isB2BContext
+      ? "/console/b2b/flight-search"
+      : "/flight-search";
+    const searchUrl = query.toString()
+      ? `${searchPath}?${query.toString()}`
+      : searchPath;
     if (typeof window !== "undefined") {
-      window.location.href = query.toString()
-        ? `/flight-search?${query.toString()}`
-        : "/flight-search";
+      window.location.href = searchUrl;
     }
   };
 
@@ -564,7 +598,7 @@ const FlightBooking: React.FC = () => {
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
-        validate={validateBooking}
+        validate={(values) => validateBooking(values, isDomestic)}
         validateOnBlur={false}
         validateOnChange={false}
         onSubmit={handleSubmit}
@@ -583,7 +617,7 @@ const FlightBooking: React.FC = () => {
 
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
                 <div className="space-y-6 lg:col-span-2">
-                  <TravelersForm />
+                  <TravelersForm isDomestic={isDomestic} />
                 </div>
 
                 <aside className="space-y-5 lg:sticky lg:top-6">

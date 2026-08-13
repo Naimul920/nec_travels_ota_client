@@ -121,11 +121,16 @@ const SearchDetails: React.FC<Props> = ({ itinerary, passengerCount }) => {
     Infant: passengerCount.infant,
   };
 
+  const fareByType = new Map(
+    (fares ?? []).map((f) => [f.passengerType, f]),
+  );
+
   const passengerRows = passengerTypeOrder
     .map((type) => ({
       type,
       label: passengerLabel[type] || type,
       qty: passengerCountMap[type] || 0,
+      fare: fareByType.get(type)?.totalFare,
     }))
     .filter((row) => row.qty > 0);
 
@@ -414,7 +419,15 @@ const SearchDetails: React.FC<Props> = ({ itinerary, passengerCount }) => {
                         x{row.qty}
                       </span>
                     </td>
-                    <td className="py-2 px-4 text-right text-gray-400">—</td>
+                    <td className="py-2 px-4 text-right">
+                      {typeof row.fare === "number" ? (
+                        <span className="font-semibold text-gray-800">
+                          {currency} {formatNumber(row.fare)}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
 

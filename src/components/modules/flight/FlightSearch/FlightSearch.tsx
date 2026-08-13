@@ -16,6 +16,7 @@ import FlightSearchSkeleton from "@/components/modules/flight/Card/FlightSearchS
 import SearchCountdown from "@/components/modules/flight/Card/SearchCountdown";
 import { useFlightSearchMutation } from "@/hooks/useFlightApi";
 import { decoding, storeSearchExpiry, encoding, getItineraryMaxStops } from "@/utils";
+import { FaPlane } from "react-icons/fa";
 import type {
   Itinerary,
   SearchPayload,
@@ -31,15 +32,18 @@ function timeToMinutes(timeStr: string): number {
 export interface FilterState {
   airlines: string[];
   stops: number[];
+  refundable: boolean[];
   departureRange: [number, number];
   arrivalRange: [number, number];
 }
 
 const FlightSearch: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showDiscounted, setShowDiscounted] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     airlines: [],
     stops: [],
+    refundable: [],
     departureRange: [0, 1440],
     arrivalRange: [0, 1440],
   });
@@ -159,6 +163,7 @@ const FlightSearch: React.FC = () => {
     setFilters({
       airlines: [],
       stops: [],
+      refundable: [],
       departureRange: [0, 1440],
       arrivalRange: [0, 1440],
     });
@@ -194,6 +199,11 @@ const FlightSearch: React.FC = () => {
             filters.airlines.includes(s.marketingCarrierCode),
           ),
         ),
+      );
+    }
+    if (filters.refundable.length > 0) {
+      list = list.filter((itin: any) =>
+        filters.refundable.includes(Boolean(itin?.isRefundable)),
       );
     }
     if (filters.stops.length > 0) {
@@ -250,6 +260,7 @@ const FlightSearch: React.FC = () => {
 
   const router = useRouter();
   const pathname = usePathname();
+  const isB2B = pathname.startsWith("/console/b2b");
 
   const departureDate = searchParams.get("date");
   const returnDate = searchParams.get("returnDate");
@@ -321,6 +332,34 @@ const FlightSearch: React.FC = () => {
     return fares.length ? Math.min(...fares) : 0;
   }, [allItins]);
 
+  const cheapestItin = useMemo(() => {
+    if (allItins.length === 0) return null;
+    return allItins.reduce((best: any, itin: any) => {
+      const bestOffer =
+        best?.saleCurrencyAmount?.offerAmount ??
+        best?.saleCurrencyAmount?.totalAmount ??
+        Number.MAX_SAFE_INTEGER;
+      const offer =
+        itin?.saleCurrencyAmount?.offerAmount ??
+        itin?.saleCurrencyAmount?.totalAmount ??
+        Number.MAX_SAFE_INTEGER;
+      return offer < bestOffer ? itin : best;
+    });
+  }, [allItins]);
+
+  const headerCurrency =
+    cheapestItin?.passengerFareBreakDown?.[0]?.currency ?? "BDT";
+  const headerOfferAmount =
+    cheapestItin?.saleCurrencyAmount?.offerAmount ??
+    cheapestItin?.saleCurrencyAmount?.totalAmount ??
+    0;
+  const headerTotalAmount =
+    cheapestItin?.saleCurrencyAmount?.totalAmount ?? 0;
+  const headerDisplayTotalAmount =
+    headerTotalAmount < headerOfferAmount
+      ? headerOfferAmount
+      : headerTotalAmount;
+
   if (!isTripTypeValid) {
     return (
       <NotFound
@@ -365,10 +404,44 @@ const FlightSearch: React.FC = () => {
 
               <div className="flex items-center gap-2 ">
                 <SearchCountdown expiresAt={data?.data?.expiresAt} />
-                <p className="text-xs">
-                  <sup className="text-secondary">*</sup>Price Includes VAT &
-                  Tax
-                </p>
+                {isB2B ? (
+                  <div className="flex flex-col items-end gap-1.5">
+                    <label className="flex items-center gap-1.5 text-xs text-gray-700 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={showDiscounted}
+                        onChange={(e) => setShowDiscounted(e.target.checked)}
+                        className="accent-secondary"
+                      />
+                      Show Discounted Fare
+                    </label>
+                    {/* {showDiscounted ? (
+                      <div className="text-center">
+                        <div className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-semibold px-2 py-1 rounded-md mb-1">
+                          <FaPlane className="w-3.5 h-3.5" />
+                          Discounted Fare
+                        </div>
+                        <p className="text-base font-bold text-gray-900 leading-tight">
+                          {headerCurrency} {headerOfferAmount.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-gray-400 line-through">
+                          {headerCurrency}{" "}
+                          {headerDisplayTotalAmount.toLocaleString()}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm font-bold text-gray-900">
+                        {headerCurrency}{" "}
+                        {headerDisplayTotalAmount.toLocaleString()}
+                      </p>
+                    )} */}
+                  </div>
+                ) : (
+                  <p className="text-xs">
+                    <sup className="text-secondary">*</sup>Price Includes VAT &
+                    Tax
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -460,6 +533,7 @@ const FlightSearch: React.FC = () => {
                           kid: data?.data?.noOfKids ?? 0,
                           infant: data?.data?.noOfInfant ?? 0,
                         }}
+                        showDiscount={showDiscounted}
                       />
                     ),
                   )}

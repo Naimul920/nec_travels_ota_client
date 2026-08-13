@@ -104,6 +104,7 @@ export async function getTicketAction(
       : `/api/v1/bookings/${encodeURIComponent(bookingId)}`;
 
     const res = await httpClient.get<BookingItem>(endpoint);
+    console.log("res ticket88888",res)
     return {
       success: res.success,
       statusCode: res.statusCode,

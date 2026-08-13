@@ -62,7 +62,7 @@ const Oneway: React.FC<OnewayProps> = ({
       {/* Departure Airport Selector */}
       
       <SearchCity
-        label="Departure City"
+        label="From"
         value={data.fromIata}
         onChange={(iata) => onChange("from", iata)}
         handelSwap={handleSwap}
@@ -70,7 +70,7 @@ const Oneway: React.FC<OnewayProps> = ({
 
       {/* Arrival Airport Selector */}
       <SearchCity
-        label="Arrival City"
+        label="To"
         value={data.toIata}
         onChange={(iata) => onChange("to", iata)}
       />
@@ -78,7 +78,7 @@ const Oneway: React.FC<OnewayProps> = ({
       {/* Departure Calendar Date Picker */}
       <div className="relative ring-1 ring-primary rounded-lg p-3 bg-white">
         <p className="text-gray-500 md:text-xs text-[10px] font-bold select-none uppercase">
-          Departure Date
+          Journey Date
         </p>
 
         <DatePicker
