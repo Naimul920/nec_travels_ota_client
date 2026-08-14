@@ -62,9 +62,6 @@ importers:
       react-phone-number-input:
         specifier: ^3.4.17
         version: 3.4.17(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      search-airport-code:
-        specifier: ^0.0.5
-        version: 0.0.5(react@19.2.4)
       sweetalert2:
         specifier: ^11.26.10
         version: 11.26.25
@@ -2292,11 +2289,6 @@ packages:
 
   scroll-into-view-if-needed@3.1.0:
     resolution: {integrity: sha512-49oNpRjWRvnU8NyGVmUaYG4jtTkNonFZI86MmGRDqBphEK2EXT9gdEUoQPZhuBM8yWHxCWbobltqYO5M4XrUvQ==}
-
-  search-airport-code@0.0.5:
-    resolution: {integrity: sha512-yHWchYbwuFmrBRi6myks2aU5ZiICu598f7lCTkD3f3bMUU7sXH5r7Itrpp/wYiW8qWRk6i3NUo2cmrinT/h/eg==}
-    peerDependencies:
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -4985,10 +4977,6 @@ snapshots:
   scroll-into-view-if-needed@3.1.0:
     dependencies:
       compute-scroll-into-view: 3.1.1
-
-  search-airport-code@0.0.5(react@19.2.4):
-    dependencies:
-      react: 19.2.4
 
   semver@6.3.1: {}
 

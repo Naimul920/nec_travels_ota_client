@@ -20,7 +20,7 @@ const AuthCardSkeleton: React.FC<AuthCardSkeletonProps> = ({ compact }) => {
           <div className="h-4 w-24 rounded bg-slate-200" />
           <div className="h-12 w-full rounded-xl bg-slate-200" />
         </div>
-        <div className="h-12 w-full rounded-xl bg-brand/40" />
+        <div className="h-12 w-full rounded-xl bg-[#6FDB9E]" />
       </div>
     );
   }

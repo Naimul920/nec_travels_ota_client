@@ -236,8 +236,8 @@ body {
 
 .search-date-picker .ant-picker-input > input {
   font-family: var(--font-sans);
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-size: 0.875rem;
+  font-weight: 700;
   color: var(--color-black);
 }
 
