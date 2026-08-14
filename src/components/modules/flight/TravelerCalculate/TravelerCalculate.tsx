@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui";
-import { FaUser, FaUserFriends } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { MdOutlineAirlineSeatReclineNormal } from "react-icons/md";
 
@@ -87,7 +87,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
       disabled={disabled}
       onClick={onClick}
       aria-label={label}
-      className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+      className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
         label === "+"
           ? "border-primary text-primary bg-primary/5 hover:bg-primary hover:text-white"
           : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"
@@ -101,22 +101,22 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
     <div className="relative " ref={ref}>
       {/* Dropdown Trigger */}
       <div
-        className="cursor-pointer  rounded-xl border-2 border-primary bg-white px-3 py-5 transition-all hover:border-primary/70 hover:shadow-md "
+        className="flex min-h-[80px] cursor-pointer flex-col justify-center rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-all hover:border-primary"
         onClick={() => setOpen(!open)}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
               Travelers & Class
             </p>
-            <p className="mt-0.5 flex items-center gap-2 text-2xl font-extrabold text-black">
+            <p className="mt-0.5 flex items-baseline gap-1.5 text-sm font-bold text-gray-900">
               {total}
-              <span className="text-sm font-semibold text-gray-600">
+              <span className="text-xs font-semibold text-gray-600">
                 Traveler{total > 1 ? "s" : ""}
               </span>
             </p>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold capitalize text-gray-600">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase text-primary">
             <MdOutlineAirlineSeatReclineNormal />
             {value.cabin.toLowerCase()}
           </span>
@@ -125,21 +125,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
 
       {/* Dropdown Panel */}
       {open && (
-        <div className="absolute z-[100] mt-2 right-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-xl space-y-4 w-full md:w-96">
-          {/* Header */}
-          <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <FaUserFriends />
-            </span>
-            <div>
-              <p className="text-sm font-bold text-gray-800">Select Travelers</p>
-              <p className="text-xs text-gray-400">
-                {total} traveler{total > 1 ? "s" : ""} ·{" "}
-                {value.cabin.toLowerCase()} class
-              </p>
-            </div>
-          </div>
-
+        <div className="absolute z-[100] mt-2 right-0 rounded-2xl border border-gray-200 bg-white p-4 shadow-xl space-y-3 w-full md:w-80">
           {/* Traveler Rows */}
           {travelers.map((item) => {
             const count = value[item.key] as number;
@@ -149,7 +135,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
                 className="flex justify-between items-center gap-3"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-50 border border-gray-100">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 border border-gray-100">
                     {item.icon}
                   </span>
                   <div>
@@ -168,7 +154,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
                     }
                     onClick={() => updateCount(item.key, count - 1)}
                   />
-                  <span className="w-7 text-center text-lg font-bold text-gray-800">
+                  <span className="w-7 text-center text-base font-bold text-gray-800">
                     {count}
                   </span>
                   <StepperBtn
@@ -198,7 +184,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
                     key={cabin}
                     type="button"
                     onClick={() => onChange("cabin", cabin)}
-                    className={`rounded-xl border px-4 py-2.5 text-sm font-semibold capitalize transition-all ${
+                    className={`rounded-lg border px-3 py-2 text-sm font-semibold capitalize transition-all ${
                       active
                         ? "border-primary bg-primary/5 text-primary ring-1 ring-primary"
                         : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:bg-gray-50"
@@ -213,7 +199,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
 
           <Button
             type="button"
-            className="w-full bg-primary text-white rounded-xl py-2.5 font-semibold hover:opacity-90"
+            className="w-full bg-primary text-white rounded-xl py-2 font-semibold hover:opacity-90"
             onClick={() => setOpen(false)}
           >
             Done

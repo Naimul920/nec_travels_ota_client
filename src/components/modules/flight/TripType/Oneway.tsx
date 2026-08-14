@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import SearchCity from "../SearchCity/SearchCity";
+import AirpotSwap from "../SearchCity/AirpotSwap";
 import { DatePicker } from "antd";
 import type { GetProps } from "antd";
 import dayjs from "dayjs";
@@ -59,25 +60,30 @@ const Oneway: React.FC<OnewayProps> = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-      {/* Departure Airport Selector */}
-      
-      <SearchCity
-        label="From"
-        value={data.fromIata}
-        onChange={(iata) => onChange("from", iata)}
-        handelSwap={handleSwap}
-      />
+      <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 md:col-span-2">
+        {/* Departure Airport Selector */}
+        <SearchCity
+          label="From"
+          value={data.fromIata}
+          onChange={(iata) => onChange("from", iata)}
+          excludeIata={data.toIata}
+        />
 
-      {/* Arrival Airport Selector */}
-      <SearchCity
-        label="To"
-        value={data.toIata}
-        onChange={(iata) => onChange("to", iata)}
-      />
+        {/* Swap button between fields */}
+        <AirpotSwap onSwap={handleSwap} />
+
+        {/* Arrival Airport Selector */}
+        <SearchCity
+          label="To"
+          value={data.toIata}
+          onChange={(iata) => onChange("to", iata)}
+          excludeIata={data.fromIata}
+        />
+      </div>
 
       {/* Departure Calendar Date Picker */}
-      <div className="relative ring-1 ring-primary rounded-lg p-3 bg-white">
-        <p className="text-gray-500 md:text-xs text-[10px] font-bold select-none uppercase">
+      <div className="relative flex min-h-[74px] flex-col rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-colors focus-within:border-primary">
+        <p className="mb-0.5 select-none text-[10px] font-bold uppercase tracking-wider text-gray-500">
           Journey Date
         </p>
 
@@ -90,7 +96,7 @@ const Oneway: React.FC<OnewayProps> = ({
           disabledDate={disabledDate}
         />
 
-        <p className="md:text-xs text-[10px] text-gray-500 line-clamp-1 select-none">
+        <p className="mt-0.5 line-clamp-1 select-none text-[10px] text-gray-500">
           {data.departureDate
             ? dayjs(data.departureDate).format("dddd")
             : "Select Date"}

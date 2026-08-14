@@ -228,7 +228,7 @@ export default function SignIn({
       >
         {/* Left ticket stub */}
         {!compact && (
-          <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-[#F7F4EC] p-10 md:flex">
+          <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-linear-to-l from-[#F0F9F1] via-[#B9EBCF] to-[#6FDB9E] p-10 md:flex">
             {/* Dotted world-map texture */}
             <svg
               className="pointer-events-none absolute inset-0 h-full w-full"

@@ -31,7 +31,7 @@ export default function SignUp() {
     <div className="flex min-h-[calc(100svh-4rem)] w-full items-center justify-center px-4 py-4">
       <div className="relative grid w-full max-w-6xl grid-cols-1 overflow-hidden rounded-3xl border border-[#12233D]/10 bg-white shadow-xl md:grid-cols-5">
         {/* Left ticket stub */}
-        <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-[#F7F4EC] p-10 md:flex">
+        <div className="relative col-span-2 hidden flex-col justify-between overflow-hidden bg-linear-to-l from-[#F0F9F1] via-[#B9EBCF] to-[#6FDB9E] p-10 md:flex">
           {/* Dotted world-map texture */}
           <svg
             className="pointer-events-none absolute inset-0 h-full w-full"

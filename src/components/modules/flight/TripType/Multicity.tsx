@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { Button } from "@/components/ui";
 import SearchCity from "../SearchCity/SearchCity";
+import AirpotSwap from "../SearchCity/AirpotSwap";
 import TravelerCalculate from "../TravelerCalculate/TravelerCalculate";
 import type { TravelerValue } from "../TravelerCalculate/TravelerCalculate";
 
@@ -91,24 +92,30 @@ const MultiCity: React.FC<MultiCityProps> = ({
             key={`leg-${index}`}
             className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center"
           >
-            {/* Departure City */}
-            <SearchCity
-              label={`Flight ${index + 1} Departure`}
-              value={row.fromIata || ""}
-              onChange={(iata) => onChange(index, "from", iata)}
-              handelSwap={() => handleSwap(index)}
-            />
+            <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
+              {/* Departure City */}
+              <SearchCity
+                label={`Flight ${index + 1} Departure`}
+                value={row.fromIata || ""}
+                onChange={(iata) => onChange(index, "from", iata)}
+                excludeIata={row.toIata}
+              />
 
-            {/* Arrival City */}
-            <SearchCity
-              label={`Flight ${index + 1} Arrival`}
-              value={row.toIata || ""}
-              onChange={(iata) => onChange(index, "to", iata)}
-            />
+              {/* Swap button between fields */}
+              <AirpotSwap onSwap={() => handleSwap(index)} />
+
+              {/* Arrival City */}
+              <SearchCity
+                label={`Flight ${index + 1} Arrival`}
+                value={row.toIata || ""}
+                onChange={(iata) => onChange(index, "to", iata)}
+                excludeIata={row.fromIata}
+              />
+            </div>
 
             {/* Departure Date */}
-            <div className="ring-1 ring-primary rounded-lg p-4 bg-white">
-              <p className="text-gray-500 text-[10px] font-bold uppercase">
+            <div className="flex min-h-[74px] flex-col rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-colors focus-within:border-primary">
+              <p className="mb-0.5 select-none text-[10px] font-bold uppercase tracking-wider text-gray-500">
                 Departure Date
               </p>
               <DatePicker
@@ -121,7 +128,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
                 allowClear={false}
                 disabledDate={disabledDate(index)}
               />
-              <p className="text-[10px] text-gray-500 mt-1">
+              <p className="mt-0.5 text-[10px] text-gray-500">
                 {row.departureDate
                   ? dayjs(row.departureDate).format("dddd")
                   : "Select Date"}

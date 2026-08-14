@@ -72,6 +72,16 @@ body {
   .scale-100 { transform: scale(1.0); transform-origin: top left; }
   .scale-110 { transform: scale(1.1); transform-origin: top left; }
 
+  /* Responsive legacy zoom helpers (`zoom-0-9 md-zoom-1`) */
+  .zoom-0-9 { transform: scale(0.9); }
+  @media (min-width: 48rem) {
+    .zoom-0-9 { transform: scale(1); }
+  }
+
+  /* Hide scrollbars on scrollable tab/rail containers */
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
   /* Custom Scrollbar Utility */
   .custom-scrollbar {
     scrollbar-width: thin;
