@@ -69,6 +69,9 @@ export const getRouteOwner = (
 };
 
 export const getDefaultDashboardRoute = (role: USER_ROLE) => {
+  if (role === "B2C") {
+    return "/";
+  }
   return `/console/${role.toLowerCase()}`;
 };
 

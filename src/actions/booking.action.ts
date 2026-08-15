@@ -16,7 +16,7 @@ export type {
   BookingItem,
 } from "@/types";
 
-interface BookingResponse {
+export interface BookingResponse {
   success: boolean;
   statusCode: number;
   message: string;
@@ -30,9 +30,40 @@ interface BookingResponse {
   };
 }
 
-export async function getBookingsAction(): Promise<BookingResponse> {
+export interface GetBookingsParams {
+  page?: number;
+  limit?: number;
+  searchTerm?: string;
+  status?: string;
+  bookingSource?: string;
+  sortBy?: string;
+  sortOrder?: string;
+  include?: string;
+  fields?: string;
+  omit?: string;
+  totalAmount?: string;
+}
+
+export async function getBookingsAction(
+  params: GetBookingsParams = {},
+): Promise<BookingResponse> {
   try {
-    const res = await httpClient.get<BookingItem[]>("/api/v1/bookings");
+    const role = await getUserRole();
+    const res = await httpClient.get<BookingItem[]>("/api/v1/bookings", {
+      params: {
+        searchTerm: params.searchTerm ?? "",
+        page: params.page ?? 1,
+        limit: params.limit ?? 10,
+        sortBy: params.sortBy ?? "created_at",
+        sortOrder: params.sortOrder ?? "desc",
+        booking_source: params.bookingSource ?? role,
+        include: params.include ?? "booking_passengers,booking_payments",
+        omit: params.omit ?? "user_id",
+        ...(params.status ? { status: params.status } : {}),
+        ...(params.fields ? { fields: params.fields } : {}),
+        ...(params.totalAmount ? { total_amount: params.totalAmount } : {}),
+      },
+    });
     return {
       success: res.success,
       statusCode: res.statusCode,
@@ -41,7 +72,10 @@ export async function getBookingsAction(): Promise<BookingResponse> {
       meta: (res as unknown as BookingResponse)?.meta,
     };
   } catch (error) {
-    const { message, statusCode } = extractApiError(error, "Failed to load bookings");
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to load bookings",
+    );
     return { success: false, statusCode, message, data: [] };
   }
 }

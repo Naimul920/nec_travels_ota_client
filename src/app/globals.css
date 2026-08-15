@@ -440,6 +440,21 @@ body {
   animation: dropdown-pop 0.16s ease-out;
 }
 
+@keyframes tab-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-tab-fade-up {
+  animation: tab-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* Neutralize antd's global anchor reset (color/text-decoration) so links
    follow app/Tailwind styles instead of the antd default link color.
    antd wraps its reset in :where() (zero specificity), so `html a` wins,

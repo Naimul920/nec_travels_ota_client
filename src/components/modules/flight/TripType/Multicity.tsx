@@ -17,6 +17,8 @@ export interface MultiCityRow {
   fromIata: string;
   toIata: string;
   departureDate: string;
+  fromName?: string;
+  toName?: string;
 }
 
 interface MultiCityProps {
@@ -25,6 +27,7 @@ interface MultiCityProps {
     index: number,
     field: "from" | "to" | "departure",
     value: string,
+    city?: string,
   ) => void;
   setData: React.Dispatch<React.SetStateAction<MultiCityRow[]>>;
   traveler: TravelerValue;
@@ -93,12 +96,13 @@ const MultiCity: React.FC<MultiCityProps> = ({
             className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center"
           >
             <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
-              {/* Departure City */}
+{/* Departure City */}
               <SearchCity
-                label={`Flight ${index + 1} Departure`}
                 value={row.fromIata || ""}
-                onChange={(iata) => onChange(index, "from", iata)}
+                onChange={(iata, city) => onChange(index, "from", iata, city)}
                 excludeIata={row.toIata}
+                placeholder="Leaving from"
+                cityName={row.fromName}
               />
 
               {/* Swap button between fields */}
@@ -106,16 +110,17 @@ const MultiCity: React.FC<MultiCityProps> = ({
 
               {/* Arrival City */}
               <SearchCity
-                label={`Flight ${index + 1} Arrival`}
                 value={row.toIata || ""}
-                onChange={(iata) => onChange(index, "to", iata)}
+                onChange={(iata, city) => onChange(index, "to", iata, city)}
                 excludeIata={row.fromIata}
+                placeholder="Going to"
+                cityName={row.toName}
               />
             </div>
 
             {/* Departure Date */}
-            <div className="flex min-h-[74px] flex-col rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-colors focus-within:border-primary">
-              <p className="mb-0.5 select-none text-[10px] font-bold uppercase tracking-wider text-gray-500">
+            <div className="relative flex min-h-[72px] flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:shadow-md">
+              <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
                 Departure Date
               </p>
               <DatePicker
@@ -128,7 +133,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
                 allowClear={false}
                 disabledDate={disabledDate(index)}
               />
-              <p className="mt-0.5 text-[10px] text-gray-500">
+              <p className="mt-0.5 line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
                 {row.departureDate
                   ? dayjs(row.departureDate).format("dddd")
                   : "Select Date"}

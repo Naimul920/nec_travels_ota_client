@@ -8,6 +8,8 @@ export interface Airport {
   city: string;
   iata: string;
   name: string;
+  location?: string;
+  country_location?: string;
 }
 
 export interface AirportSearchResponse {

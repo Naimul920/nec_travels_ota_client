@@ -1,15 +1,7 @@
-// import HoldTickets from "../../_components/AirTickets/HoldTickets";
-
-import HoldTickets from "../../_components/AirTickets/HoldTickets";
-
-// import HoldTickets from "@/app/(dashboardLayout)/console/(adminLayout)/admin/_components/AirTickets/HoldTickets";
+import BookingsTable from "../../_components/AirTickets/BookingsTable";
 
 function page() {
-  return (
-    <>
-      <HoldTickets />
-    </>
-  );
+  return <BookingsTable status="HOLD" title="Hold Tickets" showIssue />;
 }
 
 export default page;

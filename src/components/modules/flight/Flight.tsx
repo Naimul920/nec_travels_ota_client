@@ -13,6 +13,12 @@ import { modifySearch } from "@/store/flight.store";
 import detectDomesticType from "@/utils/searchFlightSug/detactedDomesticType";
 import { useAuthStore } from "@/store/auth.store";
 import { ROLE } from "@/constant";
+import RecentFlightSearch from "./RecentFlightSearch/RecentFlightSearch";
+import {
+  saveLastSearch,
+  getLastSearch,
+  type RecentSearch,
+} from "@/utils/recentSearch";
 
 type TripType = "oneway" | "roundtrip" | "multicity";
 type TripField = "from" | "to" | "departure" | "return";
@@ -21,20 +27,20 @@ interface FlightProps {
 }
 
 const DEFAULT_ONEWAY = {
-  fromIata: "DAC",
-  toIata: "CXB",
+  fromIata: "",
+  toIata: "",
   departureDate: dayjs().format("YYYY-MM-DD"),
 };
 
 const DEFAULT_MULTICITY = [
   {
-    fromIata: "DAC",
-    toIata: "CCU",
+    fromIata: "",
+    toIata: "",
     departureDate: dayjs().format("YYYY-MM-DD"),
   },
   {
-    fromIata: "CCU",
-    toIata: "DXB",
+    fromIata: "",
+    toIata: "",
     departureDate: dayjs().format("YYYY-MM-DD"),
   },
 ];
@@ -67,25 +73,25 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
         tripType: "oneway" as TripType,
         flightData: {
           oneway: {
-            fromIata: "DAC",
-            toIata: "CXB",
+            fromIata: "",
+            toIata: "",
             departureDate: dayjs().format("YYYY-MM-DD"),
           },
           roundtrip: {
-            fromIata: "DAC",
-            toIata: "CXB",
+            fromIata: "",
+            toIata: "",
             departureDate: dayjs().format("YYYY-MM-DD"),
             returnDate: dayjs().add(1, "day").format("YYYY-MM-DD"),
           },
           multicity: [
             {
-              fromIata: "DAC",
-              toIata: "CCU",
+              fromIata: "",
+              toIata: "",
               departureDate: dayjs().format("YYYY-MM-DD"),
             },
             {
-              fromIata: "CCU",
-              toIata: "DXB",
+              fromIata: "",
+              toIata: "",
               departureDate: dayjs().format("YYYY-MM-DD"),
             },
           ],
@@ -102,25 +108,25 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
 
     const defaultFlightData = {
       oneway: {
-        fromIata: "DAC",
-        toIata: "CXB",
+        fromIata: "",
+        toIata: "",
         departureDate: dayjs().format("YYYY-MM-DD"),
       },
       roundtrip: {
-        fromIata: "DAC",
-        toIata: "CXB",
+        fromIata: "",
+        toIata: "",
         departureDate: dayjs().format("YYYY-MM-DD"),
         returnDate: dayjs().add(1, "day").format("YYYY-MM-DD"),
       },
       multicity: [
         {
-          fromIata: "DAC",
-          toIata: "CCU",
+          fromIata: "",
+          toIata: "",
           departureDate: dayjs().format("YYYY-MM-DD"),
         },
         {
-          fromIata: "CCU",
-          toIata: "DXB",
+          fromIata: "",
+          toIata: "",
           departureDate: dayjs().format("YYYY-MM-DD"),
         },
       ],
@@ -132,8 +138,8 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
       flightData = {
         ...defaultFlightData,
         oneway: {
-          fromIata: params.get("from") || "DAC",
-          toIata: params.get("to") || "CXB",
+          fromIata: params.get("from") || "",
+          toIata: params.get("to") || "",
           departureDate: params.get("date") || dayjs().format("YYYY-MM-DD"),
         },
       };
@@ -141,8 +147,8 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
       flightData = {
         ...defaultFlightData,
         roundtrip: {
-          fromIata: params.get("from") || "DAC",
-          toIata: params.get("to") || "CXB",
+          fromIata: params.get("from") || "",
+          toIata: params.get("to") || "",
           departureDate: params.get("date") || dayjs().format("YYYY-MM-DD"),
           returnDate:
             params.get("returnDate") ||
@@ -188,7 +194,109 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
     () => initializeStateFromURL().traveler,
   );
 
-  const handleOnewayChange = (field: TripField, value: string) => {
+  const [locationNames, setLocationNames] = useState<Record<string, string>>(
+    {},
+  );
+
+  const setLocationName = (key: string, name?: string) => {
+    if (name) {
+      setLocationNames((prev) => ({ ...prev, [key]: name }));
+    }
+  };
+
+  // Prefill the form with the user's last search from localStorage when no
+  // search is loaded from the URL. First-ever visits (no stored search) stay blank.
+  useEffect(() => {
+    if (searchParams.get("q")) return;
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    const last = getLastSearch();
+    if (!last) return;
+
+    const emptyRoundtrip = {
+      fromIata: "",
+      toIata: "",
+      departureDate: DEFAULT_ONEWAY.departureDate,
+      returnDate: dayjs().add(1, "day").format("YYYY-MM-DD"),
+    };
+
+    setTripType(last.tripType);
+
+    setFlightData(() => {
+      if (last.tripType === "roundtrip") {
+        return {
+          oneway: { ...DEFAULT_ONEWAY },
+          roundtrip: {
+            fromIata: last.from || "",
+            toIata: last.to || "",
+            departureDate: last.date || DEFAULT_ONEWAY.departureDate,
+            returnDate:
+              last.returnDate ||
+              dayjs(DEFAULT_ONEWAY.departureDate)
+                .add(1, "day")
+                .format("YYYY-MM-DD"),
+          },
+          multicity: DEFAULT_MULTICITY.map((s) => ({ ...s })),
+        };
+      }
+
+      if (last.tripType === "multicity") {
+        const segments =
+          last.segments && last.segments.length > 0
+            ? last.segments.map((seg) => ({
+                fromIata: seg.from || "",
+                toIata: seg.to || "",
+                departureDate: seg.date || DEFAULT_ONEWAY.departureDate,
+              }))
+            : DEFAULT_MULTICITY.map((s) => ({ ...s }));
+        return {
+          oneway: { ...DEFAULT_ONEWAY },
+          roundtrip: emptyRoundtrip,
+          multicity: segments,
+        };
+      }
+
+      return {
+        oneway: {
+          ...DEFAULT_ONEWAY,
+          fromIata: last.from || "",
+          toIata: last.to || "",
+          departureDate: last.date || DEFAULT_ONEWAY.departureDate,
+        },
+        roundtrip: emptyRoundtrip,
+        multicity: DEFAULT_MULTICITY.map((s) => ({ ...s })),
+      };
+    });
+
+    setTraveler((prev) => ({
+      ...prev,
+      adults: last.adults ?? prev.adults,
+      children: last.children ?? prev.children,
+      kids: last.kids ?? prev.kids,
+      infants: last.infants ?? prev.infants,
+      cabin:
+        last.cabin === "ECONOMY" || last.cabin === "BUSINESS"
+          ? last.cabin
+          : prev.cabin,
+    }));
+
+    if (last.tripType === "multicity") {
+      last.segments?.forEach((seg, idx) => {
+        setLocationName(`multi:${idx}:from`, seg.fromName);
+        setLocationName(`multi:${idx}:to`, seg.toName);
+      });
+    } else {
+      setLocationName(`${last.tripType}:from`, last.fromName);
+      setLocationName(`${last.tripType}:to`, last.toName);
+    }
+  }, [searchParams]);
+
+  const handleOnewayChange = (
+    field: TripField,
+    value: string,
+    city?: string,
+  ) => {
     setFlightData((prev) => ({
       ...prev,
       oneway: {
@@ -198,9 +306,15 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
         ...(field === "departure" && { departureDate: value }),
       },
     }));
+    if (field === "from") setLocationName(`oneway:from`, city);
+    if (field === "to") setLocationName(`oneway:to`, city);
   };
 
-  const handleRoundtripChange = (field: TripField, value: string) => {
+  const handleRoundtripChange = (
+    field: TripField,
+    value: string,
+    city?: string,
+  ) => {
     setFlightData((prev) => {
       const updated = {
         ...prev.roundtrip,
@@ -222,12 +336,15 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
 
       return { ...prev, roundtrip: updated };
     });
+    if (field === "from") setLocationName(`roundtrip:from`, city);
+    if (field === "to") setLocationName(`roundtrip:to`, city);
   };
 
   const handleMultiCityChange = (
     index: number,
     field: "from" | "to" | "departure",
     value: string,
+    city?: string,
   ) => {
     setFlightData((prev) => {
       const updated = [...prev.multicity];
@@ -236,6 +353,8 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
       if (field === "departure") updated[index].departureDate = value;
       return { ...prev, multicity: updated };
     });
+    if (field === "from") setLocationName(`multi:${index}:from`, city);
+    if (field === "to") setLocationName(`multi:${index}:to`, city);
   };
 
   const setMultiCityData: React.Dispatch<
@@ -293,7 +412,7 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
           { fromIata, toIata, departureDate },
           {
             fromIata: toIata,
-            toIata: isRoundSource ? prev.roundtrip.fromIata : "DXB",
+            toIata: isRoundSource ? prev.roundtrip.fromIata : "",
             departureDate: secondDate,
           },
         ];
@@ -318,8 +437,17 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
   const buildSearchQuery = () => {
     const params = new URLSearchParams();
 
+    const requireCity = (iata: string, label: string) => {
+      if (!iata) {
+        ErrorAlert("Missing City", `Please select ${label} city`);
+        return false;
+      }
+      return true;
+    };
+
     if (tripType === "oneway") {
       const { fromIata, toIata } = flightData.oneway;
+      if (!requireCity(fromIata, "departure") || !requireCity(toIata, "destination")) return false;
       if (fromIata.substring(0, 2) === toIata.substring(0, 2)) {
         ErrorAlert(
           "Invalid Route",
@@ -331,6 +459,7 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
 
     if (tripType === "roundtrip") {
       const { fromIata, toIata } = flightData.roundtrip;
+      if (!requireCity(fromIata, "departure") || !requireCity(toIata, "destination")) return false;
       if (fromIata.substring(0, 2) === toIata.substring(0, 2)) {
         ErrorAlert(
           "Invalid Route",
@@ -343,6 +472,7 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
     if (tripType === "multicity") {
       for (let i = 0; i < flightData.multicity.length; i++) {
         const { fromIata, toIata } = flightData.multicity[i];
+        if (!requireCity(fromIata, "departure") || !requireCity(toIata, "destination")) return false;
         if (fromIata.substring(0, 2) === toIata.substring(0, 2)) {
           ErrorAlert(
             `Invalid Route (Leg ${i + 1})`,
@@ -444,6 +574,48 @@ const handleSubmit = (e: React.FormEvent) => {
 
   const encodedQuery = encoding(query);
 
+  // 3. Persist last search into the browser localStorage (recent searches)
+  const now = Date.now();
+  const record: RecentSearch = {
+    id: `${now}-${Math.random().toString(36).slice(2, 7)}`,
+    tripType,
+    query,
+    q: encodedQuery,
+    searchedAt: now,
+    adults: traveler.adults,
+    children: traveler.children,
+    kids: traveler.kids,
+    infants: traveler.infants,
+    cabin: traveler.cabin,
+  };
+
+  if (tripType === "multicity") {
+    record.segments = flightData.multicity.map((seg, idx) => ({
+      from: seg.fromIata,
+      to: seg.toIata,
+      date: seg.departureDate,
+      fromName: locationNames[`multi:${idx}:from`],
+      toName: locationNames[`multi:${idx}:to`],
+    }));
+    record.from = flightData.multicity[0]?.fromIata;
+    record.to = flightData.multicity[0]?.toIata;
+    record.fromName = locationNames["multi:0:from"];
+    record.toName = locationNames["multi:0:to"];
+  } else {
+    const data =
+      tripType === "roundtrip" ? flightData.roundtrip : flightData.oneway;
+    record.from = data.fromIata;
+    record.to = data.toIata;
+    record.date = data.departureDate;
+    record.fromName = locationNames[`${tripType}:from`];
+    record.toName = locationNames[`${tripType}:to`];
+    if (tripType === "roundtrip") {
+      record.returnDate = flightData.roundtrip.returnDate;
+    }
+  }
+
+  saveLastSearch(record);
+
   // B2B logged-in users go to the console path; B2C and unauthenticated users go to public search
   const searchRoute =
     isLoggedIn && user?.role === ROLE.B2B
@@ -453,74 +625,108 @@ const handleSubmit = (e: React.FormEvent) => {
   router.push(searchRoute);
 };
 
+  const handleRecentSelect = (record: RecentSearch) => {
+    if (useFlight === "search") {
+      modifySearch();
+    }
+
+    const searchRoute =
+      isLoggedIn && user?.role === ROLE.B2B
+        ? `/console/${roleLower}/flight-search?q=${record.q}`
+        : `/flight-search?q=${record.q}`;
+
+    router.push(searchRoute);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full relative ">
-      {/* Trip Type selection inputs */}
-      <div className="flex items-center justify-center gap-6 mb-3 zoom-0-9 md-zoom-1">
-        {["oneway", "roundtrip", "multicity"].map((type) => (
-          <label key={type} className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              checked={tripType === type}
-              onChange={() => handleTripTypeChange(type as TripType)}
-              className="w-3 h-3 appearance-none border-2 border-primary rounded-full 
+    <div className="w-full">
+      <form onSubmit={handleSubmit} className="w-full relative ">
+        {/* Trip Type selection inputs */}
+        <div className="flex items-center justify-center gap-6 mb-3 zoom-0-9 md-zoom-1">
+          {["oneway", "roundtrip", "multicity"].map((type) => (
+            <label key={type} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                checked={tripType === type}
+                onChange={() => handleTripTypeChange(type as TripType)}
+                className="w-3 h-3 appearance-none border-2 border-primary rounded-full 
                 checked:bg-brand checked:ring-2 checked:ring-primary checked:ring-offset-2"
+              />
+              <span className="text-xs md:text-sm font-medium text-gray-700">
+                {type === "oneway"
+                  ? "One Way"
+                  : type === "roundtrip"
+                    ? "Round Trip"
+                    : "Multi City"}
+              </span>
+            </label>
+          ))}
+        </div>
+
+        {/* Form Content Rendering */}
+        <div
+          className={`${
+            useFlight === "search" ? "bg-white" : "bg-transparent"
+          } md:py-5`}
+        >
+          {tripType === "oneway" && (
+            <Oneway
+              data={{
+                ...flightData.oneway,
+                fromName: locationNames["oneway:from"],
+                toName: locationNames["oneway:to"],
+              }}
+              onChange={handleOnewayChange}
+              traveler={traveler}
+              changeTraveler={handleTravelerChange}
             />
-            <span className="text-xs md:text-sm font-medium text-gray-700">
-              {type === "oneway"
-                ? "One Way"
-                : type === "roundtrip"
-                  ? "Round Trip"
-                  : "Multi City"}
-            </span>
-          </label>
-        ))}
-      </div>
+          )}
 
-      {/* Form Content Rendering */}
-      <div
-        className={`${
-          useFlight === "search" ? "bg-white" : "bg-transparent"
-        } md:py-5`}
-      >
-        {tripType === "oneway" && (
-          <Oneway
-            data={flightData.oneway}
-            onChange={handleOnewayChange}
-            traveler={traveler}
-            changeTraveler={handleTravelerChange}
-          />
-        )}
+          {tripType === "roundtrip" && (
+            <Roundtrip
+              data={{
+                ...flightData.roundtrip,
+                fromName: locationNames["roundtrip:from"],
+                toName: locationNames["roundtrip:to"],
+              }}
+              onChange={handleRoundtripChange}
+              traveler={traveler}
+              changeTraveler={handleTravelerChange}
+            />
+          )}
 
-        {tripType === "roundtrip" && (
-          <Roundtrip
-            data={flightData.roundtrip}
-            onChange={handleRoundtripChange}
-            traveler={traveler}
-            changeTraveler={handleTravelerChange}
-          />
-        )}
+          {tripType === "multicity" && (
+            <MultiCity
+              data={flightData.multicity.map((row, idx) => ({
+                ...row,
+                fromName: locationNames[`multi:${idx}:from`],
+                toName: locationNames[`multi:${idx}:to`],
+              }))}
+              onChange={handleMultiCityChange}
+              setData={setMultiCityData}
+              traveler={traveler}
+              changeTraveler={handleTravelerChange}
+            />
+          )}
+        </div>
 
-        {tripType === "multicity" && (
-          <MultiCity
-            data={flightData.multicity}
-            onChange={handleMultiCityChange}
-            setData={setMultiCityData}
-            traveler={traveler}
-            changeTraveler={handleTravelerChange}
-          />
-        )}
-      </div>
-
-      {/* Form Submission Control */}
-      <Button
-        type="submit"
-        className="mt-6 bg-primary text-white px-10 py-3 rounded-lg font-bold 
+        {/* Form Submission Control */}
+        <Button
+          type="submit"
+          className="mt-6 bg-primary text-white px-10 py-3 rounded-lg font-bold 
           absolute -bottom-14 left-1/2 -translate-x-1/2"
-      >
-        Search
-      </Button>
-    </form>
+        >
+          Search
+        </Button>
+      </form>
+
+      {useFlight !== "search" && (
+        <RecentFlightSearch
+          onSelect={handleRecentSelect}
+          className="md:w-1/4"
+        />
+      )}
+    </div>
   );
 };
 

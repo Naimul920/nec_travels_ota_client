@@ -334,6 +334,11 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       icon: <FaUsers />,
       children: [
         {
+          path: "/all",
+          label: "All User",
+          icon: <FaUsers />,
+        },
+        {
           path: "/admin",
           label: "Admin",
           icon: <FaUsers />,

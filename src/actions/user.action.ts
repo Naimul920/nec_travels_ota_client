@@ -56,6 +56,7 @@ export async function updateUserProfile(formData: FormData) {
 export interface AllUsersParams {
   page?: number;
   limit?: number;
+  searchTerm?: string;
   sortBy?: string;
   status?: string;
   role?: string;
@@ -85,6 +86,7 @@ export async function getAllUsersAction(
           page: params.page ?? 1,
           limit: params.limit ?? 10,
           sortBy: params.sortBy ?? "created_at",
+          searchTerm: params.searchTerm ?? "",
           ...(params.status ? { status: params.status } : {}),
           ...(params.role ? { role: params.role } : {}),
         },
@@ -184,6 +186,138 @@ export async function reviewB2BUserAction(
       message: Array.isArray(backendMessage)
         ? backendMessage.join(", ")
         : backendMessage || error?.message || "Failed to update user status",
+    };
+  }
+}
+
+export type AdminUserStatusAction =
+  | "activate"
+  | "suspend"
+  | "block"
+  | "unblock";
+
+const ADMIN_USER_STATUS_ENDPOINTS: Record<AdminUserStatusAction, string> = {
+  activate: "/users/activate-user/",
+  suspend: "/users/suspend-user/",
+  block: "/users/block-user/",
+  unblock: "/users/unblock-user/",
+};
+
+export async function changeUserStatusAction(
+  id: string,
+  action: AdminUserStatusAction,
+): Promise<UserActionResponse> {
+  try {
+    const res = await httpClient.patch<{ message: string }>(
+      `${ADMIN_USER_STATUS_ENDPOINTS[action]}${encodeURIComponent(id)}`,
+      {},
+    );
+    return {
+      success: true,
+      statusCode: res.statusCode,
+      message:
+        res.message || `User ${action} successfully`,
+    };
+  } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
+    return {
+      success: false,
+      statusCode: error?.response?.status || 500,
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error?.message || "Failed to update user status",
+    };
+  }
+}
+
+export interface UpdateUserPayload {
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  email?: string;
+  department?: string;
+  currency_id?: string;
+  credit_limit?: number;
+  package_id?: string;
+}
+
+export async function updateUserAction(
+  id: string,
+  payload: UpdateUserPayload,
+): Promise<UserActionResponse> {
+  try {
+    const res = await httpClient.patch<{ message: string }>(
+      `/api/v1/users/update-user/${encodeURIComponent(id)}`,
+      payload,
+    );
+    return {
+      success: true,
+      statusCode: res.statusCode,
+      message: res.message || "User updated successfully",
+    };
+  } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
+    return {
+      success: false,
+      statusCode: error?.response?.status || 500,
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error?.message || "Failed to update user",
+    };
+  }
+}
+
+export interface ChangeUserPasswordPayload {
+  password: string;
+  password_confirmation: string;
+}
+
+export async function changeAdminUserPasswordAction(
+  id: string,
+  payload: ChangeUserPasswordPayload,
+): Promise<UserActionResponse> {
+  try {
+    const res = await httpClient.patch<{ message: string }>(
+      `/api/v1/users/super-admin/change-password/${encodeURIComponent(id)}`,
+      payload,
+    );
+    return {
+      success: true,
+      statusCode: res.statusCode,
+      message: res.message || "Password changed successfully",
+    };
+  } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
+    return {
+      success: false,
+      statusCode: error?.response?.status || 500,
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error?.message || "Failed to change password",
+    };
+  }
+}
+
+export async function deleteUserAction(
+  id: string,
+): Promise<UserActionResponse> {
+  try {
+    const res = await httpClient.delete<{ message: string }>(
+      `/users/delete-user/${encodeURIComponent(id)}`,
+    );
+    return {
+      success: true,
+      statusCode: res.statusCode,
+      message: res.message || "User deleted successfully",
+    };
+  } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
+    return {
+      success: false,
+      statusCode: error?.response?.status || 500,
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error?.message || "Failed to delete user",
     };
   }
 }

@@ -18,10 +18,13 @@ interface RoundtripProps {
     toIata: string;
     departureDate: string;
     returnDate: string;
+    fromName?: string;
+    toName?: string;
   };
   onChange: (
     field: "from" | "to" | "departure" | "return",
-    value: string
+    value: string,
+    city?: string
   ) => void;
   traveler: TravelerValue;
   changeTraveler: <K extends keyof TravelerValue>(
@@ -62,10 +65,11 @@ const Roundtrip: React.FC<RoundtripProps> = ({
       <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 md:col-span-2">
         {/* Departure Airport Selector */}
         <SearchCity
-          label="Departure City"
           value={data.fromIata}
-          onChange={(iata) => onChange("from", iata)}
+          onChange={(iata, city) => onChange("from", iata, city)}
           excludeIata={data.toIata}
+          placeholder="Leaving from"
+          cityName={data.fromName}
         />
 
         {/* Swap button between fields */}
@@ -73,21 +77,22 @@ const Roundtrip: React.FC<RoundtripProps> = ({
 
         {/* Arrival Airport Selector */}
         <SearchCity
-          label="Arrival City"
           value={data.toIata}
-          onChange={(iata) => onChange("to", iata)}
+          onChange={(iata, city) => onChange("to", iata, city)}
           excludeIata={data.fromIata}
+          placeholder="Going to"
+          cityName={data.toName}
         />
       </div>
 
       {/* Departure Date Picker */}
-      <div className="relative flex min-h-[74px] flex-col rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-colors focus-within:border-primary">
-        <p className="mb-0.5 select-none text-[10px] font-bold uppercase tracking-wider text-gray-500">
+      <div className="relative flex min-h-[72px] flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:shadow-md">
+        <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
           Departure Date
         </p>
 
         <DatePicker
-          className="search-date-picker"
+          className="search-date-picker w-full"
           value={data.departureDate ? dayjs(data.departureDate) : null}
           onChange={(d) => d && onChange("departure", d.format("YYYY-MM-DD"))}
           format="DD MMM YY"
@@ -95,7 +100,7 @@ const Roundtrip: React.FC<RoundtripProps> = ({
           disabledDate={disabledDeparture}
         />
 
-        <p className="mt-0.5 line-clamp-1 select-none text-[10px] text-gray-500">
+        <p className="mt-0.5 line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
           {data.departureDate
             ? dayjs(data.departureDate).format("dddd")
             : "Select Date"}
@@ -103,13 +108,13 @@ const Roundtrip: React.FC<RoundtripProps> = ({
       </div>
 
       {/* Return Date Picker */}
-      <div className="relative flex min-h-[74px] flex-col rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-colors focus-within:border-primary">
-        <p className="mb-0.5 select-none text-[10px] font-bold uppercase tracking-wider text-gray-500">
+      <div className="relative flex min-h-[72px] flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:shadow-md">
+        <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
           Return Date
         </p>
 
         <DatePicker
-          className="search-date-picker"
+          className="search-date-picker w-full"
           value={data.returnDate ? dayjs(data.returnDate) : null}
           onChange={(d) => d && onChange("return", d.format("YYYY-MM-DD"))}
           format="DD MMM YY"
@@ -117,7 +122,7 @@ const Roundtrip: React.FC<RoundtripProps> = ({
           disabledDate={disabledReturn}
         />
 
-        <p className="mt-0.5 line-clamp-1 select-none text-[10px] text-gray-500">
+        <p className="mt-0.5 line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
           {data.returnDate
             ? dayjs(data.returnDate).format("dddd")
             : "Select Date"}

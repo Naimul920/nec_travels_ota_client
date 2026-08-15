@@ -16,6 +16,8 @@ interface TabsProps {
   children: React.ReactElement<TabPaneProps>[];
   className?: string;
   containerClassName?: string;
+  floating?: boolean;
+  isPending?: boolean;
 }
  
 
@@ -25,15 +27,24 @@ const Tabs: React.FC<TabsProps> = ({
   children,
   className,
   containerClassName,
+  floating = false,
+  isPending = false,
 }) => {
   return (
     <div className={clsx("w-full", className)}>
       <div
         className={clsx(
-          "flex items-center rounded-md border border-gray-200 bg-white p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_16px_rgba(15,35,61,0.08)] overflow-x-auto flex-nowrap no-scrollbar",
-          containerClassName
+          "relative z-10 w-full flex md:justify-center",
+          floating && "-mt-2 md:-mt-3 -translate-y-1/2"
         )}
       >
+        <div
+          className={clsx(
+            "flex items-center justify-start md:justify-center rounded-md border border-gray-200 bg-white p-1.5 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_16px_rgba(15,35,61,0.08)] overflow-x-auto flex-nowrap custom-scrollbar snap-x snap-proximity overscroll-x-contain touch-pan-x min-w-0 md:snap-none",
+            floating && "h-12 md:h-14",
+            containerClassName
+          )}
+        >
         {React.Children.map(children, (child) => {
           if (!React.isValidElement(child)) return null;
 
@@ -44,7 +55,7 @@ const Tabs: React.FC<TabsProps> = ({
             <Button
               onClick={() => !isDisabled && onChange(child.key as string)}
               className={clsx(
-                "flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-6 md:py-3 text-sm md:text-base font-semibold transition-all duration-300 rounded-full whitespace-nowrap shrink-0",
+                "flex items-center gap-1 md:gap-2 px-2 py-1.5 md:px-6 md:py-3 text-xs md:text-base font-semibold transition-all duration-300 rounded-full whitespace-nowrap shrink-0 snap-start",
                 isActive
                   ? "bg-brand text-white shadow-lg shadow-brand/30"
                   : "bg-transparent text-slate-700! hover:text-slate-900! hover:bg-gray-100!",
@@ -56,7 +67,7 @@ const Tabs: React.FC<TabsProps> = ({
               {child.props.icon && (
                 <span
                   className={clsx(
-                    "text-lg md:text-xl",
+                    "text-base md:text-xl",
                     isActive ? "text-white" : "text-emerald-600"
                   )}
                 >
@@ -68,11 +79,23 @@ const Tabs: React.FC<TabsProps> = ({
           );
         })}
       </div>
+      </div>
 
-      <div className="mt-2 md:mt-4 w-full">
+      <div className={clsx("w-full", floating ? "-mt-4 md:-mt-3" : "mt-2 md:mt-4")}>
         {React.Children.map(children, (child) => {
           if (!React.isValidElement(child)) return null;
-          return child.key === activeKey ? child : null;
+          if (child.key !== activeKey) return null;
+          return (
+            <div
+              key={activeKey}
+              className={clsx(
+                "animate-tab-fade-up transition-opacity duration-300",
+                isPending && "opacity-60"
+              )}
+            >
+              {child}
+            </div>
+          );
         })}
       </div>
     </div>

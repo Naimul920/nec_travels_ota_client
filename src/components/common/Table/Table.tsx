@@ -42,6 +42,8 @@ interface CustomTableProps<RecordType> {
   pagination?: TableProps<RecordType>["pagination"];
   rowKey?: string;
   isSelect?: boolean;
+  /** Hide the built-in search box (e.g. server-side search handled by the page). */
+  hideSearch?: boolean;
   /** Show a skeleton loading state in place of the table body. */
   loading?: boolean;
   /** Enable an optional "Create" button at the top of the table. Omit to hide. */
@@ -117,6 +119,7 @@ const Table = <RecordType extends object>({
   pagination,
   rowKey = "key",
   isSelect = false,
+  hideSearch = false,
   loading = false,
   createButtonText,
   createFields = [],
@@ -192,7 +195,11 @@ const Table = <RecordType extends object>({
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <TableHeader title={title} isSelect={isSelect} />
+          <TableHeader
+            title={title}
+            isSelect={isSelect}
+            hideSearch={hideSearch}
+          />
         </div>
         {showCreate && (
           <Button

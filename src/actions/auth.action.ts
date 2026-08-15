@@ -220,13 +220,30 @@ export const forgotPasswordAction = async (email: string) => {
       user_id,
     };
   } catch (error: any) {
-    const backendMessage = error?.response?.data?.message;
-    return {
-      success: false,
-      message: Array.isArray(backendMessage)
-        ? backendMessage.join(", ")
-        : backendMessage || error?.message || "Failed to send OTP",
-    };
+    const response = error?.response;
+    const status = response?.status;
+    const backendMessage = response?.data?.message;
+
+    if (typeof backendMessage === "string") {
+      return { success: false, message: backendMessage };
+    }
+    if (Array.isArray(backendMessage)) {
+      return { success: false, message: backendMessage.join(", ") };
+    }
+    if (status === 429) {
+      return {
+        success: false,
+        message: "Too many requests. Please wait a minute and try again.",
+      };
+    }
+    if (status && status >= 500) {
+      return {
+        success: false,
+        message:
+          "Our server is temporarily unavailable. Please try again in a few minutes.",
+      };
+    }
+    return { success: false, message: "Failed to send OTP. Please try again." };
   }
 };
 
@@ -246,13 +263,30 @@ export const resetPasswordAction = async (payload: {
       message: res.message || "Password reset successfully",
     };
   } catch (error: any) {
-    return {
-      success: false,
-      message:
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to reset password",
-    };
+    const response = error?.response;
+    const status = response?.status;
+    const backendMessage = response?.data?.message;
+
+    if (typeof backendMessage === "string") {
+      return { success: false, message: backendMessage };
+    }
+    if (Array.isArray(backendMessage)) {
+      return { success: false, message: backendMessage.join(", ") };
+    }
+    if (status === 429) {
+      return {
+        success: false,
+        message: "Too many requests. Please wait a minute and try again.",
+      };
+    }
+    if (status && status >= 500) {
+      return {
+        success: false,
+        message:
+          "Our server is temporarily unavailable. Please try again in a few minutes.",
+      };
+    }
+    return { success: false, message: "Failed to reset password. Please try again." };
   }
 };
 

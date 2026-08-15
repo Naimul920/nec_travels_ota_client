@@ -5,12 +5,8 @@ import NoticeMarquee from "../../../../../components/common/NoticeMarquee/Notice
 export default function HomePage() {
   return (
     <>
-      <div className="px-4 sm:px-6">
-        <NoticeMarquee />
+      <NoticeMarquee />
       <HomeTabs />
-      </div>
-
-
       <div className="mt-10 md:mt-16 py-10">
         <HomeSlider />
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import { LuBuilding2 } from "react-icons/lu";
 import { FiFileText } from "react-icons/fi";
 import { MdFlight, MdHealthAndSafety, MdHolidayVillage } from "react-icons/md";
@@ -28,12 +28,17 @@ const ComingSoon: React.FC<{ icon: React.ReactNode; title: string }> = ({
 
 export default function HomeTabs() {
   const [activeKey, setActiveKey] = useState("1");
-  const { user, isLoggedIn } = useAuthStore();
+  const [isPending, startTransition] = useTransition();
+  const { user, isLoggedIn, isLoading } = useAuthStore();
   const isB2B = isLoggedIn && user?.role === ROLE.B2B;
+
+  const handleTabChange = (key: string) => {
+    startTransition(() => setActiveKey(key));
+  };
 
   return (
     <div className="relative w-full bg-white">
-      {!isB2B && (
+      {(!isB2B && !isLoading) && (
         <div className="relative h-70 w-full overflow-hidden md:h-96">
           <video
             className="pointer-events-none absolute inset-0 h-full w-full object-cover"
@@ -51,7 +56,7 @@ export default function HomeTabs() {
       <div
         className={clsx(
           "relative z-10 mx-auto w-full max-w-7xl",
-          !isB2B && "md:-mt-32"
+          !isB2B && "md:-mt-32 px-2 sm:px-4"
         )}
       >
         <div
@@ -62,9 +67,10 @@ export default function HomeTabs() {
         >
           <Tabs
             activeKey={activeKey}
-            onChange={(key) => setActiveKey(key)}
+            onChange={handleTabChange}
+            isPending={isPending}
             className="relative z-10 flex flex-col items-center justify-center"
-            containerClassName={"w-full md:max-w-max justify-center"}
+            containerClassName={"w-full md:max-w-max"}
           >
             <TabPane key="1" tab="Flight" icon={<MdFlight size={20} />}>
               <Flight />

@@ -5,19 +5,19 @@ import { useAirportSearch } from "@/hooks/useAirportSearch";
 import type { Airport } from "@/actions/airport.action";
 
 interface SearchCityProps {
-  label: string;
   value: string;
   onChange: (iata: string, location: string) => void;
   placeholder?: string;
   excludeIata?: string;
+  cityName?: string;
 }
 
 const SearchCity: React.FC<SearchCityProps> = ({
-  label,
   value,
   onChange,
   placeholder,
   excludeIata,
+  cityName,
 }) => {
   const [query, setQuery] = useState(value);
   const [selected, setSelected] = useState<Airport | null>(null);
@@ -41,8 +41,9 @@ const SearchCity: React.FC<SearchCityProps> = ({
   // Resolve the committed airport (kept so a city is always displayed)
   const match = (data?.data ?? []).find((a) => a.iata === value);
   const resolved = selected ?? match;
-  const displayValue = focused && showSuggestions ? query : resolved?.city ?? "";
-  const isLoadingInitial = isLoading && !resolved;
+  const displayValue = focused && showSuggestions
+    ? query
+    : resolved?.city || cityName || "";
 
   // Click outside handling to close suggestion popups and restore the city
   useEffect(() => {
@@ -99,47 +100,40 @@ const SearchCity: React.FC<SearchCityProps> = ({
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setFocused(true);
-    setQuery("");
     setShowSuggestions(true);
+    setQuery((resolved?.city || cityName || "").toUpperCase());
     e.currentTarget.select();
   };
 
   return (
     <div className="relative w-full" ref={wrapperRef}>
-      <div className="relative flex min-h-[74px] flex-col rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-colors focus-within:border-primary">
-        <p className="mb-0.5 select-none text-[10px] font-bold uppercase tracking-wider text-gray-500">
-          {label}
-        </p>
-
-        {isLoadingInitial ? (
-          <div className="flex flex-col gap-1.5 py-0.5">
-            <span className="h-4 w-3/4 animate-shimmer rounded [background-image:linear-gradient(90deg,#e2e8f0_0%,#f1f5f9_50%,#e2e8f0_100%)] [background-size:200%_100%]" />
-            <span className="h-3 w-1/2 animate-shimmer rounded [background-image:linear-gradient(90deg,#e2e8f0_0%,#f1f5f9_50%,#e2e8f0_100%)] [background-size:200%_100%]" />
-          </div>
-        ) : (
-          <input
-            ref={inputRef}
-            className="w-full truncate border-none bg-transparent p-0 text-sm font-bold uppercase text-gray-900 outline-none placeholder:font-normal placeholder:text-gray-400"
-            type="text"
-            value={displayValue}
-            placeholder={placeholder}
-            autoComplete="off"
-            aria-autocomplete="list"
-            onFocus={handleFocus}
-            onChange={handleInputChange}
-          />
+      <div
+        className={`relative flex min-h-[72px] w-full flex-col justify-center rounded-md border bg-white px-3 shadow-sm transition-all duration-200 ${
+          focused ? "border-primary shadow-md" : "border-slate-200"
+        }`}
+      >
+        {(focused || value) && (
+          <p className="pointer-events-none mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
+            {placeholder}
+          </p>
         )}
 
-        {!isLoadingInitial && (
-          <p className="mt-0.5 line-clamp-1 select-none text-[10px] text-gray-500">
-            {resolved ? (
-              <>
-                <span className="font-bold text-primary">{resolved.iata}</span>
-                <span className="text-gray-400"> · {resolved.name}</span>
-              </>
-            ) : (
-              "Select City"
-            )}
+        <input
+          ref={inputRef}
+          className="w-full truncate border-none bg-transparent py-2 text-sm font-bold uppercase text-gray-900 outline-none placeholder:font-normal placeholder:text-gray-400"
+          type="text"
+          value={displayValue}
+          placeholder={focused ? "" : placeholder}
+          autoComplete="off"
+          aria-autocomplete="list"
+          onFocus={handleFocus}
+          onChange={handleInputChange}
+        />
+
+        {(focused || value) && resolved && (
+          <p className="pointer-events-none line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
+            {resolved.iata} ·{" "}
+            {resolved.location || resolved.country_location || resolved.name}
           </p>
         )}
       </div>
@@ -148,7 +142,8 @@ const SearchCity: React.FC<SearchCityProps> = ({
       {showSuggestions && focused && query?.length > 0 && (
         <ul className="absolute left-0 right-0 z-50 mt-1 max-h-64 overflow-y-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg">
           {isLoading ? (
-            <li className="px-4 py-2 text-xs text-gray-400 italic">
+            <li className="flex items-center gap-2 px-4 py-2 text-xs text-gray-400">
+              <span className="h-3 w-3 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
               Searching...
             </li>
           ) : airports.length > 0 ? (
@@ -164,7 +159,9 @@ const SearchCity: React.FC<SearchCityProps> = ({
                     {airport.city}
                   </p>
                   <p className="line-clamp-1 text-[10px] text-gray-400">
-                    {airport.name}
+                    {airport.location ||
+                      airport.country_location ||
+                      airport.name}
                   </p>
                 </div>
                 <span className="line-clamp-1 rounded bg-gray-100 px-2 py-1 font-mono text-[10px] font-bold text-gray-600">

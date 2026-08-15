@@ -101,15 +101,15 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
     <div className="relative " ref={ref}>
       {/* Dropdown Trigger */}
       <div
-        className="flex min-h-[80px] cursor-pointer flex-col justify-center rounded-lg border border-primary/40 bg-white p-2.5 shadow-sm transition-all hover:border-primary"
+        className="flex min-h-[72px] cursor-pointer flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-all hover:border-primary"
         onClick={() => setOpen(!open)}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+            <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
               Travelers & Class
             </p>
-            <p className="mt-0.5 flex items-baseline gap-1.5 text-sm font-bold text-gray-900">
+            <p className="flex items-baseline gap-1.5 text-sm font-bold text-gray-900">
               {total}
               <span className="text-xs font-semibold text-gray-600">
                 Traveler{total > 1 ? "s" : ""}

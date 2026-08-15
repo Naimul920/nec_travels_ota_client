@@ -1,14 +1,7 @@
-// import IssueTickets from "@/app/(dashboard)/b2b/_components/AirTickets/IssueTickets";
-// import React from "react";
-
-import IssueTickets from "../../_components/AirTickets/IssueTickets";
+import BookingsTable from "../../_components/AirTickets/BookingsTable";
 
 function page() {
-  return (
-    <>
-      <IssueTickets />
-    </>
-  );
+  return <BookingsTable status="ISSUED" title="Issued Tickets" />;
 }
 
 export default page;
