@@ -33,7 +33,7 @@ export default function HomeSlider() {
   };
 
   return (
-    <div className="relative mx-auto max-w-6xl">
+    <div className="relative mx-auto py-10">
       <div className="overflow-hidden rounded-xl">
         <div
           className="flex transition-transform duration-500 ease-in-out"

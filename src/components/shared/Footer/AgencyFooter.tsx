@@ -4,7 +4,7 @@ import { MdEmail } from "react-icons/md";
 export default function AgencyFooter() {
   return (
     <aside aria-label="Quick Contact Bar" className="w-full border-y border-white/20 bg-primary">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 py-2.5 text-xs text-white sm:text-sm">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 py-2.5  text-xs text-white sm:text-sm">
         
         {/* Phone Section */}
         <div className="flex items-center gap-2">

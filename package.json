@@ -20,6 +20,8 @@
     "country-flag-icons": "^1.6.20",
     "dayjs": "^1.11.21",
     "formik": "^2.4.9",
+    "html2canvas-pro": "^2.3.8",
+    "jspdf": "^4.2.1",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.13.10",
     "next": "16.2.10",

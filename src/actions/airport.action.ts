@@ -7,8 +7,9 @@ export interface Airport {
   id: string;
   city: string;
   iata: string;
-  name: string;
+  airport_name: string;
   location?: string;
+  country_name?: string;
   country_location?: string;
 }
 

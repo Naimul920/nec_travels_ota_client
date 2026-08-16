@@ -29,8 +29,8 @@ const ComingSoon: React.FC<{ icon: React.ReactNode; title: string }> = ({
 export default function HomeTabs() {
   const [activeKey, setActiveKey] = useState("1");
   const [isPending, startTransition] = useTransition();
-  const { user, isLoggedIn, isLoading } = useAuthStore();
-  const isB2B = isLoggedIn && user?.role === ROLE.B2B;
+  const { user, isLoggedIn } = useAuthStore();
+  const showHero = !isLoggedIn || user?.role === ROLE.B2C;
 
   const handleTabChange = (key: string) => {
     startTransition(() => setActiveKey(key));
@@ -38,31 +38,38 @@ export default function HomeTabs() {
 
   return (
     <div className="relative w-full bg-white">
-      {(!isB2B && !isLoading) && (
-        <div className="relative h-70 w-full overflow-hidden md:h-96">
-          <video
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            src="/assets/videos/1746430357291.mp4"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-white/40" />
-        </div>
-      )}
+      {/* Hero video: for B2C users and guests (not logged in). Kept mounted and
+          toggled with CSS (hidden) so login/logout never unmounts it — this
+          avoids the blinking / video reloading when auth state changes. */}
+      <div
+        className={clsx(
+          "relative h-70 w-full overflow-hidden bg-gray-900 md:h-96",
+          !showHero && "hidden"
+        )}
+      >
+        <video
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          src="/assets/videos/1746430357291.mp4"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-white/40" />
+      </div>
 
       {/* Floating panel straddling the video bottom edge */}
       <div
         className={clsx(
           "relative z-10 mx-auto w-full max-w-7xl",
-          !isB2B && "md:-mt-32 px-2 sm:px-4"
+          showHero && "md:-mt-32 px-2 sm:px-4"
         )}
       >
         <div
           className={clsx(
             "relative z-40 rounded-3xl border border-slate-200/80 bg-white p-2 shadow-[0_20px_60px_rgba(15,35,61,0.15)] md:p-3",
-            isB2B ? "mt-6" : "-mt-20"
+            showHero ? "-mt-20" : "mt-6"
           )}
         >
           <Tabs

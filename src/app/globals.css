@@ -455,6 +455,22 @@ body {
   animation: tab-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -800px 0;
+  }
+  100% {
+    background-position: 800px 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #eef0f3 25%, #e1e4e8 37%, #eef0f3 50%);
+  background-size: 800px 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
 /* Neutralize antd's global anchor reset (color/text-decoration) so links
    follow app/Tailwind styles instead of the antd default link color.
    antd wraps its reset in :where() (zero specificity), so `html a` wins,
@@ -463,4 +479,34 @@ html a,
 html a:hover {
   color: inherit;
   text-decoration: inherit;
+}
+
+/* ==========================================
+   6. E-TICKET PRINT ISOLATION
+   ========================================== */
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #eticket-print,
+  #eticket-print * {
+    visibility: visible;
+  }
+
+  #eticket-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    max-width: 100%;
+    box-shadow: none !important;
+    border-color: #d1d5db !important;
+    margin: 0;
+  }
 }

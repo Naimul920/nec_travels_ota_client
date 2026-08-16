@@ -101,47 +101,51 @@ function resolveImageSrc(src?: string | null): string | undefined {
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <div className="bg-[#167236] text-white font-semibold px-4 py-2 text-sm tracking-wide">
+    <div className="bg-[#167236] text-white font-semibold px-3 py-1.5 text-xs tracking-wide">
       {title}
     </div>
   );
 }
 
-// Toolbar: Hide Fare / Gross Fare toggles + Download / Cancel Booking / Issue Ticket actions.
-// Rendered above the ticket, right-aligned. Hidden on print/download.
+// Toolbar: Hide Fare / Discounted Fare toggles + Download / Print / Cancel Booking / Issue Ticket actions.
+// Rendered as a right-hand sidebar on large screens. Hidden on print.
 function TicketToolbar({
   hideFare,
   onHideFareChange,
   grossFare,
   onGrossFareChange,
   onDownload,
+  onPrint,
   onCancelBooking,
   onIssueTicket,
   canIssue,
   isCancelling,
   isIssuing,
+  isDownloading,
 }: {
   hideFare: boolean;
   onHideFareChange: (v: boolean) => void;
   grossFare: boolean;
   onGrossFareChange: (v: boolean) => void;
   onDownload: () => void;
+  onPrint: () => void;
   onCancelBooking?: () => void;
   onIssueTicket?: () => void;
   canIssue: boolean;
   isCancelling?: boolean;
   isIssuing?: boolean;
+  isDownloading?: boolean;
 }) {
   return (
-    <div className="print:hidden flex flex-wrap items-center justify-end gap-3 mb-3">
-      <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
+    <aside className="print:hidden w-full lg:w-72 shrink-0 lg:sticky lg:top-4 self-start flex flex-col gap-3 rounded-md border border-gray-200 bg-white p-4 shadow-sm">
+      <label className="flex cursor-pointer select-none items-center justify-between gap-2 text-xs font-medium text-gray-700">
         Hide Fare
         <button
           type="button"
           role="switch"
           aria-checked={hideFare}
           onClick={() => onHideFareChange(!hideFare)}
-          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
             hideFare ? "bg-[#167236]" : "bg-gray-300"
           }`}
         >
@@ -153,14 +157,14 @@ function TicketToolbar({
         </button>
       </label>
 
-      <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
+      <label className="flex cursor-pointer select-none items-center justify-between gap-2 text-xs font-medium text-gray-700">
         Discounted Fare
         <button
           type="button"
           role="switch"
           aria-checked={grossFare}
           onClick={() => onGrossFareChange(!grossFare)}
-          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+          className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
             grossFare ? "bg-[#167236]" : "bg-gray-300"
           }`}
         >
@@ -172,36 +176,47 @@ function TicketToolbar({
         </button>
       </label>
 
+      <hr className="border-gray-200" />
+
       <button
         type="button"
         onClick={onDownload}
-        className="px-4 py-1.5 rounded-md bg-[#167236] text-white text-xs font-semibold hover:bg-[#125c2c] transition-colors"
+        disabled={isDownloading}
+        className="px-4 py-2 rounded-md bg-[#167236] text-white text-xs font-semibold hover:bg-[#125c2c] disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
       >
-        Download
+        {isDownloading ? "Preparing PDF..." : "Download"}
       </button>
 
-      {onCancelBooking && (
-        <button
-          type="button"
-          onClick={onCancelBooking}
-          disabled={isCancelling}
-          className="px-4 py-1.5 rounded-md bg-red-600 text-white text-xs font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isCancelling ? "Cancelling..." : "Cancel Booking"}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={onPrint}
+        className="px-4 py-2 rounded-md border border-[#167236] text-[#167236] text-xs font-semibold hover:bg-[#167236]/5 transition-colors"
+      >
+        Print
+      </button>
 
       {onIssueTicket && (
         <button
           type="button"
           onClick={onIssueTicket}
           disabled={!canIssue || isIssuing}
-          className="px-4 py-1.5 rounded-md bg-gray-400 text-white text-xs font-semibold hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 rounded-md bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isIssuing ? "Issuing..." : "Issue Ticket"}
         </button>
       )}
-    </div>
+
+      {onCancelBooking && (
+        <button
+          type="button"
+          onClick={onCancelBooking}
+          disabled={isCancelling}
+          className="px-4 py-2 rounded-md bg-red-600 text-white text-xs font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {isCancelling ? "Cancelling..." : "Cancel Booking"}
+        </button>
+      )}
+    </aside>
   );
 }
 
@@ -213,15 +228,15 @@ function TicketHeader({ booking }: { booking: BookingItem }) {
 
   return (
     <div>
-      <div className="border-b-2 border-gray-900 pb-3 text-center">
-        <h1 className="text-3xl font-extrabold tracking-wide text-gray-900">
+      <div className="border-b-2 border-gray-900 pb-2 text-center">
+        <h1 className="text-2xl font-extrabold tracking-wide text-gray-900">
           E - Ticket
         </h1>
       </div>
 
-      <div className="flex justify-between items-start py-4 border-b border-gray-300">
+      <div className="flex justify-between items-start py-3 border-b border-gray-300">
         <div className="space-y-0.5 text-xs text-gray-700">
-          <h2 className="font-bold text-lg text-gray-900 uppercase tracking-tight">
+          <h2 className="font-bold text-base text-gray-900 uppercase tracking-tight">
             {(agency?.agency_name as ReactNode) ?? "Agency Name"}
           </h2>
           {extendedAgency?.address && (
@@ -245,14 +260,14 @@ function TicketHeader({ booking }: { booking: BookingItem }) {
           <img
             src={resolveImageSrc(agency.logo_key)}
             alt={agency.agency_name || "Agency Logo"}
-            className="h-16 max-w-[200px] object-contain"
+            className="h-12 max-w-[160px] object-contain"
           />
         ) : (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src="/assets/images/logo.png"
             alt="NEC Travels"
-            className="h-16 max-w-[200px] object-contain"
+            className="h-12 max-w-[160px] object-contain"
           />
         )}
       </div>
@@ -266,19 +281,19 @@ function PassengerTable({ booking }: { booking: BookingItem }) {
   const commonAirlinePnr = (booking_segments[0]?.airline_pnr as ReactNode) ?? "-";
 
   return (
-    <div className="mt-4">
+    <div className="mt-3">
       <SectionHeader title={`Passenger Details (${count})`} />
       <div className="overflow-x-auto border-x border-b border-gray-300">
-        <table className="w-full text-xs text-left text-gray-800 border-collapse">
+        <table className="w-full text-[11px] text-left text-gray-800 border-collapse">
           <thead>
             <tr className="bg-gray-100 border-b border-gray-300 font-semibold text-gray-900">
-              <th className="px-3 py-2 border-r border-gray-300">Passenger</th>
-              <th className="px-3 py-2 border-r border-gray-300">Name</th>
-              <th className="px-3 py-2 border-r border-gray-300">Type</th>
-              <th className="px-3 py-2 border-r border-gray-300 text-center">
+              <th className="px-2 py-1.5 border-r border-gray-300">Passenger</th>
+              <th className="px-2 py-1.5 border-r border-gray-300">Name</th>
+              <th className="px-2 py-1.5 border-r border-gray-300">Type</th>
+              <th className="px-2 py-1.5 border-r border-gray-300 text-center">
                 Airline PNR
               </th>
-              <th className="px-3 py-2 text-[#167236]">Ticket No</th>
+              <th className="px-2 py-1.5 text-[#167236]">Ticket No</th>
             </tr>
           </thead>
           <tbody>
@@ -288,26 +303,26 @@ function PassengerTable({ booking }: { booking: BookingItem }) {
 
               return (
                 <tr key={p.id ?? index} className="border-b last:border-b-0 border-gray-300">
-                  <td className="px-3 py-2 border-r border-gray-300 text-[#167236] font-medium">
+                  <td className="px-2 py-1.5 border-r border-gray-300 text-[#167236] font-medium">
                     {index === 0 ? "Passenger" : "Co Passenger"}
                   </td>
-                  <td className="px-3 py-2 border-r border-gray-300 font-semibold uppercase">
+                  <td className="px-2 py-1.5 border-r border-gray-300 font-semibold uppercase">
                     {(p.title as ReactNode)} {(p.first_name as ReactNode)} {(p.last_name as ReactNode)}
                   </td>
-                  <td className="px-3 py-2 border-r border-gray-300">
+                  <td className="px-2 py-1.5 border-r border-gray-300">
                     {(paxType as ReactNode)} &rarr; {gender}
                   </td>
 
                   {index === 0 && (
                     <td
                       rowSpan={booking_passengers.length}
-                      className="px-3 py-2 border-r border-gray-300 text-center font-bold tracking-wider align-middle bg-gray-50/50"
+                      className="px-2 py-1.5 border-r border-gray-300 text-center font-bold tracking-wider align-middle bg-gray-50/50"
                     >
                       {commonAirlinePnr}
                     </td>
                   )}
 
-                  <td className="px-3 py-2 text-[#167236] font-semibold">
+                  <td className="px-2 py-1.5 text-[#167236] font-semibold">
                     {(p.ticket_number as ReactNode) ?? "Pending"}
                   </td>
                 </tr>
@@ -324,9 +339,9 @@ function FlightDetails({ booking }: { booking: BookingItem }) {
   const { booking_segments = [] } = booking;
 
   return (
-    <div className="mt-5">
+    <div className="mt-3">
       <SectionHeader title="Flight Details" />
-      <div className="space-y-4 mt-2">
+      <div className="space-y-2.5 mt-1.5">
         {booking_segments.map((seg, idx) => {
           const airlineCode = seg.airline_code ?? seg.airline;
           const airlineName = resolveAirlineName(airlineCode);
@@ -334,11 +349,11 @@ function FlightDetails({ booking }: { booking: BookingItem }) {
 
           return (
             <div key={idx} className="border border-gray-300 rounded-sm">
-              <div className="bg-gray-100 px-3 py-1.5 font-bold text-gray-900 border-b border-gray-300 text-xs">
+              <div className="bg-gray-100 px-2.5 py-1 font-bold text-gray-900 border-b border-gray-300 text-[11px]">
                 {(seg.origin_airport_code as ReactNode)} &rarr; {(seg.destination_airport_code as ReactNode)}
               </div>
 
-              <div className="flex items-center gap-2 px-3 py-2 text-xs border-b border-gray-200">
+              <div className="flex items-center gap-2 px-2.5 py-1.5 text-[11px] border-b border-gray-200">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={resolveImageSrc(
@@ -358,65 +373,65 @@ function FlightDetails({ booking }: { booking: BookingItem }) {
                 </span>
               </div>
 
-              <table className="w-full text-xs text-left text-gray-800 border-collapse">
+              <table className="w-full text-[11px] text-left text-gray-800 border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-300 font-semibold">
-                    <th className="px-3 py-1.5 border-r border-gray-300 w-28">Date</th>
-                    <th className="px-3 py-1.5 border-r border-gray-300 w-16">Time</th>
-                    <th className="px-3 py-1.5 border-r border-gray-300">Flight Info</th>
-                    <th className="px-3 py-1.5 border-r border-gray-300 text-center w-24">
+                    <th className="px-2 py-1 border-r border-gray-300 w-28">Date</th>
+                    <th className="px-2 py-1 border-r border-gray-300 w-16">Time</th>
+                    <th className="px-2 py-1 border-r border-gray-300">Flight Info</th>
+                    <th className="px-2 py-1 border-r border-gray-300 text-center w-24">
                       Flight Time
                     </th>
-                    <th className="px-3 py-1.5 border-r border-gray-300 text-center w-28">
+                    <th className="px-2 py-1 border-r border-gray-300 text-center w-28">
                       Cabin
                     </th>
-                    <th className="px-3 py-1.5 text-center w-28">Baggage</th>
+                    <th className="px-2 py-1 text-center w-28">Baggage</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-gray-200">
-                    <td className="px-3 py-2 border-r border-gray-300 font-medium">
+                    <td className="px-2 py-1.5 border-r border-gray-300 font-medium">
                       {formatDate(seg.departure_at)}
                     </td>
-                    <td className="px-3 py-2 border-r border-gray-300 font-medium">
+                    <td className="px-2 py-1.5 border-r border-gray-300 font-medium">
                       {formatTime(seg.departure_at)}
                     </td>
-                    <td className="px-3 py-2 border-r border-gray-300">
+                    <td className="px-2 py-1.5 border-r border-gray-300">
                       Departs: <span className="font-bold">{(seg.origin_airport_code as ReactNode)}</span>
                       {extSeg.origin_terminal && (
-                        <div className="text-[10px] text-gray-500">
+                        <div className="text-[9px] text-gray-500">
                           Terminal: {extSeg.origin_terminal as ReactNode}
                         </div>
                       )}
                     </td>
                     <td
                       rowSpan={2}
-                      className="px-3 py-2 border-r border-gray-300 text-center align-middle font-medium"
+                      className="px-2 py-1.5 border-r border-gray-300 text-center align-middle font-medium"
                     >
                       {formatDuration(seg.duration)}
                     </td>
                     <td
                       rowSpan={2}
-                      className="px-3 py-2 border-r border-gray-300 text-center align-middle font-medium"
+                      className="px-2 py-1.5 border-r border-gray-300 text-center align-middle font-medium"
                     >
                       {(seg.cabin as ReactNode)} {seg.booking_class ? `(${seg.booking_class})` : ""}
                     </td>
                     <td
                       rowSpan={2}
-                      className="px-3 py-2 text-center align-middle font-medium"
+                      className="px-2 py-1.5 text-center align-middle font-medium"
                     >
                       {(seg.baggage as ReactNode) ?? "N/A"}
                     </td>
                   </tr>
 
                   <tr>
-                    <td className="px-3 py-2 border-r border-gray-300 font-medium">
+                    <td className="px-2 py-1.5 border-r border-gray-300 font-medium">
                       {formatDate(seg.arrival_at ?? seg.departure_at)}
                     </td>
-                    <td className="px-3 py-2 border-r border-gray-300 font-medium">
+                    <td className="px-2 py-1.5 border-r border-gray-300 font-medium">
                       {formatTime(seg.arrival_at)}
                     </td>
-                    <td className="px-3 py-2 border-r border-gray-300">
+                    <td className="px-2 py-1.5 border-r border-gray-300">
                       Arrival: <span className="font-bold">{(seg.destination_airport_code as ReactNode)}</span>
                     </td>
                   </tr>
@@ -473,16 +488,16 @@ function FareDetails({
     : [];
 
   return (
-    <div className="mt-5">
+    <div className="mt-3">
       <SectionHeader title="Fare Details" />
       <div className="overflow-x-auto">
-        <table className="w-full text-xs text-left text-gray-800 border-collapse">
+        <table className="w-full text-[11px] text-left text-gray-800 border-collapse">
           <thead>
             <tr className="bg-gray-100 font-semibold text-gray-900">
               {cols.map((col) => (
                 <th
                   key={col.label}
-                  className="px-3 py-1.5 border border-gray-300 text-center"
+                  className="px-2 py-1 border border-gray-300 text-center"
                 >
                   {col.label}
                 </th>
@@ -497,7 +512,7 @@ function FareDetails({
                 return (
                   <td
                     key={col.label}
-                    className={`px-3 py-2 border border-gray-300 text-center ${
+                    className={`px-2 py-1.5 border border-gray-300 text-center ${
                       tone === "total" ? "bg-green-50" : ""
                     }`}
                   >
@@ -520,12 +535,12 @@ function FareDetails({
               <tr key={row.label}>
                 <td
                   colSpan={cols.length - 1}
-                  className="px-3 py-2 border border-gray-300 font-semibold text-gray-700"
+                  className="px-2 py-1.5 border border-gray-300 font-semibold text-gray-700"
                 >
                   {row.label}
                 </td>
                 <td
-                  className={`px-3 py-2 border border-gray-300 text-center ${
+                  className={`px-2 py-1.5 border border-gray-300 text-center ${
                     row.tone === "final" ? "bg-green-50" : ""
                   }`}
                 >
@@ -550,9 +565,9 @@ function FareDetails({
 
 function NoticeBoard() {
   return (
-    <div className="mt-5">
+    <div className="mt-3">
       <SectionHeader title="Important Notice For Passengers" />
-      <div className="p-4 text-[11px] leading-relaxed text-gray-700 space-y-2.5 border-x border-b border-gray-300 rounded-b-sm">
+      <div className="p-3 text-[10px] leading-relaxed text-gray-700 space-y-1.5 border-x border-b border-gray-300 rounded-b-sm">
         <p>
           <strong className="text-gray-900">E-Ticket Notice:</strong> Carriage and other services provided by the carrier are subject to conditions of carriage which are hereby incorporated by reference. These conditions may be obtained from the issuing carrier.
         </p>
@@ -582,6 +597,8 @@ export default function ETicket({
   const [hideFare, setHideFare] = useState(false);
   const [grossFare, setGrossFare] = useState(false);
 
+  const [downloading, setDownloading] = useState(false);
+
   if (!booking) {
     return (
       <div className="max-w-4xl mx-auto p-12 text-center text-gray-500 font-medium">
@@ -598,33 +615,74 @@ export default function ETicket({
   const paymentStatus = booking.booking_payments?.[0]?.status;
   const canIssue = isHold && paymentStatus !== "PENDING" ? true : isHold;
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (onDownload) {
       onDownload();
-    } else if (typeof window !== "undefined") {
+      return;
+    }
+    if (typeof window === "undefined") return;
+
+    setDownloading(true);
+    try {
+      const element = document.getElementById("eticket-print");
+      if (!element) return;
+
+      const bookingRef = booking.booking_reference ?? "ticket";
+
+      const html2canvasMod = await import("html2canvas-pro");
+      const html2canvasPro = html2canvasMod.default;
+
+      const canvas = await html2canvasPro(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const { jsPDF } = await import("jspdf");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.98);
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      let imgWidth = pageWidth;
+      let imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+      const fitScale = Math.min(1, pageHeight / imgHeight);
+      if (fitScale < 1) {
+        imgWidth *= fitScale;
+        imgHeight *= fitScale;
+      }
+
+      const x = (pageWidth - imgWidth) / 2;
+      pdf.addImage(imgData, "JPEG", x, 0, imgWidth, imgHeight);
+      pdf.save(`ETicket-${bookingRef}.pdf`);
+    } catch (err) {
+      console.error("Failed to download ticket PDF:", err);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handlePrint = () => {
+    if (typeof window !== "undefined") {
       window.print();
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <TicketToolbar
-        hideFare={hideFare}
-        onHideFareChange={setHideFare}
-        grossFare={grossFare}
-        onGrossFareChange={setGrossFare}
-        onDownload={handleDownload}
-        onCancelBooking={onCancelBooking}
-        onIssueTicket={onIssueTicket}
-        canIssue={canIssue}
-        isCancelling={isCancelling}
-        isIssuing={isIssuing}
-      />
-
-      <div className="bg-white text-gray-800 border border-gray-300 shadow-sm p-8 print:p-0 print:border-none print:shadow-none font-sans">
+    <div className="mx-auto flex max-w-6xl flex-col gap-4 lg:flex-row lg:items-start">
+      <div
+        id="eticket-print"
+        className="min-w-0 flex-1 bg-white text-gray-800 border border-gray-300 shadow-sm p-6 font-sans"
+      >
         <TicketHeader booking={booking} />
 
-        <div className="text-center py-2.5 border-b border-gray-300 bg-gray-50/70 text-sm">
+        <div className="text-center py-1.5 border-b border-gray-300 bg-gray-50/70 text-xs">
           <span>
             Reservation PNR: <strong className="text-gray-900 font-bold">{(gds_pnr as ReactNode) ?? "-"}</strong>{" "}
             {isConfirmed && (
@@ -648,6 +706,21 @@ export default function ETicket({
         <FareDetails booking={booking} hideFare={hideFare} grossFare={grossFare} />
         <NoticeBoard />
       </div>
+
+      <TicketToolbar
+        hideFare={hideFare}
+        onHideFareChange={setHideFare}
+        grossFare={grossFare}
+        onGrossFareChange={setGrossFare}
+        onDownload={handleDownload}
+        onPrint={handlePrint}
+        onCancelBooking={onCancelBooking}
+        onIssueTicket={onIssueTicket}
+        canIssue={canIssue}
+        isCancelling={isCancelling}
+        isIssuing={isIssuing}
+        isDownloading={downloading}
+      />
     </div>
   );
 }

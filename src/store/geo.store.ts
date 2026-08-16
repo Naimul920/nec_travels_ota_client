@@ -55,7 +55,6 @@ export const useGeoStore = create<GeoState>((set, get) => ({
         throw new Error(`Geo request failed with status ${res.status}`);
       }
       const json = await res.json();
-      console.log("json*****************",json)
       const geo: GeoInfo | null = json?.data ?? null;
       set({ geo, geoLoading: false, initialized: true });
     } catch (error: any) {

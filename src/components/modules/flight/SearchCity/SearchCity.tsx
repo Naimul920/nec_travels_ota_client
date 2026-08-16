@@ -133,7 +133,7 @@ const SearchCity: React.FC<SearchCityProps> = ({
         {(focused || value) && resolved && (
           <p className="pointer-events-none line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
             {resolved.iata} ·{" "}
-            {resolved.location || resolved.country_location || resolved.name}
+            {resolved.location || resolved.country_location || resolved.airport_name}
           </p>
         )}
       </div>
@@ -161,7 +161,7 @@ const SearchCity: React.FC<SearchCityProps> = ({
                   <p className="line-clamp-1 text-[10px] text-gray-400">
                     {airport.location ||
                       airport.country_location ||
-                      airport.name}
+                      airport.airport_name}
                   </p>
                 </div>
                 <span className="line-clamp-1 rounded bg-gray-100 px-2 py-1 font-mono text-[10px] font-bold text-gray-600">

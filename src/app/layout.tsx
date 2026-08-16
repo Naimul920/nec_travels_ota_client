@@ -31,7 +31,7 @@ const stalemate = Stalemate({
 });
 
 export const metadata = {
-  title: "NEC TRAVELS OTA",
+  title: "NEC TRAVELS",
   description: "Nec Travels Online Travel Agency",
 };
 
