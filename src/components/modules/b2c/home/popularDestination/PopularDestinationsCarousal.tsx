@@ -8,6 +8,8 @@ import {
   DashedLineSvg,
   BottomAirplanesSvg,
 } from "@/components/shared/icons/decorative";
+import { subscribeNewsletterAction } from "@/actions/newsletter.action";
+import { SuccessAlert, ErrorAlert } from "@/components/common/Alert/Alert";
 
 interface Destination {
   id: string;
@@ -52,6 +54,7 @@ const BARCODE_BARS = [
 export function PopularDestinationsCarousal() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [email, setEmail] = useState("");
+  const [subscribing, setSubscribing] = useState(false);
 
   const total = useMemo(() => DESTINATIONS.length, []);
 
@@ -61,6 +64,28 @@ export function PopularDestinationsCarousal() {
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
+  };
+
+  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const targetEmail = email.trim();
+    if (!targetEmail || subscribing) return;
+
+    setSubscribing(true);
+    try {
+      const res = await subscribeNewsletterAction(targetEmail);
+      if (res.success) {
+        SuccessAlert("Subscribed", res.message);
+        setEmail("");
+      } else {
+        ErrorAlert("Subscription failed", res.message);
+      }
+    } catch {
+      ErrorAlert("Subscription failed", "Please try again later");
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   const getCardStyle = (index: number): string => {
@@ -194,7 +219,7 @@ export function PopularDestinationsCarousal() {
 
         <div className="flex flex-1 flex-col justify-center gap-4 px-8 py-10 lg:px-12">
           <form
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSubscribe}
             className="flex w-full flex-col gap-3 sm:flex-row"
           >
             <input
@@ -208,9 +233,10 @@ export function PopularDestinationsCarousal() {
 
             <button
               type="submit"
-              className="group flex h-14 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-brand px-8 font-semibold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg hover:shadow-brand/25 sm:w-auto"
+              disabled={subscribing}
+              className="group flex h-14 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-brand px-8 font-semibold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg hover:shadow-brand/25 disabled:opacity-60 disabled:cursor-not-allowed sm:w-auto"
             >
-              Subscribe
+              {subscribing ? "Subscribing..." : "Subscribe"}
               <IoIosAirplane
                 className="-rotate-45 transition-transform duration-300 group-hover:translate-x-1"
                 size={18}
