@@ -1,6 +1,6 @@
 import AppSkeleton from "@/components/common/Skeleton/AppSkeleton";
 
-export default function CommonLayoutLoading() {
+export default function HomeLoading() {
   return (
     <div className="w-full">
       <AppSkeleton />

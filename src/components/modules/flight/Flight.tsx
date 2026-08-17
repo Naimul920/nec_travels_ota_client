@@ -47,9 +47,9 @@ const DEFAULT_MULTICITY = [
 // Default route for first-time visitors (no saved last search in localStorage)
 const DEFAULT_AIRPORT = {
   fromIata: "DAC",
-  toIata: "CGP",
+  toIata: "CXB",
   fromName: "Dhaka",
-  toName: "Chittagong",
+  toName: "Cox's Bazar",
 };
 
 const Flight: React.FC<FlightProps> = ({ useFlight }) => {

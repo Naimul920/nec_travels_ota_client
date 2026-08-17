@@ -107,13 +107,17 @@ export default function CommonLayoutNavbar({
           }
           className="flex shrink-0 items-center transition-opacity duration-200 hover:opacity-80"
         >
-          <img
-            src={headerLogo}
-            alt={isB2B && user?.logo ? "Agency logo" : "NEC Fly"}
-            width={130}
-            height={40}
-            className={`h-[50px] w-auto object-contain ${focusRing} rounded-md`}
-          />
+          {isLoading ? (
+            <div className="h-[50px] w-[130px] animate-pulse rounded-md bg-gray-100" />
+          ) : (
+            <img
+              src={headerLogo}
+              alt={isB2B && user?.logo ? "Agency logo" : "NEC Fly"}
+              width={130}
+              height={40}
+              className={`h-[50px] w-auto object-contain ${focusRing} rounded-md`}
+            />
+          )}
         </Link>
 
         {/* Right Actions */}

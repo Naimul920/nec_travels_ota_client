@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect } from "react";
-import SearchCity from "../SearchCity/SearchCity";
+import SearchCity, {
+  DEFAULT_AIRPORT_CXB,
+} from "../SearchCity/SearchCity";
 import AirpotSwap from "../SearchCity/AirpotSwap";
 import { DatePicker } from "antd";
 import type { GetProps } from "antd";
@@ -83,6 +85,7 @@ const Oneway: React.FC<OnewayProps> = ({
           excludeIata={data.fromIata}
           placeholder="Going to"
           cityName={data.toName}
+          defaultAirport={DEFAULT_AIRPORT_CXB}
         />
       </div>
 

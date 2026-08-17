@@ -10,7 +10,19 @@ interface SearchCityProps {
   placeholder?: string;
   excludeIata?: string;
   cityName?: string;
+  defaultAirport?: Airport;
 }
+
+// Default destination for first-time visitors (no saved last search).
+export const DEFAULT_AIRPORT_CXB: Airport = {
+  id: "dfb2207b-b6be-43ea-8d7c-82eedfe2d280",
+  iata: "CXB",
+  city: "Cox's Bazar",
+  location: "Cox's Bazar, Bangladesh",
+  country_name: "Bangladesh",
+  country_location: "Cox's Bazar, Bangladesh",
+  airport_name: "Cox's Bazar Airport",
+};
 
 const SearchCity: React.FC<SearchCityProps> = ({
   value,
@@ -18,6 +30,7 @@ const SearchCity: React.FC<SearchCityProps> = ({
   placeholder,
   excludeIata,
   cityName,
+  defaultAirport,
 }) => {
   const [query, setQuery] = useState(value);
   const [selected, setSelected] = useState<Airport | null>(null);
@@ -40,7 +53,10 @@ const SearchCity: React.FC<SearchCityProps> = ({
 
   // Resolve the committed airport (kept so a city is always displayed)
   const match = (data?.data ?? []).find((a) => a.iata === value);
-  const resolved = selected ?? match;
+  const resolved =
+    selected ??
+    match ??
+    (value === defaultAirport?.iata ? defaultAirport : null);
   const displayValue = focused && showSuggestions
     ? query
     : resolved?.city || cityName || "";

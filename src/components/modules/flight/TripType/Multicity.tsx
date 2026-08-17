@@ -6,7 +6,9 @@ import type { GetProps } from "antd";
 import dayjs from "dayjs";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import { Button } from "@/components/ui";
-import SearchCity from "../SearchCity/SearchCity";
+import SearchCity, {
+  DEFAULT_AIRPORT_CXB,
+} from "../SearchCity/SearchCity";
 import AirpotSwap from "../SearchCity/AirpotSwap";
 import TravelerCalculate from "../TravelerCalculate/TravelerCalculate";
 import type { TravelerValue } from "../TravelerCalculate/TravelerCalculate";
@@ -115,6 +117,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
                 excludeIata={row.fromIata}
                 placeholder="Going to"
                 cityName={row.toName}
+                defaultAirport={DEFAULT_AIRPORT_CXB}
               />
             </div>
 

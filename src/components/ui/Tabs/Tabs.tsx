@@ -40,8 +40,8 @@ const Tabs: React.FC<TabsProps> = ({
       >
         <div
           className={clsx(
-            "flex items-center justify-start md:justify-center rounded-md border border-gray-200 bg-white p-1.5 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_16px_rgba(15,35,61,0.08)] overflow-x-auto flex-nowrap custom-scrollbar snap-x snap-proximity overscroll-x-contain touch-pan-x min-w-0 md:snap-none",
-            floating && "h-12 md:h-14",
+            "flex items-center justify-start md:justify-center rounded-md border border-gray-200 bg-white p-1.5 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_16px_rgba(15,35,61,0.08)] overflow-x-auto overflow-y-clip flex-nowrap custom-scrollbar snap-x snap-proximity overscroll-x-contain touch-pan-x min-w-0 md:snap-none",
+            floating && "min-h-12 md:min-h-14",
             containerClassName
           )}
         >

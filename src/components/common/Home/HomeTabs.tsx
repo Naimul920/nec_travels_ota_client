@@ -96,6 +96,7 @@ export default function HomeTabs() {
             activeKey={activeKey}
             onChange={handleTabChange}
             isPending={isPending}
+            floating={showHero}
             className="relative z-10 flex flex-col items-center justify-center"
             containerClassName={"w-full md:max-w-max"}
           >
