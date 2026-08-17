@@ -17,6 +17,31 @@ interface AdminBookingsTableProps {
 const formatDate = (value?: string | null): string =>
   value ? dayjs(value).format("DD-MM-YYYY") : "—";
 
+const STATUS_BADGE: Record<string, string> = {
+  hold: "bg-sky-50 text-sky-700",
+  pending: "bg-amber-50 text-amber-700",
+  issued: "bg-emerald-50 text-emerald-700",
+  confirmed: "bg-emerald-50 text-emerald-700",
+  cancel: "bg-red-50 text-red-700",
+  cancelled: "bg-red-50 text-red-700",
+  void: "bg-gray-100 text-gray-700",
+  voided: "bg-gray-100 text-gray-700",
+  refunded: "bg-purple-50 text-purple-700",
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const key = (status ?? "").toLowerCase();
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
+        STATUS_BADGE[key] ?? "bg-gray-50 text-gray-700"
+      }`}
+    >
+      {status}
+    </span>
+  );
+}
+
 const mapBookingRow = (booking: BookingItem, index: number) => ({
   key: booking.id,
   sl: index + 1,
@@ -96,7 +121,11 @@ const AdminBookingsTable: React.FC<AdminBookingsTableProps> = ({
       },
       { title: "Booked On", dataIndex: "bookedOn" },
       { title: "Source", dataIndex: "booking_source" },
-      { title: "Status", dataIndex: "status" },
+      {
+        title: "Status",
+        dataIndex: "status",
+        render: (v: string) => <StatusBadge status={v} />,
+      },
       {
         title: "Action",
         dataIndex: "action",

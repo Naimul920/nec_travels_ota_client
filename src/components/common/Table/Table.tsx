@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   App,
   Button,
@@ -46,6 +46,12 @@ interface CustomTableProps<RecordType> {
   hideSearch?: boolean;
   /** Show a skeleton loading state in place of the table body. */
   loading?: boolean;
+  /** Render custom content (e.g. a search bar) on the right side of the header. */
+  headerExtras?: ReactNode;
+  /** Override the table horizontal scroll. A value that always fits the container width. */
+  scroll?: TableProps<RecordType>["scroll"];
+  /** Custom empty state shown when the data source is empty. */
+  emptyText?: ReactNode;
   /** Enable an optional "Create" button at the top of the table. Omit to hide. */
   createButtonText?: string;
   createFields?: CrudField[];
@@ -121,6 +127,9 @@ const Table = <RecordType extends object>({
   isSelect = false,
   hideSearch = false,
   loading = false,
+  headerExtras,
+  scroll,
+  emptyText,
   createButtonText,
   createFields = [],
   createModalTitle,
@@ -193,7 +202,7 @@ const Table = <RecordType extends object>({
           },
         }}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 md:pb-5">
         <div className="min-w-0">
           <TableHeader
             title={title}
@@ -201,16 +210,19 @@ const Table = <RecordType extends object>({
             hideSearch={hideSearch}
           />
         </div>
-        {showCreate && (
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            className="h-10 !bg-primary text-white"
-            onClick={openCreate}
-          >
-            {createButtonText ?? "Create"}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {headerExtras}
+          {showCreate && (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              className="h-10 !bg-primary text-white"
+              onClick={openCreate}
+            >
+              {createButtonText ?? "Create"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -233,9 +245,9 @@ const Table = <RecordType extends object>({
           onChange={onChange}
           pagination={pagination}
           rowKey={rowKey}
-          scroll={{ x: "50%" }}
+          scroll={scroll ?? { x: "max-content" }}
           locale={{
-            emptyText: "No data available. Click Create to add a new record.",
+            emptyText: emptyText ?? "No data available.",
           }}
         />
       )}

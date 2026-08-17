@@ -1,5 +1,6 @@
 "use server";
 
+import { AxiosError } from "axios";
 import { httpClient } from "@/lib/axios/httpClient";
 
 export interface IssueTicketItem {
@@ -78,3 +79,128 @@ export async function getIssueTicketsAction(
     };
   }
 }
+
+export interface RequestTicketIssueResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data?: Record<string, unknown> | null;
+}
+
+export async function requestTicketIssueAction(
+  bookingId: string,
+  remarks = "Please issue the ticket as soon as possible",
+): Promise<RequestTicketIssueResponse> {
+  try {
+    const res = await httpClient.post<Record<string, unknown>>(
+      `/api/v1/ticket-issues/bookings/${encodeURIComponent(bookingId)}/request`,
+      { remarks },
+    );
+    return {
+      success: res.success,
+      statusCode: res.statusCode,
+      message: res.message,
+      data: res.data ?? null,
+    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to request ticket issue",
+    );
+    return { success: false, statusCode, message, data: null };
+  }
+}
+
+export interface TicketIssueRequest {
+  id: string;
+  ticket_id?: string | null;
+  booking_id?: string | null;
+  type?: string;
+  status?: string;
+  ticket_number?: string | null;
+  wallet_transaction_id?: string | null;
+  reviewed_at?: string | null;
+  reject_reason?: string | null;
+  remarks?: string | null;
+  created_at?: string;
+}
+
+export interface TicketIssueRequestMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface TicketIssueRequestsResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: TicketIssueRequest[];
+  meta?: TicketIssueRequestMeta;
+}
+
+export interface FetchTicketIssueRequestsParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: string;
+  status?: string;
+}
+
+export async function getTicketIssueRequestsAction(
+  params: FetchTicketIssueRequestsParams = {},
+): Promise<TicketIssueRequestsResponse> {
+  try {
+    const res = await httpClient.get<
+      TicketIssueRequest[] | { data?: TicketIssueRequest[]; meta?: TicketIssueRequestMeta }
+    >("/api/v1/ticket-issues/all", {
+      params: {
+        page: params.page ?? 1,
+        limit: params.limit ?? 10,
+        sortBy: params.sortBy ?? "created_at",
+        ...(params.status ? { status: params.status } : {}),
+      },
+    });
+
+    const raw = res.data as unknown;
+    const items = Array.isArray(raw)
+      ? raw
+      : (raw as { data?: TicketIssueRequest[] })?.data ?? [];
+
+    return {
+      success: res.success,
+      statusCode: res.statusCode,
+      message: res.message,
+      data: items || [],
+      meta:
+        res.meta ??
+        (raw as { meta?: TicketIssueRequestMeta } | null)?.meta,
+    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to load ticket issue requests",
+    );
+    return { success: false, statusCode, message, data: [] };
+  }
+}
+
+const extractApiError = (
+  error: unknown,
+  fallback: string,
+): { message: string; statusCode: number } => {
+  if (error instanceof AxiosError) {
+    const backendMessage = error.response?.data?.message;
+    return {
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || error.message || fallback,
+      statusCode: error.response?.status || 500,
+    };
+  }
+  return {
+    message: error instanceof Error ? error.message : fallback,
+    statusCode: 500,
+  };
+};

@@ -117,13 +117,13 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
           icon: <FaRegIdBadge />,
         },
         {
-          path: "/refunded-tickets",
-          label: "Refunded Tickets",
-          icon: <FaUndo />,
+          path: "/issue_request",
+          label: "Issue Request",
+          icon: <FaTicketAlt />,
         },
         {
-          path: "/flown-tickets",
-          label: "Flown Tickets",
+          path: "/refunded-tickets",
+          label: "Refunded Tickets",
           icon: <FaUndo />,
         },
         // {

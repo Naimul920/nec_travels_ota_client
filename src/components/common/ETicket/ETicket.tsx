@@ -466,8 +466,8 @@ function FlightDetails({
                 </tbody>
               </table>
               </div>
-
-              {nextSeg && layoverMinutes !== null && (
+{/** impelement this latter */}
+              {/* {nextSeg && layoverMinutes !== null && (
                 <div className="overflow-hidden rounded-sm border border-amber-300 bg-amber-50">
                   <table className="w-full border-collapse text-left text-[11px] text-gray-800">
                     <thead>
@@ -507,7 +507,7 @@ function FlightDetails({
                     </tbody>
                   </table>
                 </div>
-              )}
+              )} */}
             </Fragment>
           );
         })}

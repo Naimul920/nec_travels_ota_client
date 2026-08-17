@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { getTicketAction } from "@/actions/booking.action";
 import type { BookingItem, BookingSegment } from "@/actions/booking.action";
 import { searchAirportsAction } from "@/actions/airport.action";
+import { requestTicketIssueAction } from "@/actions/issueTicket.action";
 import ETicket from "@/components/common/ETicket/ETicket";
 
 interface TicketPageClientProps {
@@ -119,9 +120,12 @@ export default function TicketPageClient({
   };
 
   const handleIssueTicket = () => {
+    const bookingRef = booking?.booking_reference ?? "";
+    const bookingId = booking?.id ?? "";
+
     Swal.fire({
       title: "Confirm Issuing Ticket",
-      text: `Are you sure you want to issue the ticket for (${booking?.booking_reference ?? ""})?`,
+      text: `Are you sure you want to issue the ticket for (${bookingRef})?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#0F1B47",
@@ -129,18 +133,37 @@ export default function TicketPageClient({
       confirmButtonText: "Yes, Issue",
       cancelButtonText: "Not Now",
       reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setIsIssuing(true);
-        setTimeout(() => {
-          setIsIssuing(false);
+    }).then(async (result) => {
+      if (!result.isConfirmed || !bookingId) return;
+
+      setIsIssuing(true);
+      try {
+        const res = await requestTicketIssueAction(bookingId);
+        setIsIssuing(false);
+        if (res.success) {
           Swal.fire(
-            "Ticket Issued",
-            `Ticket ${booking?.booking_reference ?? ""} has been issued successfully.`,
+            "Issue Requested",
+            res.message || `Ticket ${bookingRef} issue request sent successfully.`,
             "success",
           );
-          loadTicket();
-        }, 1000);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed to Request Ticket Issue",
+            text: res.message || "Something went wrong. Please try again.",
+            confirmButtonColor: "#0F1B47",
+          });
+        }
+      } catch {
+        setIsIssuing(false);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Request Ticket Issue",
+          text: "Something went wrong. Please try again.",
+          confirmButtonColor: "#0F1B47",
+        });
+      } finally {
+        loadTicket();
       }
     });
   };

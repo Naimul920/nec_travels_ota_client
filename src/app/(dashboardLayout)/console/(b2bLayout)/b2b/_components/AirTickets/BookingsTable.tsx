@@ -3,8 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { Input, Tooltip } from "antd";
-import Swal from "sweetalert2";
+import { Input } from "antd";
 import type { TablePaginationConfig } from "antd";
 import Table from "@/components/common/Table/Table";
 import ActionButton from "@/components/common/Action/ActionButton";
@@ -40,17 +39,37 @@ const STATUS_ICON: Record<string, typeof FiClock> = {
 const formatDate = (value?: string | null): string =>
   value ? dayjs(value).format("DD-MM-YYYY") : "—";
 
+const formatAmount = (value: number | string): string =>
+  Number(value || 0).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+const getPassengerNames = (
+  passengers: BookingItem["booking_passengers"] = [],
+): string => {
+  if (!passengers?.length) return "—";
+  return passengers
+    .map((p) => `${p.title ? `${p.title} ` : ""}${p.first_name} ${p.last_name}`.trim())
+    .join(", ");
+};
+
 const mapBookingRow = (booking: BookingItem) => ({
   key: booking.id,
-  bookingId: booking.booking_reference,
+  bookingReference: booking.booking_reference,
+  bookedOn: formatDate(booking.created_at),
+  issuedOn: formatDate(booking.tickets?.issued_at),
+  passenger: getPassengerNames(booking.booking_passengers),
   origin: booking.booking_segments?.[0]?.origin_airport_code ?? "—",
   destination: booking.booking_segments?.[0]?.destination_airport_code ?? "—",
   airline: booking.booking_segments?.[0]?.airline_code ?? "—",
   flightNumber: booking.booking_segments?.[0]?.flight_number ?? "—",
   pnr: booking.gds_pnr || booking.provider_booking_id || "—",
-  amount: Number(booking.booking_fare?.total_amount || 0),
+  grossAmount: Number(
+    booking.booking_fare?.gross_fare || booking.total_amount || 0,
+  ),
+  discountAmount: Number(booking.booking_fare?.discount || 0),
   currency: booking.currency?.symbol ?? "৳",
-  bookedOn: formatDate(booking.created_at),
   travel_date: formatDate(booking.booking_segments?.[0]?.departure_at),
   status: booking.status.toLowerCase(),
 });
@@ -89,24 +108,6 @@ function RouteCell({
   );
 }
 
-function BookingCell({
-  bookingId,
-  bookedOn,
-}: {
-  bookingId: string;
-  bookedOn: string;
-}) {
-  return (
-    <div className="flex flex-col">
-      <span className="font-semibold text-[#0F1B47]">{bookingId}</span>
-      <span className="flex items-center gap-1 text-xs text-[#8FA9BE]">
-        <FiCalendar size={11} />
-        {bookedOn}
-      </span>
-    </div>
-  );
-}
-
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[#12233D]/15 bg-white px-6 py-20 text-center">
@@ -124,13 +125,15 @@ function EmptyState() {
 interface BookingsTableProps {
   status: string;
   title: string;
-  showIssue?: boolean;
+  bookingSource?: string;
+  dateColumn?: "created_at" | "issued_at";
 }
 
 export default function BookingsTable({
   status,
   title,
-  showIssue = false,
+  bookingSource,
+  dateColumn = "created_at",
 }: BookingsTableProps) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -138,12 +141,13 @@ export default function BookingsTable({
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data, isPending: isLoading } = useQuery({
-    queryKey: ["b2b-bookings", status, page, pageSize, searchTerm],
+    queryKey: ["b2b-bookings", status, bookingSource, page, pageSize, searchTerm],
     queryFn: async () => {
       const res = await getBookingsAction({
         page,
         limit: pageSize,
         status,
+        bookingSource,
         searchTerm,
         sortBy: "created_at",
         sortOrder: "desc",
@@ -166,28 +170,6 @@ export default function BookingsTable({
     }, 400);
   };
 
-  const handleIssueBooking = (row: BookingRow) => {
-    Swal.fire({
-      title: "Confirm Issuing Ticket",
-      text: `Are you sure you want to issue this ticket (${row.bookingId})?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#0F1B47",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, Issue",
-      cancelButtonText: "Cancel",
-      reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          "Ticket Issued",
-          `Ticket ${row.bookingId} has been issued successfully.`,
-          "success",
-        );
-      }
-    });
-  };
-
   const columns = useMemo(
     () => [
       {
@@ -200,11 +182,51 @@ export default function BookingsTable({
         ),
       },
       {
-        title: "Booking",
-        dataIndex: "bookingId",
-        width: 190,
+        title: dateColumn === "issued_at" ? "Issuing Date" : "Booking Date",
+        dataIndex: "bookedOn",
+        width: 130,
         render: (_: string, row: BookingRow) => (
-          <BookingCell bookingId={row.bookingId} bookedOn={row.bookedOn} />
+          <span className="inline-flex items-center gap-1.5 text-sm text-[#5B6B7A]">
+            <FiCalendar size={13} className="text-[#8FA9BE]" />
+            {dateColumn === "issued_at" ? row.issuedOn : row.bookedOn}
+          </span>
+        ),
+      },
+      {
+        title: "Booking Reference",
+        dataIndex: "bookingReference",
+        width: 170,
+        render: (v: string) => (
+          <span className="font-semibold text-[#0F1B47]">{v}</span>
+        ),
+      },
+      {
+        title: "Passenger",
+        dataIndex: "passenger",
+        width: 200,
+        render: (v: string) => (
+          <span className="text-sm text-[#5B6B7A]">{v}</span>
+        ),
+      },
+      {
+        title: "PNR",
+        dataIndex: "pnr",
+        width: 120,
+        render: (v: string) => (
+          <span className="font-mono text-sm font-semibold tracking-wide text-[#0F1B47]">
+            {v}
+          </span>
+        ),
+      },
+      {
+        title: "Travel Date",
+        dataIndex: "travel_date",
+        width: 130,
+        render: (v: string) => (
+          <span className="inline-flex items-center gap-1.5 text-sm text-[#5B6B7A]">
+            <FiCalendar size={13} className="text-[#8FA9BE]" />
+            {v}
+          </span>
         ),
       },
       {
@@ -229,38 +251,26 @@ export default function BookingsTable({
         ),
       },
       {
-        title: "PNR",
-        dataIndex: "pnr",
-        width: 120,
-        render: (v: string) => (
-          <span className="font-mono text-sm font-semibold tracking-wide text-[#0F1B47]">
-            {v}
-          </span>
-        ),
-      },
-      {
-        title: "Amount",
-        dataIndex: "amount",
-        width: 110,
+        title: "Gross Amount",
+        dataIndex: "grossAmount",
+        width: 130,
         align: "right" as const,
         render: (v: number, row: BookingRow) => (
           <span className="font-semibold text-[#0F1B47]">
             {row.currency}
-            {Number(v || 0).toLocaleString("en-IN", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatAmount(v)}
           </span>
         ),
       },
       {
-        title: "Travel Date",
-        dataIndex: "travel_date",
+        title: "Discount Amount",
+        dataIndex: "discountAmount",
         width: 130,
-        render: (v: string) => (
-          <span className="inline-flex items-center gap-1.5 text-sm text-[#5B6B7A]">
-            <FiCalendar size={13} className="text-[#8FA9BE]" />
-            {v}
+        align: "right" as const,
+        render: (v: number, row: BookingRow) => (
+          <span className="font-semibold text-emerald-600">
+            {row.currency}
+            {formatAmount(v)}
           </span>
         ),
       },
@@ -273,7 +283,7 @@ export default function BookingsTable({
       {
         title: "Action",
         dataIndex: "action",
-        width: showIssue ? 110 : 60,
+        width: 60,
         align: "center" as const,
         render: (_: string, row: BookingRow) => (
           <div className="flex items-center justify-center gap-2">
@@ -282,23 +292,11 @@ export default function BookingsTable({
                 viewLink={`/console/bookings/ticket/${encoding(row.key)}`}
               />
             )}
-            {showIssue && (
-              <Tooltip title="Issue Ticket">
-                <button
-                  type="button"
-                  onClick={() => handleIssueBooking(row)}
-                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-50 text-amber-600 transition-colors hover:bg-amber-100"
-                  aria-label="Issue Ticket"
-                >
-                  <FiCheckCircle size={18} />
-                </button>
-              </Tooltip>
-            )}
           </div>
         ),
       },
     ],
-    [showIssue],
+    [dateColumn],
   );
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
@@ -307,46 +305,39 @@ export default function BookingsTable({
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-4 px-5 sm:px-10">
-      <div className="flex items-center justify-end pt-6">
-        <Search
-          placeholder="Search bookings.."
-          allowClear
-          size="large"
-          className="w-full max-w-72"
-          prefix={<FiSearch className="text-gray-400" />}
-          onSearch={(v) => handleSearch(v)}
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-      </div>
-
-      {isLoading ? (
-        <div className="flex justify-center rounded-2xl border border-[#12233D]/10 bg-white py-24">
-          <div className="animate-spin h-8 w-8 rounded-full border-4 border-primary border-t-transparent" />
-        </div>
-      ) : rows.length ? (
-        <Table
-          title={title}
-          hideSearch
-          columns={columns}
-          pagination={{
-            current: page,
-            pageSize,
-            total,
-            showSizeChanger: true,
-            pageSizeOptions: [10, 20, 50, 100],
-            showTotal: (t) => `${t} bookings`,
-          }}
-          dataSource={rows.map((data, i) => ({
-            ...data,
-            sl: (page - 1) * pageSize + i + 1,
-          }))}
-          rowKey="key"
-          onChange={handleTableChange}
-        />
-      ) : (
-        <EmptyState />
-      )}
+    <div className="">
+      <Table
+        title={title}
+        hideSearch
+        loading={isLoading}
+        columns={columns}
+        headerExtras={
+          <Search
+            placeholder="Search bookings.."
+            allowClear
+            size="large"
+            className="w-72"
+            prefix={<FiSearch className="text-gray-400" />}
+            onSearch={(v) => handleSearch(v)}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        }
+        emptyText={<EmptyState />}
+        pagination={{
+          current: page,
+          pageSize,
+          total,
+          showSizeChanger: true,
+          pageSizeOptions: [10, 20, 50, 100],
+          showTotal: (t) => `${t} bookings`,
+        }}
+        dataSource={rows.map((data, i) => ({
+          ...data,
+          sl: (page - 1) * pageSize + i + 1,
+        }))}
+        rowKey="key"
+        onChange={handleTableChange}
+      />
     </div>
   );
 }
