@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { usePathname } from "next/navigation";
 import { LuBuilding2 } from "react-icons/lu";
 import { FiFileText } from "react-icons/fi";
 import { MdFlight, MdHealthAndSafety, MdHolidayVillage } from "react-icons/md";
@@ -30,7 +31,19 @@ export default function HomeTabs() {
   const [activeKey, setActiveKey] = useState("1");
   const [isPending, startTransition] = useTransition();
   const { user, isLoggedIn } = useAuthStore();
-  const showHero = !isLoggedIn || user?.role === ROLE.B2C;
+  const pathname = usePathname();
+
+  // Hero video rules:
+  // - Public landing page: shown for guests and B2C users.
+  // - Dashboard (`/console/...`) routes: shown ONLY for B2C accounts. The
+  //   "logged out" state must not flip it on here — when a logged-in admin/B2B
+  //   user clicks logout, `clearUser()` runs before the redirect completes, and
+  //   a truthy `!isLoggedIn` would instantly reveal the hidden video in the
+  //   dashboard background. Route-gating keeps it hidden during that window.
+  const isDashboard = pathname?.startsWith("/console") ?? false;
+  const showHero = isDashboard
+    ? user?.role === ROLE.B2C
+    : !isLoggedIn || user?.role === ROLE.B2C;
 
   const handleTabChange = (key: string) => {
     startTransition(() => setActiveKey(key));
@@ -39,24 +52,31 @@ export default function HomeTabs() {
   return (
     <div className="relative w-full bg-white">
       {/* Hero video: for B2C users and guests (not logged in). Kept mounted and
-          toggled with CSS (hidden) so login/logout never unmounts it — this
-          avoids the blinking / video reloading when auth state changes. */}
+          never `display:none` (nor zero-height + overflow-hidden), since both make
+          the browser pause/reset the video and cause the blink on login/logout.
+          When hidden, the inner hero keeps its real size but is `invisible`
+          (visibility:hidden does NOT pause media), while the outer 0-height
+          wrapper collapses the space so the tabs panel sits at the top. */}
       <div
-        className={clsx(
-          "relative h-70 w-full overflow-hidden bg-gray-900 md:h-96",
-          !showHero && "hidden"
-        )}
+        className={clsx("relative", showHero ? "" : "h-0 overflow-visible")}
       >
-        <video
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          src="/assets/videos/1746430357291.mp4"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-white/40" />
+        <div
+          className={clsx(
+            "relative h-70 w-full overflow-hidden bg-gray-900 md:h-96",
+            !showHero && "invisible"
+          )}
+        >
+          <video
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            src="/assets/videos/1746430357291.mp4"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-white/40" />
+        </div>
       </div>
 
       {/* Floating panel straddling the video bottom edge */}

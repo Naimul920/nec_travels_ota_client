@@ -1,7 +1,7 @@
 "use client";
 
 import dayjs from "dayjs";
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, Fragment } from "react";
 import type { BookingItem } from "@/actions/booking.action";
 
 interface ETicketProps {
@@ -11,6 +11,7 @@ interface ETicketProps {
   onDownload?: () => void;
   isCancelling?: boolean;
   isIssuing?: boolean;
+  airportNames?: Record<string, string>;
 }
 
 // Custom interface extensions to safely type optional fields on agency/segments/fare
@@ -87,6 +88,14 @@ function formatFare(value?: string | number | null): string {
 function resolveAirlineName(code?: string | null): string {
   if (!code) return "-";
   return AIRLINE_NAMES[code] ?? code;
+}
+
+function airportLabel(
+  code?: string | null,
+  names?: Record<string, string>,
+): string {
+  const name = code ? names?.[code] : undefined;
+  return name ? `${name} (${code})` : code || "-";
 }
 
 function resolveImageSrc(src?: string | null): string | undefined {
@@ -335,7 +344,13 @@ function PassengerTable({ booking }: { booking: BookingItem }) {
   );
 }
 
-function FlightDetails({ booking }: { booking: BookingItem }) {
+function FlightDetails({
+  booking,
+  airportNames,
+}: {
+  booking: BookingItem;
+  airportNames?: Record<string, string>;
+}) {
   const { booking_segments = [] } = booking;
 
   return (
@@ -346,11 +361,24 @@ function FlightDetails({ booking }: { booking: BookingItem }) {
           const airlineCode = seg.airline_code ?? seg.airline;
           const airlineName = resolveAirlineName(airlineCode);
           const extSeg = seg as typeof seg & ExtendedSegment;
+          const nextSeg = booking_segments[idx + 1];
+          const layoverMinutes =
+            nextSeg && seg.arrival_at && nextSeg.departure_at
+              ? Math.max(
+                  0,
+                  dayjs(nextSeg.departure_at).diff(
+                    dayjs(seg.arrival_at),
+                    "minute",
+                  ),
+                )
+              : null;
 
           return (
-            <div key={idx} className="border border-gray-300 rounded-sm">
+            <Fragment key={idx}>
+              <div className="border border-gray-300 rounded-sm">
               <div className="bg-gray-100 px-2.5 py-1 font-bold text-gray-900 border-b border-gray-300 text-[11px]">
-                {(seg.origin_airport_code as ReactNode)} &rarr; {(seg.destination_airport_code as ReactNode)}
+                {airportLabel(seg.origin_airport_code, airportNames)} &rarr;{" "}
+                {airportLabel(seg.destination_airport_code, airportNames)}
               </div>
 
               <div className="flex items-center gap-2 px-2.5 py-1.5 text-[11px] border-b border-gray-200">
@@ -397,7 +425,7 @@ function FlightDetails({ booking }: { booking: BookingItem }) {
                       {formatTime(seg.departure_at)}
                     </td>
                     <td className="px-2 py-1.5 border-r border-gray-300">
-                      Departs: <span className="font-bold">{(seg.origin_airport_code as ReactNode)}</span>
+                      Departs: <span className="font-bold">{airportLabel(seg.origin_airport_code, airportNames)}</span>
                       {extSeg.origin_terminal && (
                         <div className="text-[9px] text-gray-500">
                           Terminal: {extSeg.origin_terminal as ReactNode}
@@ -432,12 +460,55 @@ function FlightDetails({ booking }: { booking: BookingItem }) {
                       {formatTime(seg.arrival_at)}
                     </td>
                     <td className="px-2 py-1.5 border-r border-gray-300">
-                      Arrival: <span className="font-bold">{(seg.destination_airport_code as ReactNode)}</span>
+                      Arrival: <span className="font-bold">{airportLabel(seg.destination_airport_code, airportNames)}</span>
                     </td>
                   </tr>
                 </tbody>
               </table>
-            </div>
+              </div>
+
+              {nextSeg && layoverMinutes !== null && (
+                <div className="overflow-hidden rounded-sm border border-amber-300 bg-amber-50">
+                  <table className="w-full border-collapse text-left text-[11px] text-gray-800">
+                    <thead>
+                      <tr className="bg-amber-100 font-semibold text-amber-800">
+                        <th className="border-b border-r border-amber-200 px-2 py-1">
+                          Layover
+                        </th>
+                        <th className="border-b border-r border-amber-200 px-2 py-1">
+                          From
+                        </th>
+                        <th className="border-b border-r border-amber-200 px-2 py-1">
+                          To
+                        </th>
+                        <th className="border-b px-2 py-1">Duration</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border-r border-amber-200 px-2 py-1">
+                          Connection (
+                          {airportLabel(
+                            seg.destination_airport_code,
+                            airportNames,
+                          )}
+                          )
+                        </td>
+                        <td className="border-r border-amber-200 px-2 py-1">
+                          {formatTime(seg.arrival_at)}
+                        </td>
+                        <td className="border-r border-amber-200 px-2 py-1">
+                          {formatTime(nextSeg.departure_at)}
+                        </td>
+                        <td className="px-2 py-1 font-bold text-amber-700">
+                          {formatDuration(layoverMinutes)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Fragment>
           );
         })}
       </div>
@@ -593,6 +664,7 @@ export default function ETicket({
   onDownload,
   isCancelling,
   isIssuing,
+  airportNames,
 }: ETicketProps) {
   const [hideFare, setHideFare] = useState(false);
   const [grossFare, setGrossFare] = useState(false);
@@ -702,7 +774,7 @@ export default function ETicket({
         </div>
 
         <PassengerTable booking={booking} />
-        <FlightDetails booking={booking} />
+        <FlightDetails booking={booking} airportNames={airportNames} />
         <FareDetails booking={booking} hideFare={hideFare} grossFare={grossFare} />
         <NoticeBoard />
       </div>

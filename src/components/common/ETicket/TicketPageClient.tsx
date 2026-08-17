@@ -3,8 +3,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { getTicketAction } from "@/actions/booking.action";
+import type { BookingItem, BookingSegment } from "@/actions/booking.action";
+import { searchAirportsAction } from "@/actions/airport.action";
 import ETicket from "@/components/common/ETicket/ETicket";
-import type { BookingItem } from "@/actions/booking.action";
 
 interface TicketPageClientProps {
   ticketId: string;
@@ -18,8 +19,41 @@ export default function TicketPageClient({
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState<BookingItem | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [airportNames, setAirportNames] = useState<Record<string, string>>({});
   const [isCancelling, setIsCancelling] = useState(false);
   const [isIssuing, setIsIssuing] = useState(false);
+
+  const resolveAirportNames = async (
+    segments: BookingSegment[],
+  ): Promise<Record<string, string>> => {
+    const codes = Array.from(
+      new Set(
+        segments
+          .flatMap((seg) => [
+            seg.origin_airport_code,
+            seg.destination_airport_code,
+          ])
+          .filter((code): code is string => Boolean(code)),
+      ),
+    );
+
+    const results = await Promise.all(
+      codes.map(async (code) => {
+        try {
+          const res = await searchAirportsAction({ name: code, limit: 5 });
+          const match =
+            res.data?.find(
+              (a) => a.iata?.toLowerCase() === code.toLowerCase(),
+            ) ?? res.data?.[0];
+          return [code, match?.airport_name?.trim() ?? ""] as const;
+        } catch {
+          return [code, ""] as const;
+        }
+      }),
+    );
+
+    return Object.fromEntries(results);
+  };
 
   const loadTicket = useCallback(async () => {
     setLoading(true);
@@ -27,8 +61,13 @@ export default function TicketPageClient({
     const ticket = await getTicketAction(ticketId);
     if (ticket.data) {
       setBooking(ticket.data);
+      const names = await resolveAirportNames(
+        ticket.data.booking_segments ?? [],
+      );
+      setAirportNames(names);
     } else {
       setBooking(null);
+      setAirportNames({});
       setError(ticket.message || "Ticket not found");
       Swal.fire({
         icon: "error",
@@ -208,6 +247,7 @@ export default function TicketPageClient({
     <div className="p-4">
       <ETicket
         booking={booking}
+        airportNames={airportNames}
         onCancelBooking={handleCancelBooking}
         onIssueTicket={handleIssueTicket}
         isCancelling={isCancelling}
