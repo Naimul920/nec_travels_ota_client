@@ -9,6 +9,7 @@ import type { Itinerary, Schedule } from "@/interface/flight";
 import dayjs from "dayjs";
 import { FaPlane } from "react-icons/fa";
 import { useAuthStore } from "@/store/auth.store";
+import { getAirlineName } from "@/utils/airline";
 
 interface IProps {
   state: IState;
@@ -127,7 +128,7 @@ const SearchHeader: React.FC<IProps> = ({
                   <div className="relative w-11 h-11 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0">
                     <img
                       src={`/api/v1/uploads/files/images/public/airlines_logo/${firstSchedule?.marketingCarrierCode}.svg`}
-                      alt={firstSchedule?.marketingCarrierCode || "airline"}
+                      alt={getAirlineName(firstSchedule?.marketingCarrierCode)}
                       className="w-8 h-8 object-contain"
                       loading="lazy"
                       onError={(e) => {
@@ -139,7 +140,7 @@ const SearchHeader: React.FC<IProps> = ({
                     </span> */}
                   </div>
                   <span className="text-[10px] font-semibold tracking-wide text-gray-500">
-                    {firstSchedule?.marketingCarrierCode || ""}
+                    {getAirlineName(firstSchedule?.marketingCarrierCode)}
                   </span>
                 </div>
 

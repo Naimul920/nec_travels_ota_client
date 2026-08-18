@@ -11,6 +11,7 @@ import {
   formatDate,
   stopLabel,
 } from "./bookingSummary.util";
+import { getAirlineName } from "@/utils/airline";
 
 interface Props {
   itinerary: Itinerary;
@@ -35,7 +36,8 @@ const FlightLegRow: React.FC<{ leg: ReturnType<typeof getLegs>[number] }> = ({
       <AirlineLogo code={leg.carrierCode} />
       <div className="min-w-0">
         <p className="truncate text-xs font-semibold text-gray-700">
-          {leg.flightName || `${leg.carrierCode} ${leg.flightNumber}`}
+          {leg.flightName ||
+            `${leg.carrierCode} - ${getAirlineName(leg.carrierCode)} ${leg.flightNumber}`}
         </p>
         {leg.cabinCode && (
           <p className="text-[10px] uppercase tracking-wide text-gray-400">

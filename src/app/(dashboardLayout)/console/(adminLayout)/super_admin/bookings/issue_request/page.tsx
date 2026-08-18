@@ -1,7 +1,13 @@
-import IssueRequestTable from "../../_components/AirTickets/IssueRequestTable";
+import BookingsTable from "../../../../(b2bLayout)/b2b/_components/AirTickets/BookingsTable";
 
 function IssueRequestPage() {
-  return <IssueRequestTable />;
+  return (
+    <BookingsTable
+      status="ISSUE_PENDING"
+      title="Issue Request"
+      admin
+    />
+  );
 }
 
 export default IssueRequestPage;

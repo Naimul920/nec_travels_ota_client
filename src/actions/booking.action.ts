@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import { httpClient } from "@/lib/axios/httpClient";
 import { ROLE } from "@/constant";
 import { getUserRole } from "@/utils/session";
+import { buildStatusParam } from "@/utils/booking";
 import type { BookingItem } from "@/types";
 
 export type {
@@ -34,7 +35,7 @@ export interface GetBookingsParams {
   page?: number;
   limit?: number;
   searchTerm?: string;
-  status?: string;
+  status?: string | string[];
   bookingSource?: string;
   sortBy?: string;
   sortOrder?: string;
@@ -49,6 +50,7 @@ export async function getBookingsAction(
 ): Promise<BookingResponse> {
   try {
     const role = await getUserRole();
+    const status = buildStatusParam(params.status);
     const res = await httpClient.get<BookingItem[]>("/api/v1/bookings", {
       params: {
         searchTerm: params.searchTerm ?? "",
@@ -59,7 +61,7 @@ export async function getBookingsAction(
         booking_source: params.bookingSource ?? role,
         include: params.include ?? "booking_passengers,booking_payments",
         omit: params.omit ?? "user_id",
-        ...(params.status ? { status: params.status } : {}),
+        ...(status ? { status } : {}),
         ...(params.fields ? { fields: params.fields } : {}),
         ...(params.totalAmount ? { total_amount: params.totalAmount } : {}),
       },
@@ -83,9 +85,11 @@ export async function getBookingsAction(
 export interface FetchAdminBookingsParams {
   page?: number;
   limit?: number;
+  searchTerm?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   status?: string;
+  bookingSource?: string;
 }
 
 export async function getAdminBookingsAction(
@@ -100,7 +104,13 @@ export async function getAdminBookingsAction(
           limit: params.limit ?? 10,
           sortBy: params.sortBy ?? "created_at",
           sortOrder: params.sortOrder ?? "desc",
+          ...(params.searchTerm
+            ? { searchTerm: params.searchTerm }
+            : {}),
           ...(params.status ? { status: params.status } : {}),
+          ...(params.bookingSource
+            ? { booking_source: params.bookingSource }
+            : {}),
         },
       },
     );

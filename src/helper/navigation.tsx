@@ -680,11 +680,6 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
           label: "Cancelled Tickets",
           icon: <FaUndo />,
         },
-        {
-          path: "/flown",
-          label: "Flown Tickets",
-          icon: <FaPlane />,
-        },
       ],
     },
 
@@ -695,17 +690,17 @@ export const navigationConfig: Record<NavRole, NavItem[]> = {
       children: [
         {
           path: "/void",
-          label: "Void",
+          label: "Void Tickets",
           icon: <FaUndo />,
         },
         {
           path: "/refund",
-          label: "Refund",
+          label: "Refund Tickets",
           icon: <FaUndo />,
         },
         {
           path: "/reissue",
-          label: "Re-issue / Date Change",
+          label: "Re-issue Tickets",
           icon: <FaTicketAlt />,
         },
         {

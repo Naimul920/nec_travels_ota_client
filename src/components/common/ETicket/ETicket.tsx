@@ -3,6 +3,8 @@
 import dayjs from "dayjs";
 import { useState, type ReactNode, Fragment } from "react";
 import type { BookingItem } from "@/actions/booking.action";
+import { useAuthStore } from "@/store/auth.store";
+import { ROLE } from "@/constant";
 
 interface ETicketProps {
   booking?: BookingItem;
@@ -671,6 +673,9 @@ export default function ETicket({
 
   const [downloading, setDownloading] = useState(false);
 
+  const { user } = useAuthStore();
+  const isStaff = user?.role === ROLE.SUPER_ADMIN || user?.role === ROLE.ADMIN;
+
   if (!booking) {
     return (
       <div className="max-w-4xl mx-auto p-12 text-center text-gray-500 font-medium">
@@ -747,11 +752,12 @@ export default function ETicket({
   };
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-4 lg:flex-row lg:items-start">
-      <div
-        id="eticket-print"
-        className="min-w-0 flex-1 bg-white text-gray-800 border border-gray-300 shadow-sm p-6 font-sans"
-      >
+    <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-start">
+      <div className="flex-1 flex justify-center min-w-0">
+        <div
+          id="eticket-print"
+          className="w-full bg-white text-gray-800 border border-gray-300 shadow-sm p-6 font-sans max-w-4xl"
+        >
         <TicketHeader booking={booking} />
 
         <div className="text-center py-1.5 border-b border-gray-300 bg-gray-50/70 text-xs">
@@ -777,22 +783,25 @@ export default function ETicket({
         <FlightDetails booking={booking} airportNames={airportNames} />
         <FareDetails booking={booking} hideFare={hideFare} grossFare={grossFare} />
         <NoticeBoard />
+        </div>
       </div>
 
-      <TicketToolbar
-        hideFare={hideFare}
-        onHideFareChange={setHideFare}
-        grossFare={grossFare}
-        onGrossFareChange={setGrossFare}
-        onDownload={handleDownload}
-        onPrint={handlePrint}
-        onCancelBooking={onCancelBooking}
-        onIssueTicket={onIssueTicket}
-        canIssue={canIssue}
-        isCancelling={isCancelling}
-        isIssuing={isIssuing}
-        isDownloading={downloading}
-      />
+      {!isStaff && (
+        <TicketToolbar
+          hideFare={hideFare}
+          onHideFareChange={setHideFare}
+          grossFare={grossFare}
+          onGrossFareChange={setGrossFare}
+          onDownload={handleDownload}
+          onPrint={handlePrint}
+          onCancelBooking={onCancelBooking}
+          onIssueTicket={onIssueTicket}
+          canIssue={canIssue}
+          isCancelling={isCancelling}
+          isIssuing={isIssuing}
+          isDownloading={downloading}
+        />
+      )}
     </div>
   );
 }

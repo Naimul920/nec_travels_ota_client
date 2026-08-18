@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Card, App } from "antd";
-import Image from "next/image";
 import {
   AiOutlineEdit,
   AiOutlineCheck,
@@ -26,7 +25,7 @@ interface ProfileData {
 const EditProfile: React.FC = () => {
   const { message } = App.useApp();
   const [isEditing, setIsEditing] = useState(false);
-  const { data: userProfile, refetch } = useUserInfo();
+  const { data: userProfile, isPending, refetch } = useUserInfo();
   const { user, setUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -151,74 +150,49 @@ const EditProfile: React.FC = () => {
     }
   };
 
-  const image = userProfile?.profile?.image || user?.image;
-  const displayImage = previewUrl || image;
+  const displayImage = selectedFile ? previewUrl : user?.image;
+  const isLoading = isPending && !user;
 
-  const renderRow = (
-    label: string,
-    value: string,
-    field: keyof ProfileData,
-    type: string = "text",
-    readOnly?: boolean,
-    isPhone?: boolean,
-  ) => (
-    <tr className="border-b border-b-tertiary/10 last:border-b-0">
-      <td className="w-1/3 px-4 py-3 font-medium text-gray-600">{label}</td>
-      <td className="px-4 py-3">
-        {isPhone ? (
-          <PhoneInputField
-            value={value}
-            disabled={!isEditing}
-            onChange={(v) => handleChange(field, v)}
-            className={clsx(
-              "transition",
-              !isEditing && "cursor-not-allowed opacity-60",
-            )}
-          />
-        ) : (
-          <Input
-            type={type}
-            value={value}
-            disabled={!isEditing || readOnly}
-            onChange={(e) => handleChange(field, e.target.value)}
-            className={clsx(
-              "w-full rounded border px-3 py-2 transition",
-              isEditing && !readOnly
-                ? "border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-                : "cursor-not-allowed border-transparent bg-gray-100",
-            )}
-          />
-        )}
-      </td>
-    </tr>
-  );
+  const inputClass = (editable: boolean) =>
+    clsx(
+      "bg-white",
+      editable
+        ? ""
+        : "cursor-not-allowed opacity-70",
+    );
 
   return (
-    <Card className="w-full border! border-primary! rounded-lg md:max-w-5/6">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="line-clamp-1 text-lg font-semibold text-gray-800">
-          Profile Information
-        </h1>
+    <Card className="h-full w-full border! border-primary! rounded-lg">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-lg font-semibold text-gray-800">
+            Profile Information
+          </h1>
+          <p className="mt-0.5 text-xs text-gray-500">
+            Update your personal details
+          </p>
+        </div>
 
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
+            className="flex items-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:border-primary hover:bg-primary/5 hover:text-primary"
           >
-            <AiOutlineEdit /> Edit
+            <AiOutlineEdit /> Edit Profile
           </button>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleUpdate}
               disabled={isUpdating}
-              className="flex items-center gap-1 text-primary hover:opacity-65 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-55"
             >
-              <AiOutlineCheck /> {isUpdating ? "Updating..." : "Update"}
+              <AiOutlineCheck /> {isUpdating ? "Saving..." : "Save Changes"}
             </button>
             <button
               onClick={handleCancel}
-              className="flex items-center gap-1 text-secondary hover:opacity-65"
+              disabled={isUpdating}
+              className="flex items-center gap-1.5 rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:border-secondary hover:text-secondary"
             >
               <AiOutlineClose /> Cancel
             </button>
@@ -228,13 +202,11 @@ const EditProfile: React.FC = () => {
 
       <div className="mb-6 flex items-center gap-5">
         <div className="relative">
-          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gray-100">
-            {user?.image ? (
-              <Image
-                src={user?.image || ""}
+          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-gray-100 ring-2 ring-primary/15">
+            {displayImage ? (
+              <img
+                src={displayImage}
                 alt="Profile"
-                width={80}
-                height={80}
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -245,7 +217,8 @@ const EditProfile: React.FC = () => {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+            title="Change photo"
+            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 shadow-sm transition hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isUploading ? (
               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-300 border-t-primary" />
@@ -263,27 +236,81 @@ const EditProfile: React.FC = () => {
             onChange={handleImageSelect}
           />
         </div>
-        <div>
-          <p className="font-medium text-gray-800">
+        <div className="min-w-0">
+          <p className="truncate font-medium text-gray-800">
             {profile.first_name} {profile.last_name}
           </p>
-          <p className="text-sm text-gray-500">{profile.email}</p>
-          {selectedFile && (
-            <p className="mt-1 text-xs text-primary">{selectedFile.name}</p>
+          <p className="truncate text-sm text-gray-500">{profile.email}</p>
+          {selectedFile ? (
+            <p className="mt-1 truncate text-xs text-primary">
+              {selectedFile.name}
+            </p>
+          ) : (
+            <p className="mt-1 text-xs text-gray-400">JPG, PNG or WEBP</p>
           )}
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full rounded-lg border border-tertiary/10">
-          <tbody>
-            {renderRow("First Name", profile.first_name, "first_name")}
-            {renderRow("Last Name", profile.last_name, "last_name")}
-            {renderRow("Email", profile.email, "email", "email", true)}
-            {renderRow("Phone", profile.phone, "phone", "tel", false, true)}
-          </tbody>
-        </table>
-      </div>
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="skeleton-shimmer h-3 w-24 rounded-md" />
+              <div className="skeleton-shimmer h-12 w-full rounded-lg" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              First Name
+            </label>
+            <Input
+              value={profile.first_name}
+              disabled={!isEditing}
+              onChange={(e) => handleChange("first_name", e.target.value)}
+              className={inputClass(isEditing)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Last Name
+            </label>
+            <Input
+              value={profile.last_name}
+              disabled={!isEditing}
+              onChange={(e) => handleChange("last_name", e.target.value)}
+              className={inputClass(isEditing)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Email
+            </label>
+            <Input
+              type="email"
+              value={profile.email}
+              disabled
+              className={inputClass(false)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Phone
+            </label>
+            <PhoneInputField
+              value={profile.phone}
+              disabled={!isEditing}
+              onChange={(v) => handleChange("phone", v)}
+              className={clsx("transition", !isEditing && "cursor-not-allowed")}
+            />
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

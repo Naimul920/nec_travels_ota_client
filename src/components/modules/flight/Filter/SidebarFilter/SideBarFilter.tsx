@@ -8,6 +8,7 @@ import { Button } from "../../../../ui";
 import type { FilterState } from "@/components/modules/flight/FlightSearch/FlightSearch";
 import type { Itinerary, Schedule } from "../../../../../interface/flight";
 import { getItineraryMaxStops } from "@/utils/flightStops";
+import { getAirlineName } from "@/utils/airline";
 
 interface Props {
   allItins: Itinerary[];
@@ -266,7 +267,7 @@ const SideBarFilter: React.FC<Props> = ({
                       }
                     />
                     <span className="line-clamp-1">
-                      {item.code} ({item.count})
+                      {item.code} - {getAirlineName(item.code)} ({item.count})
                     </span>
                   </label>
                 </td>

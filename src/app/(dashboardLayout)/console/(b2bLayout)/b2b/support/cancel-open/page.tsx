@@ -1,11 +1,13 @@
-import Cancel from "../../_components/Support/Cancel";
+import BookingsTable from "../../_components/AirTickets/BookingsTable";
 
-function page() {
+function B2bCancelOpenPage() {
   return (
-    <>
-      <Cancel />
-    </>
+    <BookingsTable
+      status="CANCELLED"
+      title="Cancel Open"
+      bookingSource="B2B"
+    />
   );
 }
 
-export default page;
+export default B2bCancelOpenPage;

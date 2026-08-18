@@ -5,6 +5,7 @@ import type { Itinerary } from "@/interface/flight";
 import dayjs from "dayjs";
 import { FaPlane } from "react-icons/fa";
 import Image from "next/image";
+import { getAirlineName } from "@/utils/airline";
 
 function formatTime(iso: string): string {
   return dayjs(iso).format("HH:mm");
@@ -72,12 +73,13 @@ const BookingFlightInfo: React.FC<BookingFlightInfoProps> = ({ itinerary }) => {
       <div className="flex flex-col items-center gap-1">
         <Image
           src={`/api/v1/uploads/files/images/public/airlines_logo/${first?.marketingCarrierCode}.svg`}
-          alt={`${first.marketingCarrierCode}`}
+          alt={`${first.marketingCarrierCode} - ${getAirlineName(first.marketingCarrierCode)}`}
           width={30}
           height={30}
         />
-        <span className="hidden min-w-[3.5rem] text-xs font-semibold tracking-wide text-gray-400 sm:block text-center">
-          {first.marketingCarrierCode || ""}
+        <span className="hidden min-w-[3.5rem] text-[10px] font-semibold tracking-wide text-gray-400 sm:block text-center leading-tight">
+          {first.marketingCarrierCode || ""} -{" "}
+          {getAirlineName(first.marketingCarrierCode)}
         </span>
       </div>
 

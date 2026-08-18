@@ -26,6 +26,7 @@ const STATUS_BADGE: Record<string, string> = {
   hold: "bg-sky-50 text-sky-700",
   issued: "bg-emerald-50 text-emerald-700",
   cancel: "bg-red-50 text-red-700",
+  issue_pending: "bg-violet-50 text-violet-700",
 };
 
 const STATUS_ICON: Record<string, typeof FiClock> = {
@@ -33,6 +34,7 @@ const STATUS_ICON: Record<string, typeof FiClock> = {
   hold: FiPauseCircle,
   issued: FiCheckCircle,
   cancel: FiXCircle,
+  issue_pending: FiClock,
 };
 
 const formatDate = (value?: string | null): string =>
@@ -125,10 +127,10 @@ export default function HoldTickets() {
   const { data: bookingsData, isPending: isLoading } = useQuery({
     queryKey: ["b2b-hold-tickets"],
     queryFn: async () => {
-      const res = await getBookingsAction();
-      return (res.data ?? [])
-        .map(mapBookingRow)
-        .filter((row) => row.status === "hold");
+      const res = await getBookingsAction({
+        status: ["HOLD", "ISSUE_PENDING"],
+      });
+      return (res.data ?? []).map(mapBookingRow);
     },
   });
 

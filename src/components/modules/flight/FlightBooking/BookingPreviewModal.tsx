@@ -12,6 +12,7 @@ import {
   stopLabel,
   TYPE_LABEL,
 } from "./bookingSummary.util";
+import { getAirlineName } from "@/utils/airline";
 
 interface Props {
   open: boolean;
@@ -103,7 +104,8 @@ const BookingPreviewModal: React.FC<Props> = ({
               <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
                 <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
                   <span className="font-semibold text-gray-700">
-                    {leg.flightName || `${leg.carrierCode} ${leg.flightNumber}`}
+                    {leg.flightName ||
+                      `${leg.carrierCode} - ${getAirlineName(leg.carrierCode)} ${leg.flightNumber}`}
                   </span>
                   <span>
                     {stopLabel(leg.stops)} · {leg.duration}

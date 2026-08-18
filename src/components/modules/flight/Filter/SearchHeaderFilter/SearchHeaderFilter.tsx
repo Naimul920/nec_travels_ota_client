@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import Image from "next/image";
 import clsx from "clsx";
 import type { Itinerary, Schedule } from "@/interface/flight";
+import { getAirlineName } from "@/utils/airline";
 
 interface Props {
   carrierCodes: string[];
@@ -72,7 +73,7 @@ const SearchHeaderFilter: React.FC<Props> = ({
               <div className="relative w-6 h-6 shrink-0 flex items-center justify-center bg-gray-100 rounded overflow-hidden">
                 <Image
                   src={`/api/v1/uploads/files/images/public/airlines_logo/${item.code}.svg`}
-                  alt={`${item.code} logo`}
+                  alt={`${getAirlineName(item.code)} logo`}
                   width={24}
                   height={24}
                   className="object-contain w-full h-full"
@@ -84,11 +85,11 @@ const SearchHeaderFilter: React.FC<Props> = ({
               </div>
 
               {/* Airline Code & Price Details */}
-              <div className="flex flex-col justify-center leading-tight">
-                <span className="text-xs font-semibold tracking-wide uppercase">
-                  {item.code}
+              <div className="flex flex-col justify-center leading-tight w-[60px] min-w-0">
+                <span className="text-[10px] font-semibold tracking-wide uppercase leading-tight truncate">
+                  {item.code} · {getAirlineName(item.code)}
                 </span>
-                <span className="text-[11px] text-gray-500 font-medium">
+                <span className="text-[10px] text-gray-500 font-medium truncate">
                   {item.price ? `Tk. ${item.price}` : "N/A"}
                 </span>
               </div>

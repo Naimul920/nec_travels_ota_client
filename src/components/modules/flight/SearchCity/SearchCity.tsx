@@ -127,31 +127,36 @@ const SearchCity: React.FC<SearchCityProps> = ({
         className={`relative flex min-h-[72px] w-full flex-col justify-center rounded-md border bg-white px-3 shadow-sm transition-all duration-200 ${
           focused ? "border-primary shadow-md" : "border-slate-200"
         }`}
+        onClick={() => inputRef.current?.focus()}
       >
-        {(focused || value) && (
-          <p className="pointer-events-none mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
-            {placeholder}
-          </p>
-        )}
+        <p className="pointer-events-none mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
+          {placeholder}
+        </p>
 
         <input
           ref={inputRef}
-          className="w-full truncate border-none bg-transparent py-2 text-sm font-bold uppercase text-gray-900 outline-none placeholder:font-normal placeholder:text-gray-400"
+          className="w-full truncate border-none bg-transparent py-0 text-sm font-bold uppercase text-gray-900 outline-none placeholder:font-normal placeholder:text-gray-400"
           type="text"
           value={displayValue}
-          placeholder={focused ? "" : placeholder}
+          placeholder={focused ? "" : "Select City"}
           autoComplete="off"
           aria-autocomplete="list"
           onFocus={handleFocus}
           onChange={handleInputChange}
         />
 
-        {(focused || value) && resolved && (
-          <p className="pointer-events-none line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
-            {resolved.iata} ·{" "}
-            {resolved.location || resolved.country_location || resolved.airport_name}
-          </p>
-        )}
+        <p className="pointer-events-none mt-0.5 line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
+          {resolved ? (
+            <>
+              {resolved.iata} ·{" "}
+              {resolved.location ||
+                resolved.country_location ||
+                resolved.airport_name}
+            </>
+          ) : (
+            "Select City"
+          )}
+        </p>
       </div>
 
       {/* Airport Auto-Suggestions Layer */}

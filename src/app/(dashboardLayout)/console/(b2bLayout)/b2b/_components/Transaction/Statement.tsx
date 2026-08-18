@@ -1,142 +1,227 @@
 "use client";
-import React, { useState } from "react";
-import { DatePicker, Card, Row, Col } from "antd";
-import FileSearchOutlined from "@ant-design/icons/es/icons/FileSearchOutlined";
-import DownloadOutlined from "@ant-design/icons/es/icons/DownloadOutlined";
-import { Dayjs } from "dayjs";
-import Table from "@/components/common/Table/Table";
-import holdTicketsColumns from "@/utils/tableConstant/holdTickets.constant";
-import { Button } from "@/components/ui";
-import clsx from "clsx";
 
-const { RangePicker } = DatePicker;
+import React, { useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Input } from "antd";
+import type { TablePaginationConfig } from "antd";
+import { getDepositStatementAction } from "@/actions/deposit.action";
+import type { DepositStatementItem } from "@/interface/deposit";
+import Table from "@/components/common/Table/Table";
+import { FiCalendar, FiInbox, FiSearch } from "react-icons/fi";
+
+const { Search } = Input;
+
+const formatDate = (v?: string): string =>
+  v ? new Date(v).toLocaleString() : "—";
+
+const formatAmount = (v?: number): string =>
+  v != null
+    ? Number(v).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : "—";
+
+const mapStatementRow = (item: DepositStatementItem) => ({
+  key: item.id,
+  date: formatDate(item.created_at),
+  bookingReference: item.booking_reference || item.reference_id || "—",
+  pnr: item.pnr || "—",
+  serviceType: item.service_type || item.type || "—",
+  debit: item.direction === "DEBIT" ? Number(item.amount || 0) : null,
+  credit: item.direction === "CREDIT" ? Number(item.amount || 0) : null,
+  runningBalance: item.balance_after,
+  remarks: item.description || item.note || "—",
+});
+
+type StatementRow = ReturnType<typeof mapStatementRow>;
+
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[#12233D]/15 bg-white px-6 py-20 text-center">
+      <div className="flex h-28 w-28 items-center justify-center rounded-full bg-[#DCEBF9]">
+        <FiInbox size={36} className="text-[#8FA9BE]" />
+      </div>
+      <h3 className="text-xl font-bold text-[#0F1B47]">
+        No statement records found
+      </h3>
+      <p className="max-w-sm text-sm text-[#6B7785]">
+        Your transaction statement will appear here.
+      </p>
+    </div>
+  );
+}
 
 const Statement: React.FC = () => {
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [showTable, setShowTable] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleGenerate = () => {
-    if (!startDate || !endDate) return;
-    setShowTable(true);
+  const { data, isPending: isLoading } = useQuery({
+    queryKey: ["b2b-statement", page, pageSize, searchTerm],
+    queryFn: async () => {
+      const res = await getDepositStatementAction({
+        page,
+        limit: pageSize,
+        searchTerm,
+        sortBy: "created_at",
+      });
+      const rows = (res.data ?? []).map(mapStatementRow);
+      return {
+        rows,
+        total: res.meta?.total ?? rows.length,
+      };
+    },
+  });
+
+  const rows = data?.rows ?? [];
+  const total = data?.total ?? 0;
+
+  const handleSearch = (value: string) => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      setSearchTerm(value.trim());
+      setPage(1);
+    }, 400);
   };
 
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    setPage(pagination.current ?? 1);
+    setPageSize(pagination.pageSize ?? 20);
+  };
+
+  const columns = useMemo(
+    () => [
+      {
+        title: "SL",
+        dataIndex: "sl",
+        width: 56,
+        align: "center" as const,
+        render: (v: number) => (
+          <span className="text-sm font-medium text-[#8FA9BE]">{v}</span>
+        ),
+      },
+      {
+        title: "Date",
+        dataIndex: "date",
+        width: 180,
+        render: (v: string) => (
+          <span className="inline-flex items-center gap-1.5 text-sm text-[#5B6B7A]">
+            <FiCalendar size={13} className="text-[#8FA9BE]" />
+            {v}
+          </span>
+        ),
+      },
+      {
+        title: "Booking Reference",
+        dataIndex: "bookingReference",
+        width: 180,
+        render: (v: string) => (
+          <span className="font-semibold text-[#0F1B47]">{v}</span>
+        ),
+      },
+      {
+        title: "PNR",
+        dataIndex: "pnr",
+        width: 130,
+        render: (v: string) => (
+          <span className="font-mono text-sm font-semibold tracking-wide text-[#0F1B47]">
+            {v}
+          </span>
+        ),
+      },
+      {
+        title: "Service Types",
+        dataIndex: "serviceType",
+        width: 160,
+        render: (v: string) => (
+          <span className="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold uppercase text-primary">
+            {v}
+          </span>
+        ),
+      },
+      {
+        title: "Debit",
+        dataIndex: "debit",
+        width: 120,
+        align: "right" as const,
+        render: (v: number | null) => (
+          <span className="font-semibold text-red-600">
+            {v != null ? `${formatAmount(v)}` : "—"}
+          </span>
+        ),
+      },
+      {
+        title: "Credit",
+        dataIndex: "credit",
+        width: 120,
+        align: "right" as const,
+        render: (v: number | null) => (
+          <span className="font-semibold text-emerald-600">
+            {v != null ? `+${formatAmount(v)}` : "—"}
+          </span>
+        ),
+      },
+      {
+        title: "Running Balance",
+        dataIndex: "runningBalance",
+        width: 150,
+        align: "right" as const,
+        render: (v: number | undefined) => (
+          <span className="font-bold text-[#0F1B47]">
+            ৳{formatAmount(v)}
+          </span>
+        ),
+      },
+      {
+        title: "Remarks",
+        dataIndex: "remarks",
+        width: 200,
+        render: (v: string) => (
+          <span className="line-clamp-1 text-xs text-[#5B6B7A]" title={v}>
+            {v}
+          </span>
+        ),
+      },
+    ],
+    [],
+  );
+
   return (
-    <div className="p-4 md:p-6 bg-gray-50 shadow rounded-2xl space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Payment Statement
-        </h1>
-        <p className="text-gray-500">
-          View and generate payment statements by date range
-        </p>
-      </div>
-
-      {/* Filter Card */}
-      <Card
-        className="shadow-sm rounded-lg mb-5!"
-        styles={{ body: { padding: "24px" } }} // Updated here
-      >
-        <Row gutter={[16, 16]} align="bottom">
-          {/* Desktop Range Picker */}
-          <Col xs={0} md={12} lg={10}>
-            <label className="block mb-2 font-medium text-gray-700">
-              Select Date Range
-            </label>
-            <RangePicker
-              className="w-full"
-              size="large"
-              onChange={(dates) => {
-                setStartDate(dates?.[0] || null);
-                setEndDate(dates?.[1] || null);
-              }}
-              format="DD MMM YYYY"
-            />
-          </Col>
-
-          {/* Mobile Start Date */}
-          <Col xs={12} md={0}>
-            <label className="block mb-2 font-medium text-gray-700">
-              Start Date
-            </label>
-            <DatePicker
-              className="w-full"
-              size="large"
-              value={startDate}
-              onChange={(date) => setStartDate(date)}
-              format="DD MMM YYYY"
-            />
-          </Col>
-
-          {/* Mobile End Date */}
-          <Col xs={12} md={0}>
-            <label className="block mb-2 font-medium text-gray-700">
-              End Date
-            </label>
-            <DatePicker
-              className="w-full"
-              size="large"
-              value={endDate}
-              onChange={(date) => setEndDate(date)}
-              format="DD MMM YYYY"
-            />
-          </Col>
-
-          {/* Generate Button */}
-          <Col xs={24} md={6}>
-            <Button
-              variant="primary"
-              onClick={handleGenerate}
-              disabled={!startDate || !endDate}
-              className={clsx(
-                "w-full",
-                !startDate || !endDate ? "cursor-not-allowed!" : "",
-              )}
-            >
-              <FileSearchOutlined /> Generate Statement
-            </Button>
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Table Section */}
-      {showTable && (
-        <Card className="shadow-sm rounded-lg" bodyStyle={{ padding: "0px" }}>
-          <div className="px-6 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800">
-                Statement Result
-              </h2>
-              <p className="text-sm text-gray-500">
-                Showing records from{" "}
-                <span className="font-medium">
-                  {startDate?.format("DD MMM YYYY")}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium">
-                  {endDate?.format("DD MMM YYYY")}
-                </span>
-              </p>
-            </div>
-
-            {/* Action Buttons (UI only) */}
-            <div className="flex gap-2">
-              <Button variant="primary">
-                <DownloadOutlined size={20} /> Download
-              </Button>
-            </div>
-          </div>
-
-          <Table
-            title="Payments"
-            columns={holdTicketsColumns}
-            pagination={{ pageSize: 20 }}
-            dataSource={[]}
-            rowKey="sl"
+    <div>
+      <Table
+        title="STATEMENT"
+        hideSearch
+        loading={isLoading}
+        columns={columns}
+        headerExtras={
+          <Search
+            placeholder="Search statement.."
+            allowClear
+            size="large"
+            className="w-72"
+            prefix={<FiSearch className="text-gray-400" />}
+            onSearch={(v) => handleSearch(v)}
+            onChange={(e) => handleSearch(e.target.value)}
           />
-        </Card>
-      )}
+        }
+        emptyText={<EmptyState />}
+        dataSource={rows.map((data, i) => ({
+          ...data,
+          sl: (page - 1) * pageSize + i + 1,
+        }))}
+        rowKey="key"
+        pagination={{
+          current: page,
+          pageSize,
+          total,
+          showSizeChanger: true,
+          pageSizeOptions: [10, 20, 50, 100],
+          showTotal: (t) => `${t} records`,
+        }}
+        onChange={handleTableChange}
+      />
     </div>
   );
 };

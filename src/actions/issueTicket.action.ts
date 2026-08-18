@@ -186,6 +186,64 @@ export async function getTicketIssueRequestsAction(
   }
 }
 
+export interface ApproveTicketIssuePayload {
+  ticket_numbers: string[];
+  gross_amount?: number;
+  net_amount?: number;
+}
+
+export async function approveTicketIssueAction(
+  id: string,
+  payload: ApproveTicketIssuePayload,
+): Promise<RequestTicketIssueResponse> {
+  try {
+    const res = await httpClient.patch<Record<string, unknown>>(
+      `/api/v1/ticket-issues/${encodeURIComponent(id)}/approve`,
+      payload,
+    );
+    return {
+      success: res.success,
+      statusCode: res.statusCode,
+      message: res.message,
+      data: res.data ?? null,
+    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to approve ticket issue",
+    );
+    return { success: false, statusCode, message, data: null };
+  }
+}
+
+export interface RejectTicketIssuePayload {
+  reject_reason: string;
+}
+
+export async function rejectTicketIssueAction(
+  id: string,
+  payload: RejectTicketIssuePayload,
+): Promise<RequestTicketIssueResponse> {
+  try {
+    const res = await httpClient.patch<Record<string, unknown>>(
+      `/api/v1/ticket-issues/${encodeURIComponent(id)}/reject`,
+      payload,
+    );
+    return {
+      success: res.success,
+      statusCode: res.statusCode,
+      message: res.message,
+      data: res.data ?? null,
+    };
+  } catch (error) {
+    const { message, statusCode } = extractApiError(
+      error,
+      "Failed to reject ticket issue",
+    );
+    return { success: false, statusCode, message, data: null };
+  }
+}
+
 const extractApiError = (
   error: unknown,
   fallback: string,

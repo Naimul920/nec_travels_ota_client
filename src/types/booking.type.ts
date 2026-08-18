@@ -70,8 +70,10 @@ export interface BookingItem {
   gds_pnr: string;
   exchange_rate: string | null;
   remarks: string | null;
+  refund_amount?: string;
   booking_deadline: string | null;
   created_at: string;
+  updated_at?: string;
   provider_booking_id?: string;
   total_amount?: string;
   user: {

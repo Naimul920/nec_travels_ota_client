@@ -727,23 +727,6 @@ export const CRUD_PAGE_CONFIGS: Record<string, CrudPageConfig> = {
 
   // ============================ B2B ============================
 
-  [`${B2B}/bookings/flown`]: {
-    title: "Flown Tickets",
-    description: "View all flown tickets.",
-    columns: [
-      { title: "ID", dataIndex: "id", key: "id", width: 80 },
-      { title: "PNR", dataIndex: "pnr", key: "pnr" },
-      { title: "Passenger", dataIndex: "passenger", key: "passenger" },
-      { title: "Route", dataIndex: "route", key: "route" },
-      statusColumn(),
-    ],
-    fields: [
-      textField("pnr", "PNR", true),
-      textField("passenger", "Passenger"),
-      textField("route", "Route"),
-    ],
-  },
-
   [`${B2B}/support/add-ssr/seat-selection`]: {
     title: "Seat Selection",
     description: "Add SSR seat selection requests.",

@@ -1,11 +1,14 @@
-import Void from "../../_components/Support/Void";
+import BookingsTable from "../../_components/AirTickets/BookingsTable";
 
-function page() {
+function B2bVoidPage() {
   return (
-    <>
-      <Void />
-    </>
+    <BookingsTable
+      status="VOID"
+      title="Void Tickets"
+      bookingSource="B2B"
+      dateColumn="issued_at"
+    />
   );
 }
 
-export default page;
+export default B2bVoidPage;

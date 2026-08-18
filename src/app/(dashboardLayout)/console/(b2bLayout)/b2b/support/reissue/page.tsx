@@ -1,13 +1,14 @@
-// import Reissue from "@/app/(dashboard)/b2b/_components/Support/Reissue";
+import BookingsTable from "../../_components/AirTickets/BookingsTable";
 
-import Reissue from "../../_components/Support/Reissue";
-
-function page() {
+function B2bReissuePage() {
   return (
-    <>
-      <Reissue/>
-    </>
+    <BookingsTable
+      status={["REISSUED", "REISSUED_PENDING"]}
+      title="Reissue"
+      bookingSource="B2B"
+      dateColumn="issued_at"
+    />
   );
 }
 
-export default page;
+export default B2bReissuePage;

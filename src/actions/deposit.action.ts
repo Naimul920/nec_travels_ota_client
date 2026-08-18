@@ -40,7 +40,37 @@ const extractApiError = (error: unknown, fallback: string) => {
 export interface DepositParams {
   page?: number;
   limit?: number;
+  searchTerm?: string;
   sortBy?: string;
+}
+
+/** Lists the current user's own deposit requests (B2B/B2C). */
+export async function getMyDepositsAction(
+  params: DepositParams = {},
+): Promise<DepositListResponse> {
+  try {
+    const res = await httpClient.get<DepositItem[]>("/api/v1/deposits", {
+      params: {
+        page: params.page ?? 1,
+        limit: params.limit ?? 10,
+        searchTerm: params.searchTerm ?? "",
+        sortBy: params.sortBy ?? "created_at",
+      },
+    });
+    return {
+      success: res.success,
+      statusCode: res.statusCode,
+      message: res.message,
+      data: Array.isArray(res.data) ? res.data : [],
+      meta: (res as unknown as DepositListResponse)?.meta,
+    };
+  } catch (error) {
+    const { statusCode, message } = extractApiError(
+      error,
+      "Failed to load deposits",
+    );
+    return { success: false, statusCode, message, data: [] };
+  }
 }
 
 export async function getDepositsAction(
@@ -104,6 +134,7 @@ export async function getDepositStatementAction(
         params: {
           page: params.page ?? 1,
           limit: params.limit ?? 10,
+          searchTerm: params.searchTerm ?? "",
           sortBy: params.sortBy ?? "created_at",
         },
       },

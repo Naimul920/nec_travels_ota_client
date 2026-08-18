@@ -6,6 +6,12 @@ export interface DepositItem {
   statusLabel?: string;
   reference?: string | null;
   deposit_date?: string;
+  sender_account?: string;
+  sender_name?: string;
+  transaction_id?: string;
+  payment_date?: string;
+  attachment?: string | null;
+  note?: string | null;
   created_at?: string;
   updated_at?: string;
   bank?: {
@@ -61,7 +67,11 @@ export interface DepositStatementItem {
   balance_after?: number;
   reference_type?: string;
   reference_id?: string;
+  booking_reference?: string;
+  pnr?: string;
+  service_type?: string;
   description?: string;
+  note?: string;
   created_at?: string;
 }
 

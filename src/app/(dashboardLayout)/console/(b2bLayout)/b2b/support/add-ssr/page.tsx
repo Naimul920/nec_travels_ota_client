@@ -1,13 +1,13 @@
-// import AddSsr from "@/app/(dashboard)/b2b/_components/Support/AddSsr";
+import BookingsTable from "../../_components/AirTickets/BookingsTable";
 
-import AddSsr from "../../_components/Support/AddSsr";
-
-function page() {
+function B2bAddSsrPage() {
   return (
-    <>
-      <AddSsr />
-    </>
+    <BookingsTable
+      status={["SSR", "SSR_PENDING"]}
+      title="Add SSR Service"
+      bookingSource="B2B"
+    />
   );
 }
 
-export default page;
+export default B2bAddSsrPage;
