@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { checkEmailExists, checkPhoneExists } from "@/utils/checkExisting";
 
 export const loginValidationSchema = Yup.object({
   email: Yup.string().email().required(),
@@ -20,11 +21,26 @@ export const resetPasswordSchema = Yup.object({
 });
 
 export const b2cRegisterSchema = Yup.object({
-  email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
+  email: Yup.string()
+    .trim()
+    .email("Enter a valid email")
+    .required("Email is required")
+    .test("email-exists", "This email is already registered", async (value) => {
+      if (!value) return true;
+      return !(await checkEmailExists(value));
+    }),
   phone: Yup.string()
     .trim()
     .matches(/^\+?\d{7,15}$/, "Invalid phone number")
-    .required("Phone number is required"),
+    .required("Phone number is required")
+    .test(
+      "phone-exists",
+      "This phone number is already registered",
+      async (value) => {
+        if (!value) return true;
+        return !(await checkPhoneExists(value));
+      },
+    ),
   country: Yup.string().trim().required("Country is required"),
   password: Yup.string()
     .min(8, "Must be at least 8 characters")

@@ -56,6 +56,8 @@ export default function B2CSignUp() {
   const registerFormik = useFormik<B2CRegisterFormValues>({
     initialValues: registerInitialValues,
     validationSchema: b2cRegisterSchema,
+    validateOnChange: false,
+    validateOnBlur: true,
     onSubmit: async (values, helpers) => {
       helpers.setStatus(null);
       try {

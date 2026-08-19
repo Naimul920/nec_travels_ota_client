@@ -3,6 +3,7 @@ import {
   ACCEPTED_FILE_TYPES,
   MAX_FILE_SIZE_MB,
 } from "./types";
+import { checkEmailExists, checkPhoneExists } from "@/utils/checkExisting";
 
 const PHONE_REGEX = /^\+?\d{7,15}$/; // Phone number with optional country dial code, e.g. +8801700000000
 
@@ -26,11 +27,26 @@ const fileSchema = (required: boolean) => {
 export const step1Schema = Yup.object({
   first_name: Yup.string().trim().min(2, "Too short").required("First name is required"),
   last_name: Yup.string().trim().min(2, "Too short").required("Last name is required"),
-  email: Yup.string().trim().email("Enter a valid email").required("Email is required"),
+  email: Yup.string()
+    .trim()
+    .email("Enter a valid email")
+    .required("Email is required")
+    .test("email-exists", "This email is already registered", async (value) => {
+      if (!value) return true;
+      return !(await checkEmailExists(value));
+    }),
   phone: Yup.string()
     .trim()
     .matches(PHONE_REGEX, "Invalid phone number")
-    .required("Phone number is required"),
+    .required("Phone number is required")
+    .test(
+      "phone-exists",
+      "This phone number is already registered",
+      async (value) => {
+        if (!value) return true;
+        return !(await checkPhoneExists(value));
+      },
+    ),
   password: Yup.string()
     .min(8, "Must be at least 8 characters")
     .matches(/[A-Z]/, "Include at least one uppercase letter")

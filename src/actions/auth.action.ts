@@ -367,6 +367,32 @@ export const resendOtpAction = async (payload: {
   }
 };
 
+export const checkExistingAction = async (payload: {
+  email?: string;
+  phone?: string;
+}) => {
+  try {
+    const res = await httpClient.post<{ exists: boolean }>(
+      "/users/check-existing",
+      payload,
+    );
+    return {
+      success: true,
+      exists: Boolean(res.data?.exists),
+      message: res.message || "Available",
+    };
+  } catch (error: any) {
+    const backendMessage = error?.response?.data?.message;
+    return {
+      success: false,
+      exists: false,
+      message: Array.isArray(backendMessage)
+        ? backendMessage.join(", ")
+        : backendMessage || "Could not check availability",
+    };
+  }
+};
+
 export const b2bRegisterAction = async (formData: FormData) => {
   console.log("b2bRegisterAction called with formData:", JSON.stringify(formData));
   try {

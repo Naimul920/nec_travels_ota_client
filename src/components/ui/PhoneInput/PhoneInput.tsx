@@ -254,12 +254,24 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
     }
   }, [open]);
 
+  // Normalize the national digits to E.164 form: drop a pasted country
+  // code and the national trunk prefix (leading zero) before applying the
+  // dial code, e.g. "01796151260"/"+8801796151260" -> "+8801796151260".
+  const normalizeNational = (raw: string): string => {
+    const digits = raw.replace(/\D/g, "");
+    const dialDigits = dialCode.replace(/\D/g, "");
+    const withoutCode = digits.startsWith(dialDigits)
+      ? digits.slice(dialDigits.length)
+      : digits;
+    return withoutCode.replace(/^0+/, "");
+  };
+
   const selectCountry = (code: CountryCode) => {
     setUserSelectedCountry(true);
     setSelectedCountry(code);
     closeDropdown();
     // Re-emit full number with the new dial code if digits already entered
-    const digits = nationalNumber.replace(/\D/g, "");
+    const digits = normalizeNational(nationalNumber);
     if (digits) {
       const newDial = `+${getCountryCallingCode(code)}`;
       onChange?.(`${newDial}${digits}`);
@@ -267,8 +279,8 @@ const PhoneInputField: React.FC<PhoneInputProps> = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawInput = e.target.value.replace(/\D/g, ""); // Keep digits only
-    const fullNumber = rawInput ? `${dialCode}${rawInput}` : "";
+    const national = normalizeNational(e.target.value);
+    const fullNumber = national ? `${dialCode}${national}` : "";
     onChange?.(fullNumber);
   };
 
