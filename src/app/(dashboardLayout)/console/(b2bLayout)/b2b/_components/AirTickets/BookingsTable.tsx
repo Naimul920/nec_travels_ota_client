@@ -33,7 +33,6 @@ import {
   FiEdit2,
   FiEye,
   FiRotateCcw,
-  FiSend,
 } from "react-icons/fi";
 
 const { Search } = Input;
@@ -238,6 +237,8 @@ interface BookingsTableProps {
   issueRequest?: boolean;
   /** Read rows from the ticket-issue-requests endpoint instead of bookings. */
   ticketIssueSource?: boolean;
+  /** Status filter for ticket-issue-requests fetch (default: PENDING). */
+  ticketIssueStatus?: string;
 }
 
 function BookingEditModal({
@@ -414,6 +415,7 @@ export default function BookingsTable({
   admin = false,
   issueRequest = false,
   ticketIssueSource = false,
+  ticketIssueStatus = "PENDING",
 }: BookingsTableProps) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -570,7 +572,7 @@ export default function BookingsTable({
           limit: pageSize,
           sortBy: "created_at",
           sortOrder: "desc",
-          status: "PENDING",
+          status: ticketIssueStatus,
         });
         return {
           rows: (res.data ?? []).map(mapIssueRequestRow),
@@ -583,7 +585,7 @@ export default function BookingsTable({
             limit: pageSize,
             status: Array.isArray(status) ? status.join(",") : status,
             searchTerm,
-            bookingSource: bookingSource ?? "B2B",
+            bookingSource,
             sortBy: "created_at",
             sortOrder: "desc",
           })
@@ -628,7 +630,7 @@ export default function BookingsTable({
     const actionColumn = {
       title: "Action",
       dataIndex: "action",
-      width: issueRequest || ticketIssueSource ? 240 : 120,
+      width: ticketIssueSource ? 240 : issueRequest ? 90 : 120,
       align: "center" as const,
       render: (_: string, row: BookingRow) => (
         <div className="flex items-center justify-center gap-2">
@@ -636,16 +638,18 @@ export default function BookingsTable({
             <Link
               href={`/console/bookings/ticket/${encoding(row.key)}`}
               className={`inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold transition-colors ${
-                issueRequest || ticketIssueSource
-                  ? "text-green-600 hover:bg-green-50"
-                  : ""
+                issueRequest
+                  ? "text-blue-600 hover:bg-blue-50"
+                  : ticketIssueSource
+                    ? "text-green-600 hover:bg-green-50"
+                    : ""
               }`}
             >
               <FiEye size={15} />
               {(issueRequest || ticketIssueSource) && "View"}
             </Link>
           )}
-          {issueRequest || ticketIssueSource ? (
+          {ticketIssueSource ? (
             <span className="flex w-full items-center justify-center gap-2">
               <button
                 type="button"
@@ -655,35 +659,24 @@ export default function BookingsTable({
                 <FiRotateCcw size={15} />
                 Cancel / Refund
               </button>
-              {ticketIssueSource ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const issueRow = row as BookingRow & {
-                      issueRequestId: string;
-                      request: TicketIssueRequest;
-                    };
-                    setEditingBooking(row.raw);
-                    setEditingIssueId(issueRow.issueRequestId);
-                    setEditingRequest(issueRow.request ?? null);
-                  }}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
-                >
-                  <FiEdit2 size={15} />
-                  Edit
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleIssueRequest(row)}
-                  className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
-                >
-                  <FiSend size={15} />
-                  Issue
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  const issueRow = row as BookingRow & {
+                    issueRequestId: string;
+                    request: TicketIssueRequest;
+                  };
+                  setEditingBooking(row.raw);
+                  setEditingIssueId(issueRow.issueRequestId);
+                  setEditingRequest(issueRow.request ?? null);
+                }}
+                className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+              >
+                <FiEdit2 size={15} />
+                Edit
+              </button>
             </span>
-          ) : (
+          ) : issueRequest ? null : (
             <>
               <Tooltip title="Cancel / Refund" color="#000">
                 <FiRotateCcw

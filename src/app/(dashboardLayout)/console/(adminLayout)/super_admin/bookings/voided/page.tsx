@@ -1,5 +1,5 @@
-import AdminBookingsTable from "../../_components/AirTickets/AdminBookingsTable";
+import BookingsTable from "../../../../(b2bLayout)/b2b/_components/AirTickets/BookingsTable";
 
 export default function Page() {
-  return <AdminBookingsTable status="VOIDED" />;
+  return <BookingsTable status="VOID" title="Voided Tickets" admin />;
 }
