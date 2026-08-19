@@ -2,11 +2,11 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import dayjs from "dayjs";
 import { Input, Modal, Tooltip } from "antd";
 import type { TablePaginationConfig } from "antd";
 import Table from "@/components/common/Table/Table";
-import ActionButton from "@/components/common/Action/ActionButton";
 import {
   getAdminBookingsAction,
   getBookingsAction,
@@ -16,6 +16,7 @@ import {
   approveTicketIssueAction,
   getTicketIssueRequestsAction,
   rejectTicketIssueAction,
+  requestTicketIssueAction,
   type TicketIssueRequest,
 } from "@/actions/issueTicket.action";
 import { encoding } from "@/utils";
@@ -30,7 +31,9 @@ import {
   FiInbox,
   FiSearch,
   FiEdit2,
+  FiEye,
   FiRotateCcw,
+  FiSend,
 } from "react-icons/fi";
 
 const { Search } = Input;
@@ -113,6 +116,67 @@ const mapBookingRow = (booking: BookingItem) => ({
 
 type BookingRow = ReturnType<typeof mapBookingRow>;
 
+const mapIssueRequestRow = (
+  request: TicketIssueRequest,
+): BookingRow & {
+  issueRequestId: string;
+  requestCreatedAt: string;
+  request: TicketIssueRequest;
+  requestType: string;
+  requestStatus: string;
+  ticketNumber: string;
+  ticketId: string;
+  walletTransactionId: string;
+  reviewedAt: string;
+  rejectReason: string;
+  gdsPnr: string;
+  airlinePnr: string;
+} => {
+  const booking = request.booking;
+  const firstSegment = booking?.booking_segments?.[0];
+  return {
+    key: booking?.id ?? request.booking_id ?? request.id,
+    issueRequestId: request.id,
+    requestCreatedAt: formatDate(request.created_at),
+    request,
+    raw: booking as unknown as BookingItem,
+    bookingReference: booking?.booking_reference ?? "—",
+    bookedOn: formatDate(booking?.created_at ?? request.created_at),
+    applyDate: formatDate(request.created_at),
+    issuedOn: formatDate(request.ticket?.created_at),
+    passenger: (booking?.booking_passengers?.length
+      ? `${booking.booking_passengers.length} PAX`
+      : "—"),
+    origin: firstSegment?.origin_airport_code ?? "—",
+    destination: firstSegment?.destination_airport_code ?? "—",
+    airline: firstSegment?.airline_code ?? "—",
+    flightNumber: firstSegment?.flight_number ?? "—",
+    pnr: booking?.gds_pnr ?? "—",
+    grossAmount: Number(
+      booking?.booking_fare?.gross_fare ??
+        booking?.total_amount ??
+        0,
+    ),
+    discountAmount: Number(booking?.booking_fare?.discount ?? 0),
+    refundAmount: 0,
+    currency: booking?.currency?.symbol ?? "৳",
+    travel_date: formatDate(firstSegment?.departure_at),
+    status: (request.status ?? booking?.status ?? "").toLowerCase(),
+    remarks: request.remarks ?? "—",
+    requestType: request.type ?? "—",
+    requestStatus: request.status ?? "—",
+    ticketNumber: request.ticket_number ?? request.ticket?.ticket_number ?? "—",
+    ticketId: request.ticket_id ?? "—",
+    walletTransactionId: request.wallet_transaction_id ?? "—",
+    reviewedAt: request.reviewed_at
+      ? dayjs(request.reviewed_at).format("DD-MM-YYYY")
+      : "—",
+    rejectReason: request.reject_reason ?? "—",
+    gdsPnr: booking?.gds_pnr ?? "—",
+    airlinePnr: firstSegment?.airline_pnr ?? "—",
+  };
+};
+
 function StatusBadge({ status }: { status: string }) {
   const Icon = STATUS_ICON[status] ?? FiClock;
   return (
@@ -170,52 +234,71 @@ interface BookingsTableProps {
   refundAmount?: boolean;
   /** Fetch from the admin all-bookings endpoint (admin / super admin). */
   admin?: boolean;
+  /** Show an "Issue Request" action (hides Remarks column and Edit button). */
+  issueRequest?: boolean;
+  /** Read rows from the ticket-issue-requests endpoint instead of bookings. */
+  ticketIssueSource?: boolean;
 }
 
 function BookingEditModal({
   booking,
   issueId,
+  request,
   open,
   onClose,
   onSaved,
 }: {
   booking: BookingItem;
   issueId?: string;
+  request?: TicketIssueRequest | null;
   open: boolean;
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const firstSegment = booking.booking_segments?.[0];
-  const pax = (booking.booking_passengers ?? [])
-    .map((p) =>
-      `${p.title ? `${p.title} ` : ""}${p.first_name} ${p.last_name}`.trim(),
-    )
-    .join(", ");
-  const route = firstSegment
-    ? `${firstSegment.origin_airport_code} - ${firstSegment.destination_airport_code}`
-    : "—";
+  const wt = request?.wallet_transaction;
+  const amount = Number(wt?.amount ?? booking.total_amount ?? 0);
 
   const [ticketNo, setTicketNo] = useState("");
-  const [grossAmount, setGrossAmount] = useState(() =>
-    String(booking.booking_fare?.gross_fare ?? booking.total_amount ?? ""),
-  );
-  const [netAmount, setNetAmount] = useState(() =>
-    String(booking.booking_fare?.offer_amount ?? booking.total_amount ?? ""),
-  );
 
-  const rows = [
-    { label: "BOOKING REF.", value: booking.booking_reference ?? "—" },
-    { label: "PAX", value: pax || "—" },
-    { label: "GDS PNR", value: booking.gds_pnr ?? booking.provider_booking_id ?? "—" },
-    { label: "AIR LINES PNR", value: firstSegment?.airline_pnr ?? "—" },
-    {
-      label: "TRAVEL DATE",
-      value: firstSegment?.departure_at
-        ? dayjs(firstSegment.departure_at).format("DD-MM-YYYY")
-        : "—",
-    },
-    { label: "ROUTE", value: route },
-  ];
+  const requestRows = request
+    ? [
+        {
+          label: "REQUESTED ON",
+          value: request.created_at
+            ? dayjs(request.created_at).format("DD-MM-YYYY hh:mm A")
+            : "—",
+        },
+        { label: "REQUEST STATUS", value: request.status ?? "—" },
+        {
+          label: "WALLET DEBIT",
+          value: wt
+            ? `${booking.currency?.symbol ?? "৳"}${amount.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`
+            : "—",
+        },
+        {
+          label: "BALANCE BEFORE",
+          value: wt?.balance_before
+            ? `${booking.currency?.symbol ?? "৳"}${Number(wt.balance_before).toLocaleString(
+                "en-IN",
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+              )}`
+            : "—",
+        },
+        {
+          label: "BALANCE AFTER",
+          value: wt?.balance_after
+            ? `${booking.currency?.symbol ?? "৳"}${Number(wt.balance_after).toLocaleString(
+                "en-IN",
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+              )}`
+            : "—",
+        },
+        { label: "REMARKS", value: request.remarks || "—" },
+      ]
+    : [];
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -242,9 +325,10 @@ function BookingEditModal({
 
     setIsSaving(true);
     const res = await approveTicketIssueAction(issueId, {
-      ticket_numbers: [ticketNo.trim()],
-      ...(grossAmount.trim() ? { gross_amount: Number(grossAmount) } : {}),
-      ...(netAmount.trim() ? { net_amount: Number(netAmount) } : {}),
+      ticket_numbers: ticketNo
+        .split(",")
+        .map((n) => n.trim())
+        .filter(Boolean),
     });
     setIsSaving(false);
 
@@ -274,57 +358,44 @@ function BookingEditModal({
         if (!isSaving) onClose();
       }}
       onOk={handleSave}
-      okText="Save"
-      cancelText="Cancel"
+      okText="Approve"
+      cancelText="Close"
       confirmLoading={isSaving}
       destroyOnHidden
     >
       <div className="mt-4">
-        <div className="divide-y divide-gray-100 rounded-md border border-gray-200">
-          {rows.map((row) => (
-            <div
-              key={row.label}
-              className="flex items-center justify-between gap-4 px-3 py-2"
-            >
-              <span className="w-32 shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                {row.label}
-              </span>
-              <span className="text-sm font-medium text-gray-900">
-                {row.value}
-              </span>
+        {requestRows.length > 0 && (
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+              Issue Request Details
+            </p>
+            <div className="divide-y divide-gray-100 rounded-md border border-blue-200 bg-blue-50/40">
+              {requestRows.map((row) => (
+                <div
+                  key={row.label}
+                  className="flex items-center justify-between gap-4 px-3 py-2"
+                >
+                  <span className="w-32 shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    {row.label}
+                  </span>
+                  <span className="text-right text-sm font-medium text-gray-900">
+                    {row.value}
+                  </span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-3">
           <label className="flex flex-col gap-1">
             <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
               Ticket No <span className="text-red-500">*</span>
             </span>
             <Input
               value={ticketNo}
-              placeholder="Enter ticket number"
+              placeholder="Enter ticket number (comma-separated for multiple)"
               onChange={(e) => setTicketNo(e.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-              Gross Amount
-            </span>
-            <Input
-              value={grossAmount}
-              placeholder="Gross amount"
-              onChange={(e) => setGrossAmount(e.target.value)}
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-              Net Amount
-            </span>
-            <Input
-              value={netAmount}
-              placeholder="Net amount"
-              onChange={(e) => setNetAmount(e.target.value)}
             />
           </label>
         </div>
@@ -341,6 +412,8 @@ export default function BookingsTable({
   applyDate = false,
   refundAmount = false,
   admin = false,
+  issueRequest = false,
+  ticketIssueSource = false,
 }: BookingsTableProps) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -348,6 +421,9 @@ export default function BookingsTable({
   const [editingBooking, setEditingBooking] = useState<BookingItem | null>(
     null,
   );
+  const [editingIssueId, setEditingIssueId] = useState<string | null>(null);
+  const [editingRequest, setEditingRequest] =
+    useState<TicketIssueRequest | null>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const queryClient = useQueryClient();
 
@@ -371,6 +447,9 @@ export default function BookingsTable({
 
   const refresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["b2b-bookings"] });
+    queryClient.invalidateQueries({
+      queryKey: ["ticket-issue-requests-table"],
+    });
     queryClient.invalidateQueries({
       queryKey: ["ticket-issue-requests", "BookingsTable"],
     });
@@ -396,7 +475,10 @@ export default function BookingsTable({
 
       if (!isConfirmed || !reason?.trim()) return;
 
-      const issueId = issueIdByBooking.get(row.key);
+      const issueId =
+        "issueRequestId" in row
+          ? (row as BookingRow & { issueRequestId: string }).issueRequestId
+          : issueIdByBooking.get(row.key);
       if (!issueId) {
         Swal.fire({
           icon: "error",
@@ -431,9 +513,49 @@ export default function BookingsTable({
     [refresh, issueIdByBooking],
   );
 
+  const handleIssueRequest = useCallback(
+    async (row: BookingRow) => {
+      const { isConfirmed } = await Swal.fire({
+        title: "Request Ticket Issue",
+        text: `Send an issue request for booking (${row.bookingReference ?? ""})?`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#0F1B47",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: "Send Request",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      });
+
+      if (!isConfirmed) return;
+
+      const res = await requestTicketIssueAction(
+        row.key,
+        "Please issue the ticket as soon as possible",
+      );
+
+      if (res.success) {
+        Swal.fire(
+          "Issue Requested",
+          res.message || "Ticket issue request sent successfully.",
+          "success",
+        );
+        refresh();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Request Ticket Issue",
+          text: res.message || "Something went wrong. Please try again.",
+          confirmButtonColor: "#0F1B47",
+        });
+      }
+    },
+    [refresh],
+  );
+
   const { data, isPending: isLoading } = useQuery({
     queryKey: [
-      "b2b-bookings",
+      ticketIssueSource ? "ticket-issue-requests-table" : "b2b-bookings",
       admin ? "admin" : "mine",
       status,
       bookingSource,
@@ -442,6 +564,19 @@ export default function BookingsTable({
       searchTerm,
     ],
     queryFn: async () => {
+      if (ticketIssueSource) {
+        const res = await getTicketIssueRequestsAction({
+          page,
+          limit: pageSize,
+          sortBy: "created_at",
+          sortOrder: "desc",
+          status: "PENDING",
+        });
+        return {
+          rows: (res.data ?? []).map(mapIssueRequestRow),
+          total: res.meta?.total ?? res.data?.length ?? 0,
+        };
+      }
       const res = admin
         ? await getAdminBookingsAction({
             page,
@@ -479,17 +614,220 @@ export default function BookingsTable({
     }, 400);
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        title: "SL",
-        dataIndex: "sl",
-        width: 56,
-        align: "center" as const,
-        render: (v: number) => (
-          <span className="text-sm font-medium text-[#8FA9BE]">{v}</span>
-        ),
-      },
+  const columns = useMemo(() => {
+    const slColumn = {
+      title: "SL",
+      dataIndex: "sl",
+      width: 56,
+      align: "center" as const,
+      render: (v: number) => (
+        <span className="text-sm font-medium text-[#8FA9BE]">{v}</span>
+      ),
+    };
+
+    const actionColumn = {
+      title: "Action",
+      dataIndex: "action",
+      width: issueRequest || ticketIssueSource ? 240 : 120,
+      align: "center" as const,
+      render: (_: string, row: BookingRow) => (
+        <div className="flex items-center justify-center gap-2">
+          {(row?.pnr || ticketIssueSource) && (
+            <Link
+              href={`/console/bookings/ticket/${encoding(row.key)}`}
+              className={`inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold transition-colors ${
+                issueRequest || ticketIssueSource
+                  ? "text-green-600 hover:bg-green-50"
+                  : ""
+              }`}
+            >
+              <FiEye size={15} />
+              {(issueRequest || ticketIssueSource) && "View"}
+            </Link>
+          )}
+          {issueRequest || ticketIssueSource ? (
+            <span className="flex w-full items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleCancelRefund(row)}
+                className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-amber-600 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-amber-700"
+              >
+                <FiRotateCcw size={15} />
+                Cancel / Refund
+              </button>
+              {ticketIssueSource ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const issueRow = row as BookingRow & {
+                      issueRequestId: string;
+                      request: TicketIssueRequest;
+                    };
+                    setEditingBooking(row.raw);
+                    setEditingIssueId(issueRow.issueRequestId);
+                    setEditingRequest(issueRow.request ?? null);
+                  }}
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+                >
+                  <FiEdit2 size={15} />
+                  Edit
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleIssueRequest(row)}
+                  className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+                >
+                  <FiSend size={15} />
+                  Issue
+                </button>
+              )}
+            </span>
+          ) : (
+            <>
+              <Tooltip title="Cancel / Refund" color="#000">
+                <FiRotateCcw
+                  size={20}
+                  className="cursor-pointer text-amber-600 hover:text-amber-700"
+                  onClick={() => handleCancelRefund(row)}
+                />
+              </Tooltip>
+              <Tooltip title="Edit" color="#000">
+                <FiEdit2
+                  size={20}
+                  className="cursor-pointer text-blue-600 hover:text-blue-700"
+                  onClick={() => setEditingBooking(row.raw)}
+                />
+              </Tooltip>
+            </>
+          )}
+        </div>
+      ),
+    };
+
+    if (ticketIssueSource) {
+      return [
+        slColumn,
+        {
+          title: "Booking Date",
+          dataIndex: "bookedOn",
+          width: 130,
+          render: (v: string) => (
+            <span className="inline-flex items-center gap-1.5 text-sm text-[#5B6B7A]">
+              <FiCalendar size={13} className="text-[#8FA9BE]" />
+              {v}
+            </span>
+          ),
+        },
+        {
+          title: "Request Date",
+          dataIndex: "requestCreatedAt",
+          width: 130,
+          render: (v: string) => (
+            <span className="inline-flex items-center gap-1.5 text-sm text-[#5B6B7A]">
+              <FiCalendar size={13} className="text-[#8FA9BE]" />
+              {v}
+            </span>
+          ),
+        },
+        {
+          title: "Booking Ref.",
+          dataIndex: "bookingReference",
+          width: 160,
+          render: (v: string) => (
+            <span className="font-semibold text-[#0F1B47]">{v}</span>
+          ),
+        },
+        {
+          title: "PAX",
+          dataIndex: "passenger",
+          width: 150,
+          render: (v: string) => (
+            <span className="text-sm text-[#5B6B7A]">{v}</span>
+          ),
+        },
+        {
+          title: "GDS PNR",
+          dataIndex: "gdsPnr",
+          width: 110,
+          render: (v: string) => (
+            <span className="font-mono text-sm font-semibold tracking-wide text-[#0F1B47]">
+              {v}
+            </span>
+          ),
+        },
+        {
+          title: "Air Lines PNR",
+          dataIndex: "airlinePnr",
+          width: 120,
+          render: (v: string) => (
+            <span className="font-mono text-sm font-semibold tracking-wide text-[#0F1B47]">
+              {v}
+            </span>
+          ),
+        },
+        {
+          title: "Travel Date",
+          dataIndex: "travel_date",
+          width: 130,
+          render: (v: string) => (
+            <span className="inline-flex items-center gap-1.5 text-sm text-[#5B6B7A]">
+              <FiCalendar size={13} className="text-[#8FA9BE]" />
+              {v}
+            </span>
+          ),
+        },
+        {
+          title: "Route",
+          dataIndex: "route",
+          width: 160,
+          render: (_: string, row: BookingRow) => (
+            <RouteCell origin={row.origin} destination={row.destination} />
+          ),
+        },
+        {
+          title: "Airlines",
+          dataIndex: "airline",
+          width: 110,
+          render: (v: string, row: BookingRow) => (
+            <div className="flex flex-col">
+              <span className="font-semibold uppercase text-[#0F1B47]">
+                {v}
+              </span>
+              <span className="text-xs text-[#8FA9BE]">{row.flightNumber}</span>
+            </div>
+          ),
+        },
+        {
+          title: "Gross",
+          dataIndex: "grossAmount",
+          width: 120,
+          align: "right" as const,
+          render: (v: number, row: BookingRow) => (
+            <span className="font-semibold text-[#0F1B47]">
+              {row.currency}
+              {formatAmount(v)}
+            </span>
+          ),
+        },
+        {
+          title: "Dis. Fare",
+          dataIndex: "discountAmount",
+          width: 110,
+          align: "right" as const,
+          render: (v: number, row: BookingRow) => (
+            <span className="font-semibold text-emerald-600">
+              {row.currency}
+              {formatAmount(v)}
+            </span>
+          ),
+        },
+        actionColumn,
+      ];
+    }
+
+    return [
+      slColumn,
       ...(applyDate
         ? [
             {
@@ -620,48 +958,23 @@ export default function BookingsTable({
         width: 110,
         render: (v: string) => <StatusBadge status={v} />,
       },
-      {
-        title: "Remarks",
-        dataIndex: "remarks",
-        width: 180,
-        render: (v: string) => (
-          <span className="line-clamp-1 text-xs text-[#5B6B7A]" title={v}>
-            {v}
-          </span>
-        ),
-      },
-      {
-        title: "Action",
-        dataIndex: "action",
-        width: 120,
-        align: "center" as const,
-        render: (_: string, row: BookingRow) => (
-          <div className="flex items-center justify-center gap-2">
-            {row?.pnr && (
-              <ActionButton
-                viewLink={`/console/bookings/ticket/${encoding(row.key)}`}
-              />
-            )}
-            <Tooltip title="Cancel / Refund" color="#000">
-              <FiRotateCcw
-                size={20}
-                className="cursor-pointer text-amber-600 hover:text-amber-700"
-                onClick={() => handleCancelRefund(row)}
-              />
-            </Tooltip>
-            <Tooltip title="Edit" color="#000">
-              <FiEdit2
-                size={20}
-                className="cursor-pointer text-blue-600 hover:text-blue-700"
-                onClick={() => setEditingBooking(row.raw)}
-              />
-            </Tooltip>
-          </div>
-        ),
-      },
-    ],
-    [applyDate, dateColumn, refundAmount, handleCancelRefund],
-  );
+      ...(issueRequest
+        ? []
+        : [
+            {
+              title: "Remarks",
+              dataIndex: "remarks",
+              width: 180,
+              render: (v: string) => (
+                <span className="line-clamp-1 text-xs text-[#5B6B7A]" title={v}>
+                  {v}
+                </span>
+              ),
+            },
+          ]),
+      actionColumn,
+    ];
+  }, [applyDate, dateColumn, refundAmount, handleCancelRefund, issueRequest, ticketIssueSource, handleIssueRequest]);
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
     setPage(pagination.current ?? 1);
@@ -706,9 +1019,16 @@ export default function BookingsTable({
       {editingBooking && (
         <BookingEditModal
           booking={editingBooking}
-          issueId={issueIdByBooking.get(editingBooking.id)}
+          issueId={
+            editingIssueId ?? issueIdByBooking.get(editingBooking.id) ?? undefined
+          }
+          request={editingRequest}
           open
-          onClose={() => setEditingBooking(null)}
+          onClose={() => {
+            setEditingBooking(null);
+            setEditingIssueId(null);
+            setEditingRequest(null);
+          }}
           onSaved={refresh}
         />
       )}

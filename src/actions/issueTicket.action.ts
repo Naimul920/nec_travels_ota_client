@@ -123,6 +123,57 @@ export interface TicketIssueRequest {
   reject_reason?: string | null;
   remarks?: string | null;
   created_at?: string;
+  booking?: {
+    id?: string;
+    booking_reference?: string;
+    status?: string;
+    total_amount?: string;
+    created_at?: string;
+    updated_at?: string;
+    gds_pnr?: string;
+    currency?: { id?: string; code?: string; symbol?: string } | null;
+    booking_fare?: {
+      base_fare?: string;
+      tax?: string;
+      gross_fare?: string;
+      ait?: string;
+      service_charge?: string;
+      discount?: string;
+      offer_amount?: string;
+      total_amount?: string;
+    } | null;
+    booking_passengers?: Array<{
+      id?: string;
+      title?: string;
+      first_name?: string;
+      last_name?: string;
+      passenger_type?: string;
+    }>;
+    booking_segments?: Array<{
+      airline?: string;
+      flight_number?: string;
+      airline_code?: string;
+      origin_airport_code?: string;
+      destination_airport_code?: string;
+      departure_at?: string;
+      arrival_at?: string;
+      airline_pnr?: string;
+    }>;
+  } | null;
+  ticket?: {
+    id?: string;
+    ticket_number?: string | null;
+    status?: string;
+    created_at?: string;
+  } | null;
+  wallet_transaction?: {
+    id?: string;
+    amount?: string;
+    balance_before?: string;
+    balance_after?: string;
+    description?: string;
+    created_at?: string;
+  } | null;
 }
 
 export interface TicketIssueRequestMeta {
@@ -159,6 +210,7 @@ export async function getTicketIssueRequestsAction(
         page: params.page ?? 1,
         limit: params.limit ?? 10,
         sortBy: params.sortBy ?? "created_at",
+        sortOrder: params.sortOrder ?? "desc",
         ...(params.status ? { status: params.status } : {}),
       },
     });

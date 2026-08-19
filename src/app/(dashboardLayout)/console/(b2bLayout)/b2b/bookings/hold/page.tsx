@@ -6,6 +6,7 @@ function B2bHoldPage() {
       status={["HOLD", "ISSUE_PENDING"]}
       title="Hold Tickets"
       bookingSource="B2B"
+      issueRequest
     />
   );
 }

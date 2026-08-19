@@ -6,6 +6,7 @@ function IssueRequestPage() {
       status="ISSUE_PENDING"
       title="Issue Request"
       admin
+      ticketIssueSource
     />
   );
 }

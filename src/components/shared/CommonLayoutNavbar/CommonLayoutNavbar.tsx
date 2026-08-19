@@ -36,7 +36,9 @@ function Avatar({
 }) {
   return (
     <div
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-linear-to-br from-brand to-emerald-600 ${size}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full ${size} ${
+        src ? "" : "bg-linear-to-br from-brand to-emerald-600"
+      }`}
     >
       {src ? (
         <img src={src} alt="Profile" className="h-full w-full object-cover" />
