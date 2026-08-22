@@ -15,7 +15,7 @@ export default function PopularDestination() {
     "M120 40c16-6 34 0 40 14 6 14-2 28-18 32-14 4-28-4-32-16-4-12 2-24 10-30Z",
   ];
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#F0F6F3] via-[#FBFDFC] to-[#F0F6F3] py-20 text-slate-900">
+    <section className="relative overflow-hidden border-t border-emerald-950/5 bg-[#f4faf7] py-16 text-slate-900 sm:py-20 lg:py-24">
       {/* Background Ambient Glows */}
       <div className="pointer-events-none absolute -left-40 top-1/4 h-96 w-96 rounded-full bg-brand/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-40 bottom-1/4 h-96 w-96 rounded-full bg-brand/[0.07] blur-3xl" />
@@ -45,7 +45,7 @@ export default function PopularDestination() {
       </svg>
 
       {/* Unified Header */}
-      <div className="relative z-10 flex justify-center px-4 mb-20 sm:mb-28">
+      <div className="relative z-10 mx-auto mb-12 flex max-w-7xl justify-center px-4 sm:mb-16 sm:px-6 lg:px-8">
         <div className="relative flex flex-col items-center">
           <div className="mb-4 inline-flex items-center rounded-full border border-brand/30 bg-brand/10 px-4 py-1 backdrop-blur-sm">
             <span className="font-plex-mono text-xs font-semibold tracking-[0.3em] uppercase text-brand">
@@ -53,15 +53,15 @@ export default function PopularDestination() {
             </span>
           </div>
 
-          <h1 className="relative text-center text-4xl font-bold tracking-tight text-slate-900 md:text-5xl xl:text-6xl">
+          <h2 className="relative text-center font-grotesk text-3xl font-bold tracking-tight text-[#12233D] sm:text-4xl lg:text-5xl">
             <span>Popular </span>
             <span className="text-brand">Destination</span>
 
             <AirplaneIcon className="absolute -right-7 -top-6 h-8 w-8 -rotate-45 text-brand drop-shadow-[0_0_12px_rgba(0,165,80,0.35)] md:-right-9 md:-top-7 md:h-10 md:w-10" />
-          </h1>
+          </h2>
 
-          <DashedLineSvg className="absolute left-1/2 top-16 hidden -translate-x-1/2 text-brand/30 lg:block" />
-          <BottomAirplanesSvg className="absolute -bottom-16 left-1/2 hidden -translate-x-1/2 text-brand/40 lg:block" />
+          <DashedLineSvg className="absolute left-1/2 top-14 hidden -translate-x-1/2 text-brand/20 lg:block" />
+          <BottomAirplanesSvg className="absolute -bottom-12 left-1/2 hidden -translate-x-1/2 text-brand/30 lg:block" />
         </div>
       </div>
 

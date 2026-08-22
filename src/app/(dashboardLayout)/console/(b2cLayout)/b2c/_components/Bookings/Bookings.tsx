@@ -314,18 +314,13 @@ export default function Bookings() {
             {row?.pnr && (
               <ActionButton
                 viewLink={`/console/bookings/ticket/${encoding(row.key)}`}
-                handleDelete={
-                  activeTab === "hold"
-                    ? () => console.log("delete", row.pnr)
-                    : undefined
-                }
               />
             )}
           </div>
         ),
       },
     ],
-    [activeTab],
+    [],
   );
 
   return (

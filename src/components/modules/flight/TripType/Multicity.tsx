@@ -4,9 +4,10 @@ import React from "react";
 import { DatePicker } from "antd";
 import type { GetProps } from "antd";
 import dayjs from "dayjs";
-import { FaPlus, FaMinus } from "react-icons/fa";
-import { Button } from "@/components/ui";
+import { FaPlus } from "react-icons/fa";
+import { FiTrash2 } from "react-icons/fi";
 import SearchCity, {
+  DEFAULT_AIRPORT_DAC,
   DEFAULT_AIRPORT_CXB,
 } from "../SearchCity/SearchCity";
 import AirpotSwap from "../SearchCity/AirpotSwap";
@@ -32,6 +33,7 @@ interface MultiCityProps {
     city?: string,
   ) => void;
   setData: React.Dispatch<React.SetStateAction<MultiCityRow[]>>;
+  onRemoveRow: (index: number) => void;
   traveler: TravelerValue;
   changeTraveler: <K extends keyof TravelerValue>(
     field: K,
@@ -43,6 +45,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
   data,
   onChange,
   setData,
+  onRemoveRow,
   traveler,
   changeTraveler,
 }) => {
@@ -83,21 +86,30 @@ const MultiCity: React.FC<MultiCityProps> = ({
     ]);
   };
 
-  const removeRow = () => {
-    if (data.length > 1) {
-      setData((prev) => prev.slice(0, -1));
-    }
-  };
-
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="col-span-12 lg:col-span-9 flex flex-col gap-4">
+      <div className="col-span-12 flex flex-col gap-3 lg:col-span-9">
         {data.map((row, index) => (
           <div
             key={`leg-${index}`}
-            className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center"
+            className="relative grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-2 pt-12 sm:grid-cols-2 sm:pt-2 md:grid-cols-3"
           >
-            <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2">
+            <div className="absolute right-2 top-2 flex items-center gap-2 sm:right-3 sm:top-1/2 sm:-translate-y-1/2 md:static md:col-span-3 md:mb-[-0.25rem] md:ml-auto md:translate-y-0">
+              <span className="text-xs font-semibold text-slate-400">
+                Flight {index + 1}
+              </span>
+              {data.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => onRemoveRow(index)}
+                  aria-label={`Remove flight ${index + 1}`}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-white text-rose-500 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+                >
+                  <FiTrash2 aria-hidden="true" />
+                </button>
+              )}
+            </div>
+            <div className="relative grid grid-cols-1 gap-3 sm:col-span-2 sm:grid-cols-2 md:col-span-2">
 {/* Departure City */}
               <SearchCity
                 value={row.fromIata || ""}
@@ -105,6 +117,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
                 excludeIata={row.toIata}
                 placeholder="Leaving from"
                 cityName={row.fromName}
+                defaultAirport={DEFAULT_AIRPORT_DAC}
               />
 
               {/* Swap button between fields */}
@@ -122,8 +135,8 @@ const MultiCity: React.FC<MultiCityProps> = ({
             </div>
 
             {/* Departure Date */}
-            <div className="relative flex min-h-[72px] flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:shadow-md">
-              <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
+            <div className="relative flex min-h-20 flex-col justify-center rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
+              <p className="mb-1 select-none text-[10px] font-bold uppercase tracking-[0.12em] text-brand">
                 Departure Date
               </p>
               <DatePicker
@@ -136,7 +149,7 @@ const MultiCity: React.FC<MultiCityProps> = ({
                 allowClear={false}
                 disabledDate={disabledDate(index)}
               />
-              <p className="mt-0.5 line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
+              <p className="mt-1 line-clamp-1 select-none text-[10px] font-medium uppercase text-slate-400">
                 {row.departureDate
                   ? dayjs(row.departureDate).format("dddd")
                   : "Select Date"}
@@ -146,30 +159,19 @@ const MultiCity: React.FC<MultiCityProps> = ({
         ))}
       </div>
 
-      <div className="col-span-12 lg:col-span-3 flex flex-col gap-4 justify-between">
+      <div className="col-span-12 flex flex-col justify-between gap-3 lg:col-span-3">
         <TravelerCalculate value={traveler} onChange={changeTraveler} />
 
-        <div className="flex gap-2">
-          <Button
+        <div>
+          <button
             type="button"
             onClick={addRow}
             disabled={data.length >= 5}
-            className={`flex-1 bg-primary text-white p-3 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity ${
-              data.length >= 5 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <FaPlus /> Add City
-          </Button>
-          <Button
-            type="button"
-            onClick={removeRow}
-            disabled={data.length <= 1}
-            className={`bg-red-500 text-white p-3 rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity ${
-              data.length <= 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <FaMinus />
-          </Button>
+            <FaPlus aria-hidden="true" />
+            {data.length >= 5 ? "Maximum 5 flights" : "Add another flight"}
+          </button>
         </div>
       </div>
     </div>

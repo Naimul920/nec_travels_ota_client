@@ -36,8 +36,6 @@ const CreditRequestAdd: React.FC = () => {
     }
   }, [pnr]);
 
-  console.log(parsed);
-
   if (!parsed)
     return (
       <Error

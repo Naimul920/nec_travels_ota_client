@@ -2,6 +2,7 @@
 
 import React from "react";
 import SearchCity, {
+  DEFAULT_AIRPORT_DAC,
   DEFAULT_AIRPORT_CXB,
 } from "../SearchCity/SearchCity";
 import AirpotSwap from "../SearchCity/AirpotSwap";
@@ -63,8 +64,8 @@ const Roundtrip: React.FC<RoundtripProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-      <div className="relative grid grid-cols-1 sm:grid-cols-2 gap-4 md:col-span-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="relative grid grid-cols-1 gap-3 sm:col-span-2 sm:grid-cols-2 lg:col-span-2">
         {/* Departure Airport Selector */}
         <SearchCity
           value={data.fromIata}
@@ -72,6 +73,7 @@ const Roundtrip: React.FC<RoundtripProps> = ({
           excludeIata={data.toIata}
           placeholder="Leaving from"
           cityName={data.fromName}
+          defaultAirport={DEFAULT_AIRPORT_DAC}
         />
 
         {/* Swap button between fields */}
@@ -89,8 +91,8 @@ const Roundtrip: React.FC<RoundtripProps> = ({
       </div>
 
       {/* Departure Date Picker */}
-      <div className="relative flex min-h-[72px] flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:shadow-md">
-        <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
+      <div className="relative flex min-h-20 flex-col justify-center rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
+        <p className="mb-1 select-none text-[10px] font-bold uppercase tracking-[0.12em] text-brand">
           Departure Date
         </p>
 
@@ -103,7 +105,7 @@ const Roundtrip: React.FC<RoundtripProps> = ({
           disabledDate={disabledDeparture}
         />
 
-        <p className="mt-0.5 line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
+        <p className="mt-1 line-clamp-1 select-none text-[10px] font-medium uppercase text-slate-400">
           {data.departureDate
             ? dayjs(data.departureDate).format("dddd")
             : "Select Date"}
@@ -111,8 +113,8 @@ const Roundtrip: React.FC<RoundtripProps> = ({
       </div>
 
       {/* Return Date Picker */}
-      <div className="relative flex min-h-[72px] flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-colors focus-within:border-primary focus-within:shadow-md">
-        <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
+      <div className="relative flex min-h-20 flex-col justify-center rounded-xl border border-slate-200 bg-white px-4 transition focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
+        <p className="mb-1 select-none text-[10px] font-bold uppercase tracking-[0.12em] text-brand">
           Return Date
         </p>
 
@@ -125,7 +127,7 @@ const Roundtrip: React.FC<RoundtripProps> = ({
           disabledDate={disabledReturn}
         />
 
-        <p className="mt-0.5 line-clamp-1 select-none text-[10px] font-normal uppercase text-gray-400">
+        <p className="mt-1 line-clamp-1 select-none text-[10px] font-medium uppercase text-slate-400">
           {data.returnDate
             ? dayjs(data.returnDate).format("dddd")
             : "Select Date"}

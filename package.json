@@ -7,7 +7,8 @@
     "dev": "bun --bun next dev --port 3000",
     "build": "bun --bun next build",
     "start": "bun --bun next start --port 3027",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.2",
@@ -22,7 +23,6 @@
     "formik": "^2.4.9",
     "html2canvas-pro": "^2.3.8",
     "jspdf": "^4.2.1",
-    "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.13.10",
     "next": "16.2.10",
     "react": "19.2.4",

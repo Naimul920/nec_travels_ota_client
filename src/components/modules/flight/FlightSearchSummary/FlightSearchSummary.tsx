@@ -3,7 +3,6 @@
 import React, { useMemo } from "react";
 // 2. Swapped useLocation from 'react-router-dom' to Next.js native hooks
 import { useSearchParams } from "next/navigation";
-import { Button } from "../../../ui";
 import dayjs from "dayjs";
 import Flight from "../Flight";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
@@ -71,28 +70,46 @@ const FlightSearchSummary: React.FC = () => {
   return (
     <>
       {/* ===== SUMMARY CARD ===== */}
-      <div className="bg-white shadow my-3 md:mt-0">
+      <section className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-3 sm:px-5">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">Your itinerary</p>
+            <p className="mt-0.5 text-xs font-medium text-slate-500">
+              {segments.length} {segments.length === 1 ? "flight leg" : "flight legs"} · {params.get("cabin") || "Economy"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => modifySearch()}
+            aria-expanded={Boolean(flight?.isModifySearch)}
+            className={`inline-flex h-10 items-center gap-1.5 rounded-xl px-4 text-xs font-bold transition ${
+              flight?.isModifySearch
+                ? "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                : "bg-[#12233D] text-white hover:bg-[#1b3457]"
+            }`}
+          >
+            {flight?.isModifySearch ? "Close search" : "Modify search"}
+            {flight?.isModifySearch ? <BiChevronUp size={16} /> : <BiChevronDown size={16} />}
+          </button>
+        </div>
         {segments.map((seg, index) => (
           <div
             key={index}
-            className="grid grid-cols-12 items-center gap-2 px-3 py-2 border-b border-gray-200 last:border-none"
+            className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-100 px-4 py-4 last:border-none sm:px-5"
           >
-            {/* LEFT CONTENT */}
-            <div className="col-span-11 flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
-              {/* Trip type */}
-              <span className="text-sm font-semibold uppercase text-primary">
-                {tripType}
+              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-brand">
+                {tripType === "multicity" ? `Leg ${index + 1}` : tripType.replace("trip", " trip")}
               </span>
 
-              {/* Route */}
-              <span className="text-balance md:font-bold font-medium">
-                {seg.from} → {seg.to}
-              </span>
+              <div className="flex items-center gap-2 font-grotesk text-lg font-bold text-[#12233D] sm:text-xl">
+                <span>{seg.from}</span>
+                <span className="text-brand">→</span>
+                <span>{seg.to}</span>
+              </div>
 
-              {/* Date */}
-              <div className="md:ml-auto flex items-center">
+              <div className="flex items-center text-xs font-semibold text-slate-600 sm:ml-auto sm:text-sm">
                 {seg.date && (
-                  <span className="text-balance md:font-bold font-medium text-gray-700">
+                  <span>
                     {dayjs(seg.date).format("DD MMM YYYY")}
                   </span>
                 )}
@@ -100,43 +117,20 @@ const FlightSearchSummary: React.FC = () => {
                 {seg.returnDate && (
                   <>
                     {" - "}
-                    <span className="text-balance md:font-bold font-medium text-gray-700">
+                    <span>
                       {dayjs(seg.returnDate).format("DD MMM YYYY")}
                     </span>
                   </>
                 )}
               </div>
 
-              {/* Passenger */}
-              <span className="text-[10px] text-gray-500">
+              <span className="w-full text-[11px] font-medium text-slate-400 sm:w-auto">
                 Adt {passengers.adult}, Chd {passengers.child}, Kid{" "}
                 {passengers.kid}, Inf {passengers.infant}
               </span>
-            </div>
-
-            {/* RIGHT BUTTON */}
-            {index === 0 && (
-              <div className="col-span-1 flex justify-end">
-                <Button
-                  onClick={() => modifySearch()}
-                  className={`flex items-center gap-1 px-3 py-1 text-xs font-medium transition-all ${
-                    flight?.isModifySearch
-                      ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      : "bg-primary text-white"
-                  }`}
-                >
-                  {flight?.isModifySearch ? "Hide" : "Modify"}
-                  {flight?.isModifySearch ? (
-                    <BiChevronUp size={14} />
-                  ) : (
-                    <BiChevronDown size={14} />
-                  )}
-                </Button>
-              </div>
-            )}
           </div>
         ))}
-      </div>
+      </section>
 
       {/* ===== TOGGLE SEARCH FORM ===== */}
       <div
@@ -147,7 +141,7 @@ const FlightSearchSummary: React.FC = () => {
         }`}
       >
         {flight?.isModifySearch && (
-          <div className="p-4 md:p-6 bg-white rounded-md shadow-sm mb-10">
+          <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
             <Flight useFlight="search" />
           </div>
         )}

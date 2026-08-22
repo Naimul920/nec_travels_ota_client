@@ -1,6 +1,6 @@
 import FlightBooking from "@/components/modules/flight/FlightBooking/FlightBooking";
 
-function page() {
+function FlightBookingPage() {
   return (
     <>
       <FlightBooking />
@@ -8,4 +8,4 @@ function page() {
   );
 }
 
-export default page;
+export default FlightBookingPage;

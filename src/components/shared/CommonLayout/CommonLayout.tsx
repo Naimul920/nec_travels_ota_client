@@ -21,12 +21,15 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
   const isB2BUser = isLoggedIn && user?.role === ROLE.B2B;
   const showSidebar = isLoggedIn && user?.role !== ROLE.B2C;
   const isLanding = pathname === "/";
+  const isAuthPage = pathname.startsWith("/auth/");
 
   const mainClassName = isLanding
     ? "w-full flex-1"
+    : isAuthPage
+      ? "mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-20"
     : clsx(
-        "w-full flex-1 mx-auto max-w-7xl px-2 sm:px-4",
-        isB2BUser ? "py-4" : "py-8 sm:py-12"
+        "mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8",
+        isB2BUser ? "py-4" : ""
       );
 
   return (
@@ -35,7 +38,7 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
       {isB2BUser && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[50vh] bg-linear-to-t from-[#6ed498] via-[#a3e3ba] to-transparent"
+          className="pointer-events-none fixed inset-x-0 bottom-0 h-[55vh] w-full border-0 bg-linear-to-t from-[#6ed498] via-[#a3e3ba]/70 to-transparent bg-center outline-none [mask-image:linear-gradient(to_top,black_0%,black_55%,transparent_100%)]"
         />
       )}
 
@@ -44,10 +47,8 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
         setSidebarOpen={setSidebarOpen}
       />
 
-      <div className="relative flex w-full flex-1">
-        <main className={mainClassName}>
-          {children}
-        </main>
+      <div className="relative flex min-w-0 w-full flex-1">
+        <main className={mainClassName}>{children}</main>
 
         {showSidebar && (
           <aside
@@ -65,7 +66,7 @@ export default function CommonLayout({ children }: CommonLayoutProps) {
         )}
       </div>
 
-      <div className="relative">
+      <div className="relative shrink-0">
         <Footer />
       </div>
     </div>

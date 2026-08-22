@@ -182,6 +182,7 @@ export const logoutAction = async () => {
 
   await deleteCookie("access_token");
   await deleteCookie("refresh_token");
+  await deleteCookie("last_refresh");
   await deleteTokenExpiresAt();
   await deleteUserRole();
   await deleteDepartments();
@@ -191,11 +192,14 @@ export const isLoginAction = async (): Promise<ILoginStatus> => {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
+    const expiresAt = Number(cookieStore.get("token_expires_at")?.value || 0);
     const role = await getUserRole();
+    const hasValidExpiry =
+      expiresAt > 0 && Math.floor(Date.now() / 1000) < expiresAt;
 
     return {
       role: (role as USER_ROLE) ?? null,
-      loggedIn: Boolean(accessToken && role),
+      loggedIn: Boolean(accessToken && role && hasValidExpiry),
     };
   } catch (error) {
     console.error("isLoginAction error:", error);
@@ -394,7 +398,6 @@ export const checkExistingAction = async (payload: {
 };
 
 export const b2bRegisterAction = async (formData: FormData) => {
-  console.log("b2bRegisterAction called with formData:", JSON.stringify(formData));
   try {
     const res = await httpClient.post<{ message: string; user_id: string }>(
       "/auth/register/b2b",
@@ -403,7 +406,6 @@ export const b2bRegisterAction = async (formData: FormData) => {
         headers: { "Content-Type": "multipart/form-data" },
       },
     );
-    console.log("res***************",res)
     return {
       success: true,
       message: res.message || "Registration submitted successfully",

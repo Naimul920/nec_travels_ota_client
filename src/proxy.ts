@@ -5,9 +5,19 @@ import {
   isAuthRoute,
   canAccessRoute,
 } from "@/utils/auth";
+import type { USER_ROLE } from "@/constant";
 
 const LOGIN_PATH = "/auth/signin";
 const API_BASE_URL = process.env.API_BASE_URL || "";
+const VALID_ROLES = new Set<USER_ROLE>([
+  "SUPER_ADMIN",
+  "ADMIN",
+  "B2B",
+  "B2C",
+]);
+
+const isUserRole = (value: string | undefined): value is USER_ROLE =>
+  Boolean(value && VALID_ROLES.has(value as USER_ROLE));
 
 const normalizePathname = (pathname: string) => {
   const sanitized = pathname.replace(/\/+$/, "");
@@ -31,9 +41,8 @@ const setCookieOnResponse = (
 ) => {
   response.cookies.set(name, value, {
     httpOnly: true,
-    secure: process.env.NEXT_PUBLIC_NODE_ENV === "production",
-    sameSite:
-      process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "strict" : "lax",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     path: "/",
     maxAge,
   });
@@ -48,7 +57,12 @@ const setTokenCookies = (
     ? tokens.expireToken - now
     : 15 * 60;
 
-  setCookieOnResponse(response, "access_token", tokens.accessToken, accessMaxAge);
+  setCookieOnResponse(
+    response,
+    "access_token",
+    tokens.accessToken,
+    Math.max(0, accessMaxAge),
+  );
   if (tokens.refreshToken)
     setCookieOnResponse(response, "refresh_token", tokens.refreshToken, 7 * 24 * 60 * 60);
   if (tokens.expireToken)
@@ -65,7 +79,7 @@ const attemptRefresh = async (
   request: NextRequest,
 ): Promise<{ ok: boolean; tokens?: { accessToken: string; refreshToken?: string; expireToken?: number } }> => {
   const refreshToken = request.cookies.get("refresh_token")?.value;
-  if (!refreshToken) return { ok: false };
+  if (!refreshToken || !API_BASE_URL) return { ok: false };
 
   try {
     const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
@@ -110,7 +124,8 @@ export async function proxy(request: NextRequest) {
 
     const accessToken = request.cookies.get("access_token")?.value;
     const refreshToken = request.cookies.get("refresh_token")?.value;
-    const userRole = request.cookies.get("user_role")?.value;
+    const rawUserRole = request.cookies.get("user_role")?.value;
+    const userRole = isUserRole(rawUserRole) ? rawUserRole : undefined;
     const departments = request.cookies
       .get("user_departments")
       ?.value?.split(",")
@@ -122,17 +137,17 @@ export async function proxy(request: NextRequest) {
     const isLoggedIn = Boolean(accessToken && userRole) && !isTokenExpired;
 
     if (isAuthPage) {
-      if (isLoggedIn) {
+      if (isLoggedIn && userRole) {
         return NextResponse.redirect(
-          new URL(getDefaultDashboardRoute(userRole as any), request.url),
+          new URL(getDefaultDashboardRoute(userRole), request.url),
         );
       }
 
       if (refreshToken && isTokenExpired) {
         const { ok, tokens } = await attemptRefresh(request);
-        if (ok && tokens) {
+        if (ok && tokens && userRole) {
           const response = NextResponse.redirect(
-            new URL(getDefaultDashboardRoute(userRole as any), request.url),
+            new URL(getDefaultDashboardRoute(userRole), request.url),
           );
           setTokenCookies(response, tokens);
           return response;
@@ -160,7 +175,7 @@ export async function proxy(request: NextRequest) {
         }
         if (userRole === "ADMIN" || userRole === "SUPER_ADMIN") {
           return NextResponse.redirect(
-            new URL(getDefaultDashboardRoute(userRole as any), request.url),
+            new URL(getDefaultDashboardRoute(userRole), request.url),
           );
         }
         return NextResponse.next();
@@ -168,7 +183,7 @@ export async function proxy(request: NextRequest) {
 
       if (isLoggedIn && userRole && userRole !== "B2C") {
         return NextResponse.redirect(
-          new URL(getDefaultDashboardRoute(userRole as any), request.url),
+          new URL(getDefaultDashboardRoute(userRole), request.url),
         );
       }
       return NextResponse.next();
@@ -177,12 +192,16 @@ export async function proxy(request: NextRequest) {
     if (!isLoggedIn) {
       if (refreshToken) {
         const { ok, tokens } = await attemptRefresh(request);
-        if (ok && tokens) {
+        if (ok && tokens && userRole) {
           const response = NextResponse.next();
           setTokenCookies(response, tokens);
           return response;
         }
       }
+      return NextResponse.redirect(buildLoginRedirect(request));
+    }
+
+    if (!userRole) {
       return NextResponse.redirect(buildLoginRedirect(request));
     }
 
@@ -192,19 +211,23 @@ export async function proxy(request: NextRequest) {
 
     if (routeOwner !== userRole) {
       return NextResponse.redirect(
-        new URL(getDefaultDashboardRoute(userRole as any), request.url),
+        new URL(getDefaultDashboardRoute(userRole), request.url),
       );
     }
 
     if (departments?.length && !canAccessRoute(pathname, departments)) {
       return NextResponse.redirect(
-        new URL(getDefaultDashboardRoute(userRole as any), request.url),
+        new URL(getDefaultDashboardRoute(userRole), request.url),
       );
     }
 
     return NextResponse.next();
   } catch (error) {
     console.error("Proxy error:", error);
+    // Public pages remain available, but protected routes fail closed.
+    if (request.nextUrl.pathname.startsWith("/console")) {
+      return NextResponse.redirect(buildLoginRedirect(request));
+    }
     return NextResponse.next();
   }
 }

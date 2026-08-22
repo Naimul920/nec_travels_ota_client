@@ -1,6 +1,5 @@
 "use client"; // 1. Set explicit Client Component boundary line for stateful filters
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 // 2. Swapped React Router Hook for Next.js App Router Native Hook Engine
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -9,14 +8,12 @@ import { NotFound } from "@/components/ui";
 import FlightSearchSummary from "@/components/modules/flight/FlightSearchSummary/FlightSearchSummary";
 import SearchHeaderFilter from "@/components/modules/flight/Filter/SearchHeaderFilter/SearchHeaderFilter";
 import SideBarFilter from "@/components/modules/flight/Filter/SidebarFilter/SideBarFilter";
-import { Button } from "@/components/ui";
 import { IoFilterSharp, IoClose } from "react-icons/io5";
 import FlightCard from "@/components/modules/flight/Card/FlightCard";
 import FlightSearchSkeleton from "@/components/modules/flight/Card/FlightSearchSkeleton";
 import SearchCountdown from "@/components/modules/flight/Card/SearchCountdown";
 import { useFlightSearchMutation } from "@/hooks/useFlightApi";
 import { decoding, storeSearchExpiry, encoding, getItineraryMaxStops } from "@/utils";
-import { FaPlane } from "react-icons/fa";
 import type {
   Itinerary,
   SearchPayload,
@@ -154,7 +151,11 @@ const FlightSearch: React.FC = () => {
   }, [payload, flightSearch]);
 
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = sidebarOpen ? "hidden" : "auto";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, [sidebarOpen]);
 
   // 4. Tracks Next.js native param instances string changes to reset standard layouts
@@ -246,6 +247,12 @@ const FlightSearch: React.FC = () => {
   }, [allItins, filters]);
 
   const totalFlights = filteredFlights.length;
+  const activeFilterCount =
+    filters.airlines.length +
+    filters.stops.length +
+    filters.refundable.length +
+    Number(filters.departureRange[0] > 0 || filters.departureRange[1] < 1440) +
+    Number(filters.arrivalRange[0] > 0 || filters.arrivalRange[1] < 1440);
 
   const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters);
@@ -332,34 +339,6 @@ const FlightSearch: React.FC = () => {
     return fares.length ? Math.min(...fares) : 0;
   }, [allItins]);
 
-  const cheapestItin = useMemo(() => {
-    if (allItins.length === 0) return null;
-    return allItins.reduce((best: any, itin: any) => {
-      const bestOffer =
-        best?.saleCurrencyAmount?.offerAmount ??
-        best?.saleCurrencyAmount?.totalAmount ??
-        Number.MAX_SAFE_INTEGER;
-      const offer =
-        itin?.saleCurrencyAmount?.offerAmount ??
-        itin?.saleCurrencyAmount?.totalAmount ??
-        Number.MAX_SAFE_INTEGER;
-      return offer < bestOffer ? itin : best;
-    });
-  }, [allItins]);
-
-  const headerCurrency =
-    cheapestItin?.passengerFareBreakDown?.[0]?.currency ?? "BDT";
-  const headerOfferAmount =
-    cheapestItin?.saleCurrencyAmount?.offerAmount ??
-    cheapestItin?.saleCurrencyAmount?.totalAmount ??
-    0;
-  const headerTotalAmount =
-    cheapestItin?.saleCurrencyAmount?.totalAmount ?? 0;
-  const headerDisplayTotalAmount =
-    headerTotalAmount < headerOfferAmount
-      ? headerOfferAmount
-      : headerTotalAmount;
-
   if (!isTripTypeValid) {
     return (
       <NotFound
@@ -377,78 +356,63 @@ const FlightSearch: React.FC = () => {
   }
 
   return (
-    <div
-      className=""
-      id="mainScrollContainer"
-    >
-      <FlightSearchSummary />
+    <main className="min-h-screen bg-slate-50/80 pb-12" id="mainScrollContainer">
+      <div className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-5 lg:px-8">
+        <FlightSearchSummary />
 
-      {isPending && <FlightSearchSkeleton cardCount={3} />}
+        {isPending && <FlightSearchSkeleton cardCount={3} />}
 
       {!isPending && (
         <>
-          <div className="flex items-center justify-between mb-2">
-            <Button
+          <div className="mb-4 flex min-h-16 flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <button
+              type="button"
               onClick={() => setSidebarOpen(true)}
-              className="bg-transparent text-black! p-0! md:hidden"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-[#12233D] transition hover:border-brand hover:text-brand lg:hidden"
             >
-              <IoFilterSharp size={15} />
-            </Button>
+              <IoFilterSharp aria-hidden="true" />
+              Filters
+              {activeFilterCount > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[10px] text-white">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
 
-            <div className="flex justify-between w-full px-3">
-              <h3 className="md:text-sm text-xs font-semibold">
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">Search results</p>
+                <h2 className="mt-0.5 text-sm font-bold text-[#12233D] sm:text-base">
                 {isPending
                   ? "Searching..."
                   : `${totalFlights} Available Flights`}
-              </h3>
+                </h2>
+              </div>
 
-              <div className="flex items-center gap-2 ">
+              <div className="flex flex-wrap items-center justify-end gap-3">
                 <SearchCountdown expiresAt={data?.data?.expiresAt} />
                 {isB2B ? (
-                  <div className="flex flex-col items-end gap-1.5">
-                    <label className="flex items-center gap-1.5 text-xs text-gray-700 cursor-pointer select-none">
+                  <label className="flex cursor-pointer select-none items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
                       <input
                         type="checkbox"
                         checked={showDiscounted}
                         onChange={(e) => setShowDiscounted(e.target.checked)}
-                        className="accent-secondary"
+                        className="h-4 w-4 accent-brand"
                       />
-                      Show Discounted Fare
-                    </label>
-                    {/* {showDiscounted ? (
-                      <div className="text-center">
-                        <div className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-semibold px-2 py-1 rounded-md mb-1">
-                          <FaPlane className="w-3.5 h-3.5" />
-                          Discounted Fare
-                        </div>
-                        <p className="text-base font-bold text-gray-900 leading-tight">
-                          {headerCurrency} {headerOfferAmount.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-400 line-through">
-                          {headerCurrency}{" "}
-                          {headerDisplayTotalAmount.toLocaleString()}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-sm font-bold text-gray-900">
-                        {headerCurrency}{" "}
-                        {headerDisplayTotalAmount.toLocaleString()}
-                      </p>
-                    )} */}
-                  </div>
+                      Discounted fare
+                  </label>
                 ) : (
-                  <p className="text-xs">
-                    <sup className="text-secondary">*</sup>Price Includes VAT &
-                    Tax
+                  <p className="hidden text-xs font-medium text-slate-500 sm:block">
+                    <span className="text-brand">*</span> Includes VAT and tax
                   </p>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-12 md:gap-5">
-            <div className="lg:col-span-2 hidden lg:block ">
-              <div className="bg-white shadow rounded-b-sm sticky md:top-13 max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="grid grid-cols-12 gap-5">
+            <aside className="col-span-3 hidden lg:block xl:col-span-3">
+              <div className="custom-scrollbar sticky top-16 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <SideBarFilter
                   allItins={allItins}
                   filters={filters}
@@ -461,27 +425,38 @@ const FlightSearch: React.FC = () => {
                   onDateStep={handleDateStep}
                 />
               </div>
-            </div>
+            </aside>
 
             {sidebarOpen && (
-              <div className="fixed inset-0 bg-black/40 z-40 md:hidden pointer-events-none" />
+              <button
+                type="button"
+                aria-label="Close filters"
+                onClick={() => setSidebarOpen(false)}
+                className="fixed inset-0 z-40 bg-slate-900/10 backdrop-blur-[1px] lg:hidden"
+              />
             )}
 
-            <div
-              className={`fixed top-0 left-0 h-full w-full bg-white z-99 md:hidden overflow-y-scroll
+            <aside
+              aria-label="Flight filters"
+              className={`fixed left-0 top-0 z-50 h-dvh w-[min(90vw,380px)] overflow-hidden bg-white shadow-2xl lg:hidden
             transform transition-transform duration-300 ease-in-out
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
             >
-              <div className="flex items-center justify-between p-4 border-b">
-                <h3 className="font-semibold text-sm">Filter Flights</h3>
-                <Button
+              <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">Refine results</p>
+                  <h3 className="text-sm font-bold text-[#12233D]">Flight filters</h3>
+                </div>
+                <button
+                  type="button"
                   onClick={() => setSidebarOpen(false)}
-                  className="bg-transparent text-secondary! p-0"
+                  aria-label="Close flight filters"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:text-slate-900"
                 >
-                  <IoClose size={22} />
-                </Button>
+                  <IoClose size={20} aria-hidden="true" />
+                </button>
               </div>
-              <div className="overflow-y-auto h-[calc(100%-56px)] custom-scrollbar">
+              <div className="custom-scrollbar h-[calc(100%-4rem)] overflow-y-auto">
                 <SideBarFilter
                   allItins={allItins}
                   filters={filters}
@@ -494,10 +469,10 @@ const FlightSearch: React.FC = () => {
                   onDateStep={handleDateStep}
                 />
               </div>
-            </div>
+            </aside>
 
-            <div className="lg:col-span-10 col-span-12">
-              <div className="sticky md:top-14 z-10">
+            <section className="col-span-12 min-w-0 lg:col-span-9 xl:col-span-9">
+              <div className="sticky top-0 z-20 pb-3">
                 <SearchHeaderFilter
                   carrierCodes={carrierCodes}
                   allItins={allItins}
@@ -507,19 +482,21 @@ const FlightSearch: React.FC = () => {
               </div>
 
               {isError && (
-                <div className="text-center py-10 text-red-500 text-sm">
-                  Failed to load flights. Please try again.
+                <div className="rounded-2xl border border-rose-200 bg-white px-6 py-14 text-center shadow-sm">
+                  <p className="text-base font-bold text-rose-600">We couldn’t load these flights</p>
+                  <p className="mt-2 text-sm text-slate-500">Please refresh the page or modify your search and try again.</p>
                 </div>
               )}
 
               {!isPending && !isError && totalFlights === 0 && (
-                <div className="text-center py-10 text-gray-500 text-sm">
-                  No flights found for this search.
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+                  <p className="text-base font-bold text-[#12233D]">No matching flights found</p>
+                  <p className="mt-2 text-sm text-slate-500">Try clearing some filters or changing your travel dates.</p>
                 </div>
               )}
 
               {!isPending && !isError && totalFlights > 0 && (
-                <div className="py-2 space-y-2">
+                <div className="space-y-4">
                   {filteredFlights.map(
                     (itinerary: Itinerary, filteredIndex: number) => (
                       <FlightCard
@@ -539,11 +516,12 @@ const FlightSearch: React.FC = () => {
                   )}
                 </div>
               )}
-            </div>
+            </section>
           </div>
         </>
       )}
-    </div>
+      </div>
+    </main>
   );
 };
 

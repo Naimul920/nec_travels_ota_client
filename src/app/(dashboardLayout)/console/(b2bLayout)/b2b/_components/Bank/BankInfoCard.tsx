@@ -27,7 +27,6 @@ const BankInfoCard: React.FC<Props> = ({ data }) => {
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold overflow-hidden">
           {logo ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logo}
               alt={data.bank_name}

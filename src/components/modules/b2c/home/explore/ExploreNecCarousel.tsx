@@ -10,16 +10,15 @@ const BARCODE_BARS = [
 
 function ExploreNecCarousel() {
   return (
-    <section className="relative w-full overflow-hidden bg-linear-to-b from-[#E5F6ED] via-white to-[#F2F7F4] px-5 py-14 sm:px-10 sm:py-20">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-12 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+    <div className="grid items-center gap-12 rounded-[32px] border border-emerald-950/10 bg-white/80 p-5 shadow-[0_24px_80px_-40px_rgba(18,35,61,0.35)] backdrop-blur sm:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:p-12">
         {/* Left: boarding-pass style destination card */}
-        <div className="flex w-full max-w-md flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+        <div className="flex w-full flex-col items-start gap-6 text-left">
           <p className="font-plex-mono text-xs tracking-[0.35em] text-brand">
             FEATURED DESTINATION
           </p>
 
           {/* Gate card */}
-          <div className="w-full max-w-[380px] overflow-hidden rounded-2xl border border-[#12233D]/10 bg-white shadow-lg">
+          <div className="w-full overflow-hidden rounded-2xl border border-[#12233D]/10 bg-white shadow-sm">
             <div className="flex items-center justify-between bg-[#0F1836] px-5 py-4">
               <div className="flex items-center gap-2">
                 <FiMapPin className="text-brand" size={16} />
@@ -47,7 +46,7 @@ function ExploreNecCarousel() {
             Find one-of-a-kind activities you won&apos;t find anywhere else.
           </p>
 
-          <div className="flex flex-col items-center gap-4 lg:items-start">
+          <div className="flex flex-col items-start gap-4">
             <button className="group flex h-12 items-center gap-2 rounded-xl bg-brand px-8 text-base font-semibold text-white shadow-md transition-colors hover:bg-brand/90">
               Book now
               <IoIosAirplane
@@ -75,11 +74,10 @@ function ExploreNecCarousel() {
         </div>
 
         {/* Right: carousel */}
-        <div className="flex w-full justify-center lg:w-auto">
+        <div className="flex min-w-0 w-full justify-center py-8 lg:py-4">
           <ExploreCarousel />
         </div>
-      </div>
-    </section>
+    </div>
   );
 }
 

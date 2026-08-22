@@ -1,9 +1,9 @@
-import AppSkeleton from "@/components/common/Skeleton/AppSkeleton";
+import HomeSkeleton from "@/components/common/Skeleton/HomeSkeleton";
 
 export default function HomeLoading() {
   return (
     <div className="w-full">
-      <AppSkeleton />
+      <HomeSkeleton />
     </div>
   );
 }

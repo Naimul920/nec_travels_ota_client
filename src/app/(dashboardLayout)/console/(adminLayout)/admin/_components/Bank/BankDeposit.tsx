@@ -16,13 +16,7 @@ const BankDeposit: React.FC<Props> = ({ data }) => {
       amount: "",
       file: null,
     },
-    onSubmit: (values) => {
-      console.log({
-        ...values,
-        bankId: data.id,
-        depositType: data.accountType,
-      });
-    },
+    onSubmit: () => {},
   });
 
   return (

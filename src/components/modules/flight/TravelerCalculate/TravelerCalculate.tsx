@@ -101,22 +101,31 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
     <div className="relative " ref={ref}>
       {/* Dropdown Trigger */}
       <div
-        className="flex min-h-[72px] cursor-pointer flex-col justify-center rounded-md border border-slate-200 bg-white px-3 shadow-sm transition-all hover:border-primary"
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setOpen((value) => !value);
+          }
+        }}
+        className="flex min-h-20 cursor-pointer flex-col justify-center rounded-xl border border-slate-200 bg-white px-4 transition-all hover:border-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/10"
         onClick={() => setOpen(!open)}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="mb-0.5 select-none text-[10px] font-medium uppercase tracking-wide text-primary">
+            <p className="mb-1 select-none text-[10px] font-bold uppercase tracking-[0.12em] text-brand">
               Travelers & Class
             </p>
-            <p className="flex items-baseline gap-1.5 text-sm font-bold text-gray-900">
+            <p className="flex items-baseline gap-1.5 text-base font-bold text-[#12233D]">
               {total}
               <span className="text-xs font-semibold text-gray-600">
                 Traveler{total > 1 ? "s" : ""}
               </span>
             </p>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase text-primary">
+          <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-[10px] font-bold uppercase text-brand">
             <MdOutlineAirlineSeatReclineNormal />
             {value.cabin.toLowerCase()}
           </span>
@@ -125,7 +134,7 @@ const TravelerCalculate: React.FC<Props> = ({ value, onChange }) => {
 
       {/* Dropdown Panel */}
       {open && (
-        <div className="absolute z-[100] mt-2 right-0 rounded-2xl border border-gray-200 bg-white p-4 shadow-xl space-y-3 w-full md:w-80">
+        <div className="absolute right-0 z-[100] mt-2 w-full space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-900/10 sm:w-80">
           {/* Traveler Rows */}
           {travelers.map((item) => {
             const count = value[item.key] as number;

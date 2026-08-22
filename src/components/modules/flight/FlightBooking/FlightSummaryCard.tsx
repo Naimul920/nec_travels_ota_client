@@ -31,11 +31,11 @@ const AirlineLogo: React.FC<{ code: string }> = ({ code }) => (
 const FlightLegRow: React.FC<{ leg: ReturnType<typeof getLegs>[number] }> = ({
   leg,
 }) => (
-  <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+  <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5">
     <div className="mb-2 flex items-center gap-2">
       <AirlineLogo code={leg.carrierCode} />
       <div className="min-w-0">
-        <p className="truncate text-xs font-semibold text-gray-700">
+        <p className="truncate text-xs font-bold text-[#12233D]">
           {leg.flightName ||
             `${leg.carrierCode} - ${getAirlineName(leg.carrierCode)} ${leg.flightNumber}`}
         </p>
@@ -52,9 +52,9 @@ const FlightLegRow: React.FC<{ leg: ReturnType<typeof getLegs>[number] }> = ({
       </div>
     </div>
 
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between rounded-lg bg-white px-3 py-2 ring-1 ring-slate-100">
       <div className="text-left">
-        <p className="text-sm font-bold text-gray-900">{leg.fromCode}</p>
+        <p className="font-grotesk text-lg font-bold text-[#12233D]">{leg.fromCode}</p>
         <p className="text-[11px] text-gray-500">{formatTime(leg.departISO)}</p>
       </div>
 
@@ -69,7 +69,7 @@ const FlightLegRow: React.FC<{ leg: ReturnType<typeof getLegs>[number] }> = ({
       </div>
 
       <div className="text-right">
-        <p className="text-sm font-bold text-gray-900">{leg.toCode}</p>
+        <p className="font-grotesk text-lg font-bold text-[#12233D]">{leg.toCode}</p>
         <p className="text-[11px] text-gray-500">{formatTime(leg.arriveISO)}</p>
       </div>
     </div>
@@ -94,17 +94,19 @@ const FlightSummaryCard: React.FC<Props> = ({ itinerary, travelerSummary }) => {
   const price = getPriceSummary(itinerary);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="bg-brand px-5 py-4 text-white">
-        <h3 className="text-base font-bold">Booking Summary</h3>
-        <p className="text-xs text-white/85">
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="relative overflow-hidden bg-[#12233D] px-5 py-5 text-white">
+        <div aria-hidden="true" className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-brand/25 blur-2xl" />
+        <p className="relative text-[10px] font-bold uppercase tracking-[0.18em] text-brand">Trip overview</p>
+        <h2 className="relative mt-1 text-base font-bold">Booking summary</h2>
+        <p className="relative mt-1 text-xs text-white/65">
           {legs.length > 0
             ? `${legs[0].fromCode} ${formatDate(legs[0].departISO).split(",")[0]} → ${legs[legs.length - 1].toCode}`
             : "Flight itinerary"}
         </p>
       </div>
 
-      <div className="space-y-4 p-5">
+      <div className="space-y-5 p-5">
         <div className="space-y-2">
           {legs.map((leg, i) => (
             <FlightLegRow key={i} leg={leg} />
@@ -113,7 +115,7 @@ const FlightSummaryCard: React.FC<Props> = ({ itinerary, travelerSummary }) => {
 
         {travelerSummary.length > 0 && (
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
               Travelers
             </p>
             <div className="space-y-1">
@@ -125,7 +127,7 @@ const FlightSummaryCard: React.FC<Props> = ({ itinerary, travelerSummary }) => {
         )}
 
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
             Fare Breakdown
           </p>
           <div className="space-y-1">
@@ -140,14 +142,14 @@ const FlightSummaryCard: React.FC<Props> = ({ itinerary, travelerSummary }) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-          <span className="text-sm font-semibold text-gray-700">Total</span>
-          <span className="text-xl font-extrabold text-brand">
+        <div className="flex items-end justify-between rounded-xl bg-brand/10 px-4 py-3">
+          <span><span className="block text-[10px] font-bold uppercase tracking-wide text-slate-400">Total payable</span><span className="text-xs text-slate-500">Taxes included</span></span>
+          <span className="font-grotesk text-xl font-bold text-brand">
             {price.currency} {price.total.toLocaleString()}
           </span>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

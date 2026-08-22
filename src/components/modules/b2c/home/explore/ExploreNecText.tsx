@@ -3,52 +3,45 @@ import { IoIosAirplane } from "react-icons/io";
 
 function ExploreNecText() {
   return (
-    <div className="flex items-center justify-center px-5 py-14 md:py-20">
-      <div className="flex select-none flex-col items-center gap-5 text-center">
-        <p className="font-plex-mono text-xs tracking-[0.35em] text-brand">
-          LIMITED-TIME FARE
-        </p>
-
-        <div className="relative">
-          {/* fare tag — echoes the small chips used on the ticket panels elsewhere */}
-          <span className="absolute -top-8 left-1 -rotate-6 md:-top-10">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-white px-3 py-1 shadow-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-              <span className="font-plex-mono text-[10px] font-bold uppercase tracking-[0.15em] text-brand md:text-xs">
-                up to
-              </span>
-            </span>
-          </span>
-
-          <h1 className="font-grotesk text-4xl font-bold tracking-tight text-[#12233D] sm:text-5xl md:text-6xl">
-            15% is yours!
-          </h1>
+    <header className="mb-10 grid gap-7 border-b border-[#12233D]/10 pb-10 sm:mb-14 sm:pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:items-end lg:gap-14">
+      <div className="max-w-3xl">
+        <div className="mb-5 flex items-center gap-3">
+          <span className="h-px w-8 bg-brand" aria-hidden="true" />
+          <p className="font-plex-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-brand sm:text-xs">
+            Curated by NEC Travels
+          </p>
         </div>
 
-        <p className="max-w-md text-sm font-medium text-[#5B6B7A] md:text-base">
-          Just book a trip and{" "}
-          <span className="whitespace-nowrap text-[#12233D]">
-            explore the world
-          </span>
+        <h2 className="text-balance font-grotesk text-3xl font-bold leading-[1.08] tracking-tight text-[#12233D] sm:text-4xl lg:text-5xl">
+          Go somewhere
+          <span className="block text-brand">worth remembering.</span>
+        </h2>
+      </div>
+
+      <div className="relative overflow-hidden rounded-2xl border border-brand/15 bg-white/70 p-5 pr-16 shadow-[0_14px_40px_-28px_rgba(18,35,61,0.35)] backdrop-blur sm:p-6 sm:pr-18">
+        <span
+          className="absolute inset-y-5 left-0 w-1 rounded-r-full bg-brand"
+          aria-hidden="true"
+        />
+        <span className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-brand sm:right-6 sm:top-6">
+          <IoIosAirplane className="-rotate-45 text-xl" aria-hidden="true" />
+        </span>
+
+        <p className="text-sm leading-6 text-[#5B6B7A] sm:text-[15px]">
+          Handpicked city breaks with exclusive fares and local experiences,
+          all planned in one place.
         </p>
 
-        {/* perforated seam — mirrors the ticket-stub motif used site-wide */}
-        <div className="relative w-full max-w-[220px]">
-          <div className="border-t border-dashed border-[#12233D]/20" />
-          <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-[#F7F4EC]" />
-          <span className="absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full bg-[#F7F4EC]" />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <h2 className="font-grotesk text-3xl font-extrabold tracking-tight text-[#12233D] sm:text-4xl md:text-5xl">
-            Explore <span className="text-brand">NEC</span> Travels
-          </h2>
-          <IoIosAirplane
-            className="-rotate-45 text-2xl text-brand sm:text-3xl md:text-4xl"
-          />
+        <div className="mt-4 flex flex-wrap gap-2" aria-label="Travel benefits">
+          <span className="rounded-full bg-[#12233D]/5 px-3 py-1 font-plex-mono text-[9px] font-semibold uppercase tracking-wider text-[#5B6B7A]">
+            Exclusive fares
+          </span>
+          <span className="rounded-full bg-brand/10 px-3 py-1 font-plex-mono text-[9px] font-semibold uppercase tracking-wider text-brand">
+            Local picks
+          </span>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 

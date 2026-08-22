@@ -62,8 +62,11 @@ export default function B2BSignUp() {
   // Renamed refs so validators always read the latest step (Formik can
   // invoke onSubmit with a stale closure) and rapid clicks can't double-advance.
   const currentStepRef = useRef(currentStep);
-  currentStepRef.current = currentStep;
   const stepNavLockRef = useRef(false);
+
+  useEffect(() => {
+    currentStepRef.current = currentStep;
+  }, [currentStep]);
 
   const formik = useFormik<B2BSignUpFormValues>({
     initialValues,

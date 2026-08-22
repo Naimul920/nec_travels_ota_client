@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
-  FaChevronLeft,
   FaChevronRight,
   FaPlane,
   FaHotel,
@@ -226,17 +225,17 @@ export default function ExclusiveOffer() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [cardWidth, setCardWidth] = useState(300);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [transitionEnabled, setTransitionEnabled] = useState(true);
   const trackRef = useRef<HTMLDivElement>(null);
 
   const deals = DEALS_DATA[activeTab];
+  const loopDeals = [...deals, ...deals];
 
   // Calculate widths dynamically
   useEffect(() => {
     const updateDimensions = () => {
       const track = trackRef.current;
       if (!track) return;
-      setContainerWidth(track.clientWidth);
       const firstCard = track.firstElementChild as HTMLElement | null;
       if (firstCard) {
         setCardWidth(firstCard.getBoundingClientRect().width);
@@ -248,44 +247,39 @@ export default function ExclusiveOffer() {
     return () => window.removeEventListener("resize", updateDimensions);
   }, [activeTab]);
 
-  const visibleCount = useMemo(() => {
-    if (containerWidth <= 0) return 4;
-    return Math.max(1, Math.floor(containerWidth / (cardWidth + CARD_GAP)));
-  }, [containerWidth, cardWidth]);
-
-  const maxIndex = Math.max(0, deals.length - visibleCount);
-
+  // Move only forward. The duplicated cards make the first deal appear
+  // immediately after the final deal without a visible backwards jump.
   useEffect(() => {
-    setCurrentIndex((prev) => Math.min(prev, maxIndex));
-  }, [maxIndex, deals.length]);
-
-  // Auto-play infinite loop effect
-  useEffect(() => {
-    if (isHovered) return;
+    if (isHovered || deals.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+      setCurrentIndex((prev) => prev + 1);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isHovered, maxIndex]);
+  }, [isHovered, deals.length]);
+
+  const handleLoopReset = (event: React.TransitionEvent<HTMLDivElement>) => {
+    if (event.currentTarget !== event.target) return;
+    if (currentIndex !== deals.length) return;
+
+    setTransitionEnabled(false);
+    setCurrentIndex(0);
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setTransitionEnabled(true));
+    });
+  };
 
   const handleTabChange = (tab: TabCategory) => {
+    setTransitionEnabled(false);
     setActiveTab(tab);
     setCurrentIndex(0);
-  };
-
-  // Infinite loop navigation handlers
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+    window.requestAnimationFrame(() => setTransitionEnabled(true));
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#F0F6F3] via-[#FBFDFC] to-[#F0F6F3] py-20 text-slate-900 select-none">
+    <section className="relative overflow-hidden bg-white py-16 text-slate-900 select-none sm:py-20 lg:py-24">
       {/* Brand Ambient Glows */}
       <div className="pointer-events-none absolute -left-40 top-1/4 h-[500px] w-[500px] rounded-full bg-brand/10 blur-[120px]" />
       <div className="pointer-events-none absolute -right-40 bottom-1/4 h-[500px] w-[500px] rounded-full bg-brand/[0.07] blur-[120px]" />
@@ -322,9 +316,9 @@ export default function ExclusiveOffer() {
         </g>
       </svg>
 
-      <div className="mx-auto max-w-[1520px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header Container */}
-        <div className="relative z-10 mx-auto mb-12 max-w-3xl text-center">
+        <div className="relative z-10 mx-auto mb-10 max-w-3xl text-center sm:mb-12">
           <div className="flex flex-col items-center gap-4">
             {/* Eyebrow Badge */}
             <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 backdrop-blur-md">
@@ -335,7 +329,7 @@ export default function ExclusiveOffer() {
             </span>
 
             {/* Heading */}
-            <h2 className="font-grotesk text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
+            <h2 className="font-grotesk text-balance text-3xl font-bold tracking-tight text-[#12233D] sm:text-4xl lg:text-5xl">
               Exclusive <span className="text-brand">Travel Offers</span>
             </h2>
 
@@ -347,7 +341,7 @@ export default function ExclusiveOffer() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="relative z-10 mb-12 flex justify-center">
+        <div className="relative z-10 mb-10 flex justify-center sm:mb-12">
           <div className="flex w-full max-w-2xl items-center justify-between rounded-full border border-slate-200 bg-white/80 p-1.5 shadow-[0_8px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-2">
             {TAB_CONFIG.map((tab) => {
               const Icon = tab.icon;
@@ -373,30 +367,26 @@ export default function ExclusiveOffer() {
 
         {/* Carousel Content */}
         <div
-          className="relative z-10 mx-auto w-full overflow-hidden px-2"
+          className="relative z-10 mx-auto w-full overflow-hidden"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {/* Previous Arrow (Wraps to end) */}
-          <button
-            onClick={handlePrev}
-            aria-label="Previous deal"
-            className="absolute left-0 top-1/2 z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-brand hover:bg-brand/10 hover:text-brand active:scale-95"
-          >
-            <FaChevronLeft className="h-4 w-4" />
-          </button>
-
           {/* Slider Track */}
           <div
             ref={trackRef}
-            className="flex transition-transform duration-500 ease-out"
+            onTransitionEnd={handleLoopReset}
+            className={`flex ${transitionEnabled ? "transition-transform duration-500 ease-out" : "transition-none"}`}
             style={{
               transform: `translateX(-${currentIndex * (cardWidth + CARD_GAP)}px)`,
             }}
           >
-            {deals.map((item) => (
-              <div
-                key={item.id}
+            {loopDeals.map((item, index) => {
+              const isClone = index >= deals.length;
+
+              return (
+                <div
+                key={`${item.id}-${isClone ? "clone" : "original"}`}
+                aria-hidden={isClone}
                 className="group relative h-[380px] w-[260px] shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl transition-all duration-500 hover:-translate-y-2 hover:border-brand/50 hover:shadow-2xl hover:shadow-brand/20 sm:h-[420px] sm:w-[290px] md:w-[310px]"
                 style={{ marginRight: CARD_GAP }}
               >
@@ -441,41 +431,21 @@ export default function ExclusiveOffer() {
                       <p className="text-2xl font-bold text-white">{item.price}</p>
                     </div>
 
-                    <button className="group/btn flex items-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-xs font-semibold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg hover:shadow-brand/30">
+                    <button
+                      type="button"
+                      tabIndex={isClone ? -1 : 0}
+                      className="group/btn flex items-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-xs font-semibold text-white transition-all duration-300 hover:brightness-110 hover:shadow-lg hover:shadow-brand/30"
+                    >
                       <span>Claim Deal</span>
                       <FaChevronRight className="h-2.5 w-2.5 transition-transform duration-300 group-hover/btn:translate-x-1" />
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
-
-          {/* Next Arrow (Wraps to start) */}
-          <button
-            onClick={handleNext}
-            aria-label="Next deal"
-            className="absolute right-0 top-1/2 z-30 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-brand hover:bg-brand/10 hover:text-brand active:scale-95"
-          >
-            <FaChevronRight className="h-4 w-4" />
-          </button>
         </div>
-
-        {/* Carousel Pagination Dots */}
-        {maxIndex > 0 && (
-          <div className="mt-8 flex justify-center gap-2">
-            {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentIndex === idx ? "w-8 bg-brand" : "w-2 bg-brand/20 hover:bg-brand/40"
-                }`}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );

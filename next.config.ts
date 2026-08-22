@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Allows CI/verification builds to avoid colliding with a running dev server.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
     remotePatterns: [
       {
@@ -22,10 +24,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "picsum.photos",
-      },
-      {
-        protocol: "http",
-        hostname: "**",
       },
     ],
     formats: ["image/avif", "image/webp"],

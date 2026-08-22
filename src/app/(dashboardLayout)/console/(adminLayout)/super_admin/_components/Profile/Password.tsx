@@ -17,10 +17,7 @@ const Password: React.FC = () => {
       newPassword: "",
       confirmPassword: "",
     },
-    onSubmit: async (values) => {
-      console.log("Password Update:", values);
-      // 🔜 API call here
-    },
+    onSubmit: async () => {},
   });
 
   return (

@@ -34,14 +34,16 @@ const Tabs: React.FC<TabsProps> = ({
     <div className={clsx("w-full", className)}>
       <div
         className={clsx(
-          "relative z-10 w-full flex md:justify-center",
-          floating && "-mt-2 md:-mt-3 -translate-y-1/2"
+          "relative z-10 flex w-full justify-start md:justify-center",
+          floating && "-translate-y-[65%]"
         )}
       >
         <div
+          role="tablist"
+          aria-label="Travel services"
           className={clsx(
-            "flex items-center justify-start md:justify-center rounded-md border border-gray-200 bg-white p-1.5 pb-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_16px_rgba(15,35,61,0.08)] overflow-x-auto overflow-y-clip flex-nowrap custom-scrollbar snap-x snap-proximity overscroll-x-contain touch-pan-x min-w-0 md:snap-none",
-            floating && "min-h-12 md:min-h-14",
+            "flex min-w-0 flex-nowrap items-center justify-start gap-1 overflow-x-auto overflow-y-hidden rounded-2xl border border-slate-200 bg-slate-50 p-1.5 custom-scrollbar snap-x snap-proximity overscroll-x-contain touch-pan-x md:justify-center md:snap-none",
+            floating && "shadow-[0_10px_30px_-24px_rgba(15,35,61,0.35)]",
             containerClassName
           )}
         >
@@ -53,12 +55,14 @@ const Tabs: React.FC<TabsProps> = ({
 
           return (
             <Button
+              role="tab"
+              aria-selected={isActive}
               onClick={() => !isDisabled && onChange(child.key as string)}
               className={clsx(
-                "flex items-center gap-1 md:gap-2 px-2 py-1.5 md:px-6 md:py-3 text-xs md:text-base font-semibold transition-all duration-300 rounded-full whitespace-nowrap shrink-0 snap-start",
+                "flex h-10 shrink-0 snap-start items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-semibold transition-all duration-200 md:h-11 md:gap-2 md:px-5 md:text-sm",
                 isActive
-                  ? "bg-brand text-white shadow-lg shadow-brand/30"
-                  : "bg-transparent text-slate-700! hover:text-slate-900! hover:bg-gray-100!",
+                  ? "bg-brand text-white shadow-sm shadow-brand/25"
+                  : "bg-transparent text-slate-600! hover:bg-white! hover:text-[#12233D]!",
                 isDisabled &&
                   "opacity-40 cursor-not-allowed pointer-events-none grayscale"
               )}
@@ -67,7 +71,7 @@ const Tabs: React.FC<TabsProps> = ({
               {child.props.icon && (
                 <span
                   className={clsx(
-                    "text-base md:text-xl",
+                    "text-base md:text-lg",
                     isActive ? "text-white" : "text-emerald-600"
                   )}
                 >
@@ -81,13 +85,14 @@ const Tabs: React.FC<TabsProps> = ({
       </div>
       </div>
 
-      <div className={clsx("w-full", floating ? "-mt-4 md:-mt-3" : "mt-2 md:mt-4")}>
+      <div className={clsx("w-full", floating ? "-mt-8" : "mt-4")}>
         {React.Children.map(children, (child) => {
           if (!React.isValidElement(child)) return null;
           if (child.key !== activeKey) return null;
           return (
             <div
               key={activeKey}
+              role="tabpanel"
               className={clsx(
                 "animate-tab-fade-up transition-opacity duration-300",
                 isPending && "opacity-60"

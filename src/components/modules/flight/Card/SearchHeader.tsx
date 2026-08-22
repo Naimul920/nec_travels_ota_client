@@ -2,7 +2,6 @@
 
 import React from "react";
 import type { IState } from "@/components/modules/flight/Card/FlightCard";
-import { Button } from "@/components/ui";
 // 2. Swapped React Router Hooks for Next.js Native App Router Navigation Utilities
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { Itinerary, Schedule } from "@/interface/flight";
@@ -104,9 +103,9 @@ const SearchHeader: React.FC<IProps> = ({
 
   // console.log("Segments:", segments, itinerary);
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 relative overflow-hidden shadow-sm mt-4 first:mt-1">
-      <div className="grid grid-cols-12 gap-4 items-center">
-        <div className="col-span-12 md:col-span-10 space-y-5 md:border-r border-dashed border-gray-300 md:py-6 md:pe-4">
+    <article className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-5">
+      <div className="grid grid-cols-12 items-stretch gap-4">
+        <div className="col-span-12 space-y-5 md:col-span-9 md:border-r md:border-dashed md:border-slate-200 md:pr-5">
           {segments.map((seg, idx) => {
             const schedules = seg?.schedules ?? [];
             const firstSchedule = schedules[0];
@@ -121,11 +120,11 @@ const SearchHeader: React.FC<IProps> = ({
             return (
               <div
                 key={idx}
-                className="grid grid-cols-12 gap-2 items-center border-b pb-5 border-dashed border-gray-300 last:border-b-0 last:pb-0"
+                className="grid grid-cols-12 items-center gap-2 border-b border-dashed border-slate-200 pb-5 last:border-b-0 last:pb-0"
               >
                 {/* Airline logo */}
                 <div className="md:col-span-1 col-span-2 flex flex-col items-center justify-center gap-1 md:ps-1">
-                  <div className="relative w-11 h-11 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
                     <img
                       src={`/api/v1/uploads/files/images/public/airlines_logo/${firstSchedule?.marketingCarrierCode}.svg`}
                       alt={getAirlineName(firstSchedule?.marketingCarrierCode)}
@@ -139,38 +138,38 @@ const SearchHeader: React.FC<IProps> = ({
                       {firstSchedule?.marketingCarrierCode || ""}
                     </span> */}
                   </div>
-                  <span className="text-[10px] font-semibold tracking-wide text-gray-500">
+                  <span className="max-w-20 truncate text-center text-[9px] font-semibold text-slate-500">
                     {getAirlineName(firstSchedule?.marketingCarrierCode)}
                   </span>
                 </div>
 
                 {/* Departure */}
                 <div className="md:col-span-2 col-span-3 flex flex-col items-start text-start md:ps-2">
-                  <p className="text-primary font-extrabold text-base md:text-2xl whitespace-nowrap">
+                  <p className="whitespace-nowrap font-grotesk text-lg font-bold text-[#12233D] md:text-2xl">
                     {firstSchedule?.departure?.airport}{" "}
                     {formatTime(
                       firstSchedule?.departureDateTime,
                       firstSchedule?.departure?.time,
                     )}
                   </p>
-                  <p className="text-gray-500 text-xs whitespace-nowrap">
+                  <p className="mt-1 whitespace-nowrap text-[10px] font-medium text-slate-400 sm:text-xs">
                     {formatDate(firstSchedule?.departureDateTime)}
                   </p>
                 </div>
 
                 {/* Route */}
-                <div className="md:col-span-7 col-span-4 flex flex-col items-center">
-                  <p className="text-gray-500 text-xs font-medium">
+                <div className="col-span-4 flex flex-col items-center md:col-span-7">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-brand sm:text-xs">
                     {stopLabel(stopCount)}
                   </p>
-                  <p className="text-sm font-bold text-gray-900 mt-0.5">
+                  <p className="mt-0.5 text-xs font-bold text-[#12233D] sm:text-sm">
                     {duration}
                   </p>
-                  <div className="flex flex-wrap items-center justify-center gap-1 mt-1.5">
+                  <div className="relative mt-2 flex w-full items-center justify-center gap-1 before:absolute before:left-0 before:right-0 before:top-1/2 before:border-t before:border-dashed before:border-slate-300">
                     {flightNumbers.map((fn, fIdx) => (
                       <span
                         key={`${fn}-${fIdx}`}
-                        className="inline-flex px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[10px] font-semibold"
+                        className="relative z-10 inline-flex rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[9px] font-bold text-slate-500"
                       >
                         {fn}
                       </span>
@@ -180,14 +179,14 @@ const SearchHeader: React.FC<IProps> = ({
 
                 {/* Arrival */}
                 <div className="md:col-span-2 col-span-3 flex flex-col text-end items-end md:pe-2">
-                  <p className="text-primary font-extrabold text-base md:text-2xl whitespace-nowrap">
+                  <p className="whitespace-nowrap font-grotesk text-lg font-bold text-[#12233D] md:text-2xl">
                     {lastSchedule?.arrival?.airport}{" "}
                     {formatTime(
                       lastSchedule?.arrivalDateTime,
                       lastSchedule?.arrival?.time,
                     )}
                   </p>
-                  <p className="text-gray-500 text-xs whitespace-nowrap">
+                  <p className="mt-1 whitespace-nowrap text-[10px] font-medium text-slate-400 sm:text-xs">
                     {formatDate(lastSchedule?.arrivalDateTime)}
                   </p>
                 </div>
@@ -196,7 +195,7 @@ const SearchHeader: React.FC<IProps> = ({
           })}
         </div>
 
-        <div className="hidden md:flex flex-col items-center justify-center md:col-span-2 text-center">
+        <div className="hidden flex-col items-center justify-center text-center md:col-span-3 md:flex">
           {/* <p>taxFare: {taxFare?.toLocaleString()}</p>
           <p>baseAmount: {baseAmount?.toLocaleString()}</p>
           <p>grossFare: {grossFare?.toLocaleString()}</p>
@@ -222,7 +221,7 @@ const SearchHeader: React.FC<IProps> = ({
               </p>
             ) : (
               <>
-                <div className="inline-flex items-center gap-1 bg-green-50 text-green-600 text-xs font-semibold px-2 py-1 rounded-md mb-2">
+                <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-600">
                   <FaPlane className="w-3.5 h-3.5" />
                   Discounted Fare
                 </div>
@@ -236,48 +235,51 @@ const SearchHeader: React.FC<IProps> = ({
             )}
           </div>
 
-          <Button
+          <button
+            type="button"
             onClick={() => handelFlightBooking(String(index))}
-            className="text-xs rounded-sm mt-2"
+            className="mt-4 h-10 w-full max-w-36 rounded-xl bg-brand px-4 text-xs font-bold text-white shadow-lg shadow-brand/20 transition hover:bg-brand/90"
           >
             Book Now
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="flex md:hidden justify-between items-center pt-2">
-        <Button
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 md:hidden">
+        <button
+          type="button"
           onClick={() =>
             setState((prev) => ({ ...prev, isDetails: !prev.isDetails }))
           }
-          variant="secondary"
-          className="text-xs rounded-sm"
+          className="h-10 rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-600 transition hover:border-brand hover:text-brand"
         >
           {state.isDetails ? "Hide" : "Show"} Details
-        </Button>
+        </button>
         <div className="text-center">
-          <p className="text-xs text-secondary font-bold">{currency}</p>
-          <p className="text-sm font-bold">{offerAmount.toLocaleString()}</p>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Fare</p>
+          <p className="text-sm font-bold text-[#12233D]">{currency} {offerAmount.toLocaleString()}</p>
         </div>
-        <Button
+        <button
+          type="button"
           onClick={() => handelFlightBooking(String(index))}
-          className="text-xs rounded-sm"
+          className="h-10 rounded-xl bg-brand px-4 text-xs font-bold text-white shadow-md shadow-brand/20"
         >
           Book Now
-        </Button>
+        </button>
       </div>
 
-      <div className="md:block hidden mt-4 md:absolute md:left-[49%] md:-translate-x-4/4 md:-bottom-2">
-        <Button
-          className="text-white rounded-none text-[10px] font-normal pt-1 rounded-t-full"
+      <div className="mt-4 hidden md:absolute md:bottom-0 md:left-[37.5%] md:block md:-translate-x-1/2">
+        <button
+          type="button"
+          className="rounded-t-xl bg-[#12233D] px-5 py-1.5 text-[10px] font-bold text-white transition hover:bg-brand"
           onClick={() =>
             setState((prev) => ({ ...prev, isDetails: !prev.isDetails }))
           }
         >
           {state.isDetails ? "Hide" : "Show"} Details
-        </Button>
+        </button>
       </div>
-    </div>
+    </article>
   );
 };
 

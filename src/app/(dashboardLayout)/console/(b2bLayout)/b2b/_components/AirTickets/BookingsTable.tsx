@@ -967,7 +967,7 @@ export default function BookingsTable({
           ]),
       actionColumn,
     ];
-  }, [applyDate, dateColumn, refundAmount, handleCancelRefund, issueRequest, ticketIssueSource, handleIssueRequest]);
+  }, [applyDate, dateColumn, refundAmount, handleCancelRefund, issueRequest, ticketIssueSource]);
 
   const handleTableChange = (pagination: TablePaginationConfig) => {
     setPage(pagination.current ?? 1);

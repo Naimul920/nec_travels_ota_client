@@ -108,8 +108,8 @@ export interface BookingPassenger {
   gender: string;
   date_of_birth: string;
   country: string;
-  passport_number: string;
-  passport_expire: string;
+  passport_number?: string;
+  passport_expire?: string;
   passenger_type: string;
   email?: string;
   phone?: string;
@@ -133,8 +133,8 @@ export interface LeadPassenger {
   gender: string;
   date_of_birth: string;
   country: string;
-  passport_number: string;
-  passport_expire: string;
+  passport_number?: string;
+  passport_expire?: string;
   passenger_type: string;
   email?: string;
   phone?: string;
@@ -155,7 +155,7 @@ export interface Passenger {
 export interface BookFlightPayload {
   quoteId: string;
   lead_passenger: LeadPassenger;
-  passengers?: Passenger[];
+  passengers?: BookingPassenger[];
   segments: BookingSegment[];
   payment_type: string;
   provider: string;

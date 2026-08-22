@@ -79,8 +79,10 @@ const PassengerCard: React.FC<Props> = ({
     set("gender", p.gender);
     set("date_of_birth", p.date_of_birth);
     set("country", p.country);
-    set("passport_number", p.passport_number);
-    set("passport_expire", p.passport_expire);
+    if (!isDomestic) {
+      set("passport_number", p.passport_number);
+      set("passport_expire", p.passport_expire);
+    }
     set("email", p.email);
     set("phone", p.phone);
   };
@@ -108,19 +110,20 @@ const PassengerCard: React.FC<Props> = ({
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all">
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300">
       {/* Header Bar */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/70 px-4 py-4 sm:px-5">
         <div className="flex items-center gap-3">
-          <h3 className="text-xl font-bold text-gray-900">Passenger Info</h3>
+          <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${meta.tone}`}>{meta.icon}</span>
+          <div><h3 className="text-sm font-bold text-[#12233D]">{meta.label} {index + 1}</h3><p className="mt-0.5 text-[11px] text-slate-400">{meta.sub}</p></div>
           <span
-            className={`rounded-md px-2.5 py-1 text-xs font-semibold ${meta.tone}`}
+            className="hidden rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500 ring-1 ring-slate-200 sm:inline-flex"
           >
-            {meta.label} {index + 1}
+            Traveler {index + 1}
           </span>
           {isLeadPassenger && (
             <span
-              className={`rounded-md px-2.5 py-1 text-xs bg-brand text-white font-semibold`}
+              className="rounded-full bg-brand/10 px-2.5 py-1 text-[10px] font-bold text-brand"
             >
               Lead Passenger
             </span>
@@ -138,7 +141,9 @@ const PassengerCard: React.FC<Props> = ({
       </div>
 
       {/* Form Fields Grid matching exact 4-column design */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 uppercase [&_label]:normal-case">
+      <div className="p-4 sm:p-5">
+      <p className="mb-4 text-xs leading-5 text-slate-500">Use the traveler’s official name. Avoid initials unless they appear on the travel document.</p>
+      <div className="grid grid-cols-1 gap-4 uppercase sm:grid-cols-2 xl:grid-cols-4 [&_label]:normal-case">
         {/* Row 1 */}
         <Select
           label="Title"
@@ -261,7 +266,8 @@ const PassengerCard: React.FC<Props> = ({
           </>
         )}
       </div>
-    </div>
+      </div>
+    </section>
   );
 };
 

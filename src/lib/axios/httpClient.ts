@@ -55,24 +55,13 @@ const axiosInstance = async () => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("access_token")?.value;
 
-  const lastRefresh = cookieStore.get("last_refresh")?.value;
-  const now = Date.now();
+  const expiresAt = Number(cookieStore.get("token_expires_at")?.value || 0);
+  const nowInSeconds = Math.floor(Date.now() / 1000);
   const shouldRefresh =
-    accessToken && (!lastRefresh || now - Number(lastRefresh) > 5 * 60 * 1000);
+    Boolean(accessToken) && expiresAt > 0 && expiresAt - nowInSeconds <= 5 * 60;
 
   if (shouldRefresh) {
-    const refreshed = await tryRefreshToken();
-    if (refreshed) {
-      const store = await cookies();
-      store.set("last_refresh", now.toString(), {
-        httpOnly: true,
-        secure: process.env.NEXT_PUBLIC_NODE_ENV === "production",
-        sameSite:
-          process.env.NEXT_PUBLIC_NODE_ENV === "production" ? "strict" : "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60,
-      });
-    }
+    await tryRefreshToken();
   }
 
   const refreshedStore = await cookies();

@@ -189,17 +189,17 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
     };
   };
 
-  const [tripType, setTripType] = useState<TripType>(
-    () => initializeStateFromURL().tripType,
+  const initialSearchState = useMemo(
+    () => initializeStateFromURL(),
+    // Initial state is intentionally read once; later URL changes use the
+    // search-page flow rather than resetting a form the user may be editing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
-  const [flightData, setFlightData] = useState(
-    () => initializeStateFromURL().flightData,
-  );
-
-  const [traveler, setTraveler] = useState(
-    () => initializeStateFromURL().traveler,
-  );
+  const [tripType, setTripType] = useState<TripType>(initialSearchState.tripType);
+  const [flightData, setFlightData] = useState(initialSearchState.flightData);
+  const [traveler, setTraveler] = useState(initialSearchState.traveler);
 
   const [locationNames, setLocationNames] = useState<Record<string, string>>(
     {},
@@ -386,6 +386,34 @@ const Flight: React.FC<FlightProps> = ({ useFlight }) => {
       ...prev,
       multicity: typeof data === "function" ? data(prev.multicity) : data,
     }));
+  };
+
+  const removeMultiCityRow = (index: number) => {
+    setFlightData((prev) => ({
+      ...prev,
+      multicity: prev.multicity.filter((_, rowIndex) => rowIndex !== index),
+    }));
+
+    setLocationNames((prev) => {
+      const next: Record<string, string> = {};
+
+      Object.entries(prev).forEach(([key, name]) => {
+        const match = key.match(/^multi:(\d+):(from|to)$/);
+        if (!match) {
+          next[key] = name;
+          return;
+        }
+
+        const rowIndex = Number(match[1]);
+        const field = match[2];
+        if (rowIndex === index) return;
+
+        const shiftedIndex = rowIndex > index ? rowIndex - 1 : rowIndex;
+        next[`multi:${shiftedIndex}:${field}`] = name;
+      });
+
+      return next;
+    });
   };
 
   const handleTripTypeChange = (type: TripType) => {
@@ -649,19 +677,26 @@ const handleSubmit = (e: React.FormEvent) => {
 
   return (
     <div className="w-full">
-      <form onSubmit={handleSubmit} className="w-full relative ">
+      <form onSubmit={handleSubmit} className="relative w-full">
         {/* Trip Type selection inputs */}
-        <div className="flex items-center justify-center gap-6 mb-3 zoom-0-9 md-zoom-1">
+        <fieldset className="mb-4 flex flex-wrap items-center justify-center gap-2">
+          <legend className="sr-only">Trip type</legend>
           {["oneway", "roundtrip", "multicity"].map((type) => (
-            <label key={type} className="flex items-center gap-2 cursor-pointer">
+            <label
+              key={type}
+              className={`cursor-pointer rounded-full border px-3.5 py-2 text-xs font-semibold transition sm:px-4 ${
+                tripType === type
+                  ? "border-brand bg-brand/10 text-brand"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+              }`}
+            >
               <input
                 type="radio"
                 checked={tripType === type}
                 onChange={() => handleTripTypeChange(type as TripType)}
-                className="w-3 h-3 appearance-none border-2 border-primary rounded-full 
-                checked:bg-brand checked:ring-2 checked:ring-primary checked:ring-offset-2"
+                className="sr-only"
               />
-              <span className="text-xs md:text-sm font-medium text-gray-700">
+              <span>
                 {type === "oneway"
                   ? "One Way"
                   : type === "roundtrip"
@@ -670,13 +705,13 @@ const handleSubmit = (e: React.FormEvent) => {
               </span>
             </label>
           ))}
-        </div>
+        </fieldset>
 
         {/* Form Content Rendering */}
         <div
           className={`${
             useFlight === "search" ? "bg-white" : "bg-transparent"
-          } md:py-5`}
+          }`}
         >
           {tripType === "oneway" && (
             <Oneway
@@ -713,6 +748,7 @@ const handleSubmit = (e: React.FormEvent) => {
               }))}
               onChange={handleMultiCityChange}
               setData={setMultiCityData}
+              onRemoveRow={removeMultiCityRow}
               traveler={traveler}
               changeTraveler={handleTravelerChange}
             />
@@ -722,8 +758,7 @@ const handleSubmit = (e: React.FormEvent) => {
         {/* Form Submission Control */}
         <Button
           type="submit"
-          className="mt-6 bg-primary text-white px-10 py-3 rounded-lg font-bold 
-          absolute -bottom-14 left-1/2 -translate-x-1/2"
+          className="mx-auto mt-5 flex h-12 w-full items-center justify-center rounded-xl bg-brand px-10 font-bold text-white shadow-lg shadow-brand/20 transition hover:-translate-y-0.5 hover:bg-brand/90 sm:w-auto sm:min-w-44"
         >
           Search
         </Button>

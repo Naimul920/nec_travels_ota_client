@@ -83,6 +83,17 @@ export const resolvePostLoginRedirect = (
     return getDefaultDashboardRoute(role);
   }
 
+  // Only allow same-origin application paths. This prevents an attacker from
+  // turning the post-login redirect query parameter into an open redirect.
+  if (
+    !redirectPath.startsWith("/") ||
+    redirectPath.startsWith("//") ||
+    redirectPath.includes("\\") ||
+    /[\u0000-\u001F\u007F]/.test(redirectPath)
+  ) {
+    return getDefaultDashboardRoute(role);
+  }
+
   const pathname = redirectPath.split("?")[0] || redirectPath;
   const search = redirectPath.slice(pathname.length);
 

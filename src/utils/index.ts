@@ -1,4 +1,3 @@
-export { default as decode } from "./decode";
 export { default as encoding } from "./urlEncodeDecode/encode";
 export { default as decoding } from "./urlEncodeDecode/decode";
 export { default as detactedDomesticType } from "./searchFlightSug/detactedDomesticType";

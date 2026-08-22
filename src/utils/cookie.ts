@@ -9,14 +9,14 @@ export const setCookie = async (
 ) => {
   const cookieStore = await cookies();
 
-  const isProduction = process.env.NEXT_PUBLIC_NODE_ENV === "production";
+  const isProduction = process.env.NODE_ENV === "production";
 
   cookieStore.set(name, value, {
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? "strict" : "lax",
     path: "/",
-    maxAge: maxAgeInSeconds,
+    maxAge: Math.max(0, maxAgeInSeconds),
   });
 };
 

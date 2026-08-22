@@ -17,6 +17,12 @@ const eslintConfig = defineConfig([
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
+      // This rule rejects common, intentional synchronization/fetch effects.
+      // Keep exhaustive dependency checking enabled instead.
+      "react-hooks/set-state-in-effect": "off",
+      // Several authenticated/blob image sources do not have stable dimensions
+      // or hosts that can safely pass through the Next image optimizer.
+      "@next/next/no-img-element": "off",
     },
   },
 ]);

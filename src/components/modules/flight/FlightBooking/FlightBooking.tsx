@@ -433,17 +433,26 @@ const FlightBooking: React.FC = () => {
   const toBookingPassenger = (
     p: Passenger,
     passenger_type: string,
-  ): BookingPassenger => ({
-    title: p.title,
-    firstname: p.firstname,
-    lastname: p.lastname,
-    gender: p.gender,
-    date_of_birth: p.date_of_birth,
-    country: p.country,
-    passport_number: p.passport_number,
-    passport_expire: p.passport_expire,
-    passenger_type,
-  });
+  ): BookingPassenger => {
+    const passenger: BookingPassenger = {
+      title: p.title,
+      firstname: p.firstname,
+      lastname: p.lastname,
+      gender: p.gender,
+      date_of_birth: p.date_of_birth,
+      country: p.country,
+      passenger_type,
+    };
+
+    // The domestic booking contract must omit these keys completely. Sending
+    // empty strings is different from not sending the fields at all.
+    if (!isDomestic) {
+      passenger.passport_number = p.passport_number;
+      passenger.passport_expire = p.passport_expire;
+    }
+
+    return passenger;
+  };
 
   const handleSubmit = async (values: BookingFormValues) => {
     if (searchExpired) {
@@ -561,31 +570,35 @@ const FlightBooking: React.FC = () => {
 
   if (!itinerary) {
     return (
-      <div className="text-center py-10 text-gray-500 text-sm">
-        Selected flight could not be found. Please go back and search again.
+      <div className="my-12 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+        <h1 className="text-lg font-bold text-[#12233D]">Flight no longer available</h1>
+        <p className="mt-2 text-sm text-slate-500">This itinerary may have expired or changed. Return to the results and choose another flight.</p>
+        <button type="button" onClick={handleBack} className="mt-5 rounded-xl bg-brand px-5 py-2.5 text-sm font-bold text-white">Back to results</button>
       </div>
     );
   }
 
   return (
-    <div className="">
+    <div className="py-5 sm:py-8 lg:py-10">
       {/* Top bar */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
+      <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
           <button
             type="button"
             onClick={handleBack}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-brand hover:text-brand"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-bold text-slate-600 transition hover:border-brand hover:text-brand"
           >
             <FaArrowLeft className="text-xs" />
             Back to Results
           </button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900 lg:text-2xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">Secure checkout</p>
+            <h1 className="mt-0.5 font-grotesk text-xl font-bold text-[#12233D] lg:text-2xl">
               Complete Your Booking
             </h1>
-            <p className="text-xs text-gray-500 lg:text-sm">
-              Please review your flight details and traveler information
+            <p className="mt-1 text-xs text-slate-500 lg:text-sm">
+              Review the itinerary and enter traveler names exactly as shown on travel documents.
             </p>
           </div>
         </div>
@@ -593,6 +606,11 @@ const FlightBooking: React.FC = () => {
           expiresAt={expiresAt}
           onExpire={() => setSearchExpired(true)}
         />
+        </div>
+        <div className={`mt-4 flex items-start gap-3 rounded-xl px-4 py-3 text-xs ${isDomestic ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"}`}>
+          <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${isDomestic ? "bg-emerald-500" : "bg-amber-500"}`} />
+          <p><strong>{isDomestic ? "Domestic flight:" : "International flight:"}</strong> {isDomestic ? "Passport information is not required and will not be included in the booking request." : "A valid passport number and expiry date are required for every traveler."}</p>
+        </div>
       </div>
 
       <Formik
@@ -615,23 +633,23 @@ const FlightBooking: React.FC = () => {
             <Form>
               <LeadPassengerPrefill />
 
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
-                <div className="space-y-6 lg:col-span-2">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
+                <div className="space-y-5 lg:col-span-8">
                   <TravelersForm isDomestic={isDomestic} />
                 </div>
 
-                <aside className="space-y-5 lg:sticky lg:top-6">
+                <aside className="space-y-4 lg:col-span-4 lg:sticky lg:top-20">
                   <FlightSummaryCard
                     itinerary={itinerary}
                     travelerSummary={travelerSummary}
                   />
 
                   {/* Action buttons */}
-                  <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                  <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <button
                       type="button"
                       onClick={() => setPreviewOpen(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-brand bg-brand-light px-4 py-3 text-sm font-bold text-brand transition-colors hover:bg-brand hover:text-white"
+                      className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-brand/30 bg-brand/5 px-4 text-sm font-bold text-brand transition hover:bg-brand hover:text-white"
                     >
                       <FaEye className="text-sm" />
                       Preview Booking
@@ -640,7 +658,7 @@ const FlightBooking: React.FC = () => {
                     {/* Terms agreement */}
                     <label
                       htmlFor="terms-agreement"
-                      className="flex cursor-pointer items-start gap-2.5 rounded-lg bg-gray-50 px-3.5 py-3"
+                      className="flex cursor-pointer items-start gap-2.5 rounded-xl bg-slate-50 px-3.5 py-3"
                     >
                       <input
                         id="terms-agreement"
@@ -688,6 +706,7 @@ const FlightBooking: React.FC = () => {
                 onClose={() => setPreviewOpen(false)}
                 itinerary={itinerary}
                 values={values}
+                isDomestic={isDomestic}
               />
             </Form>
           );

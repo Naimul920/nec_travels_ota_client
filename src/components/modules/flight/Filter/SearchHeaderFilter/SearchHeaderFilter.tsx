@@ -51,9 +51,22 @@ const SearchHeaderFilter: React.FC<Props> = ({
   if (airlines.length === 0) return null;
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-b-md p-2 shadow-xs">
+    <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
       {/* Horizontal Scrollable Carousel */}
-      <div className="flex gap-2 overflow-x-auto custom-scrollbar py-1 px-0.5">
+      <div className="custom-scrollbar flex gap-2 overflow-x-auto p-0.5">
+        <button
+          type="button"
+          onClick={() => onSelect(null)}
+          className={clsx(
+            "flex h-14 min-w-28 shrink-0 flex-col justify-center rounded-xl border px-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30",
+            selectedCode === null
+              ? "border-brand bg-brand/10 text-brand"
+              : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50",
+          )}
+        >
+          <span className="text-xs font-bold">All airlines</span>
+          <span className="mt-0.5 text-[10px] font-medium opacity-70">{allItins.length} options</span>
+        </button>
         {airlines.map((item) => {
           const isSelected = selectedCode === item.code;
 
@@ -63,14 +76,14 @@ const SearchHeaderFilter: React.FC<Props> = ({
               type="button"
               onClick={() => onSelect(isSelected ? null : item.code)}
               className={clsx(
-                "flex items-center gap-2.5 px-3 py-2 min-w-[110px] h-11 rounded-lg border text-left transition-all duration-150 ease-in-out shrink-0 focus:outline-none focus:ring-2 focus:ring-primary/20",
+                "flex h-14 min-w-40 shrink-0 items-center gap-3 rounded-xl border px-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30",
                 isSelected
-                  ? "border-primary bg-primary/5 ring-1 ring-primary text-primary shadow-xs"
-                  : "border-gray-200 bg-white text-gray-800 hover:border-gray-300 hover:bg-gray-50"
+                  ? "border-brand bg-brand/10 text-brand"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               )}
             >
               {/* Airline Logo Container */}
-              <div className="relative w-6 h-6 shrink-0 flex items-center justify-center bg-gray-100 rounded overflow-hidden">
+              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 p-1">
                 <Image
                   src={`/api/v1/uploads/files/images/public/airlines_logo/${item.code}.svg`}
                   alt={`${getAirlineName(item.code)} logo`}
@@ -85,12 +98,12 @@ const SearchHeaderFilter: React.FC<Props> = ({
               </div>
 
               {/* Airline Code & Price Details */}
-              <div className="flex flex-col justify-center leading-tight w-[60px] min-w-0">
-                <span className="text-[10px] font-semibold tracking-wide uppercase leading-tight truncate">
-                  {item.code} · {getAirlineName(item.code)}
+              <div className="flex min-w-0 flex-1 flex-col justify-center leading-tight">
+                <span className="truncate text-[11px] font-bold">
+                  {getAirlineName(item.code)}
                 </span>
-                <span className="text-[10px] text-gray-500 font-medium truncate">
-                  {item.price ? `Tk. ${item.price}` : "N/A"}
+                <span className="mt-1 truncate text-[10px] font-medium text-slate-500">
+                  {item.code} · {item.price ? `${item.currency} ${item.price}` : "Fare unavailable"} · {item.count}
                 </span>
               </div>
             </button>

@@ -4,7 +4,6 @@ import { Slider } from "antd";
 import dayjs from "dayjs";
 import React, { useMemo } from "react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import { Button } from "../../../../ui";
 import type { FilterState } from "@/components/modules/flight/FlightSearch/FlightSearch";
 import type { Itinerary, Schedule } from "../../../../../interface/flight";
 import { getItineraryMaxStops } from "@/utils/flightStops";
@@ -49,17 +48,17 @@ const DateStep: React.FC<{
   onStep: (delta: number) => void;
 }> = ({ label, date, onStep }) => {
   const arrowClass =
-    "flex items-center justify-center w-7 h-7 rounded border border-gray-200 text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors";
+    "flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-brand hover:bg-brand/5 hover:text-brand";
   return (
     <div>
-      <p className="text-[12px] font-semibold text-gray-700 line-clamp-1 mb-1">
+      <p className="mb-2 line-clamp-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
         {label}
       </p>
       <div className="flex items-center justify-between gap-2">
         <button type="button" className={arrowClass} onClick={() => onStep(-1)}>
           <LuChevronLeft size={16} />
         </button>
-        <span className="flex-1 text-center text-xs font-medium text-gray-800 line-clamp-1">
+        <span className="flex-1 text-center text-xs font-bold text-[#12233D] line-clamp-1">
           {formatDateLabel(date)}
         </span>
         <button type="button" className={arrowClass} onClick={() => onStep(1)}>
@@ -148,11 +147,19 @@ const SideBarFilter: React.FC<Props> = ({
 
   return (
     <>
-      <div className="bg-primary text-white p-2 py-3 md:block hidden">
-        <h3 className="text-sm font-bold">Filter By</h3>
+      <div className="hidden border-b border-slate-100 px-4 py-4 lg:block">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">Refine results</p>
+            <h3 className="mt-0.5 text-base font-bold text-[#12233D]">Flight filters</h3>
+          </div>
+          {hasActiveFilters && (
+            <button type="button" onClick={handleReset} className="text-xs font-bold text-rose-500 hover:text-rose-600">Clear all</button>
+          )}
+        </div>
       </div>
  {/* Dates */}
-      <div className="p-2 border-b border-gray-300 space-y-3">
+      <div className="space-y-4 border-b border-slate-100 p-4">
         <DateStep
           label="Departure Date"
           date={departureDate}
@@ -167,21 +174,21 @@ const SideBarFilter: React.FC<Props> = ({
         )}
       </div>
       {/* Stops */}
-      <div className="p-2 border-b border-gray-300">
+      <div className="border-b border-slate-100 p-4">
         <table className="w-full filter-table">
           <thead>
-            <tr className="text-gray-700 font-semibold">
-              <th className="text-left pb-2">Flight Stops</th>
+            <tr className="text-xs font-bold text-[#12233D]">
+              <th className="pb-3 text-left">Flight stops</th>
               {/* <th className="text-right pb-2">From</th> */}
             </tr>
           </thead>
-          <tbody className="text-gray-800">
+          <tbody className="text-xs text-slate-600">
             {stops.map((item) => (
               <tr key={item.value}>
                 <td className="py-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex cursor-pointer items-center gap-2.5 py-1">
                     <input
-                      type="checkbox"
+                      type="checkbox" className="h-4 w-4 rounded accent-brand"
                       checked={filters.stops.includes(item.value)}
                       onChange={() =>
                         update({
@@ -190,12 +197,11 @@ const SideBarFilter: React.FC<Props> = ({
                       }
                     />
                     <span className="line-clamp-1">
-                      {item.label}
-                      ({item.total})
+                      {item.label} <span className="text-slate-400">({item.total})</span>
                     </span>
                   </label>
                 </td>
-                <td className="text-right line-clamp-1">
+                <td className="text-right text-[11px] font-semibold text-slate-500 line-clamp-1">
                   {currency} {item.minPrice.toLocaleString()}
                 </td>
               </tr>
@@ -212,8 +218,8 @@ const SideBarFilter: React.FC<Props> = ({
      
 
       {/* Refundability */}
-      <div className="p-2 border-b border-gray-300">
-        <p className="text-[12px] font-semibold text-gray-700 mb-2 line-clamp-1">
+      <div className="border-b border-slate-100 p-4">
+        <p className="mb-3 line-clamp-1 text-xs font-bold text-[#12233D]">
           Refundable
         </p>
         <div className="space-y-2">
@@ -223,10 +229,10 @@ const SideBarFilter: React.FC<Props> = ({
           ].map((item) => (
             <label
               key={String(item.value)}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2.5 text-xs text-slate-600"
             >
               <input
-                type="checkbox"
+                type="checkbox" className="h-4 w-4 rounded accent-brand"
                 checked={filters.refundable.includes(item.value)}
                 onChange={() =>
                   update({
@@ -235,8 +241,7 @@ const SideBarFilter: React.FC<Props> = ({
                 }
               />
               <span className="line-clamp-1">
-                {item.label}
-                ({item.total})
+                {item.label} <span className="text-slate-400">({item.total})</span>
               </span>
             </label>
           ))}
@@ -244,21 +249,21 @@ const SideBarFilter: React.FC<Props> = ({
       </div>
 
       {/* Airlines */}
-      <div className="p-2 border-b border-gray-300">
+      <div className="border-b border-slate-100 p-4">
         <table className="w-full filter-table">
           <thead>
-            <tr className="text-gray-700 font-semibold">
-              <th className="text-left pb-2">Airlines</th>
-              <th className="text-right pb-2">From</th>
+            <tr className="text-xs font-bold text-[#12233D]">
+              <th className="pb-3 text-left">Airlines</th>
+              <th className="pb-3 text-right">From</th>
             </tr>
           </thead>
-          <tbody className="text-gray-800">
+          <tbody className="text-xs text-slate-600">
             {airlines.map((item) => (
               <tr key={item.code}>
                 <td className="py-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex cursor-pointer items-center gap-2.5 py-1">
                     <input
-                      type="checkbox"
+                      type="checkbox" className="h-4 w-4 rounded accent-brand"
                       checked={filters.airlines.includes(item.code)}
                       onChange={() =>
                         update({
@@ -271,7 +276,7 @@ const SideBarFilter: React.FC<Props> = ({
                     </span>
                   </label>
                 </td>
-                <td className="text-right line-clamp-1">
+                <td className="text-right text-[11px] font-semibold text-slate-500 line-clamp-1">
                   {currency} {item.minPrice.toLocaleString()}
                 </td>
               </tr>
@@ -288,11 +293,11 @@ const SideBarFilter: React.FC<Props> = ({
       
 
       {/* Departure Time */}
-      <div className="p-2 border-b border-gray-300">
-        <p className="text-[12px] font-semibold text-gray-700 line-clamp-1 mb-1">
+      <div className="border-b border-slate-100 p-4">
+        <p className="mb-1 line-clamp-1 text-xs font-bold text-[#12233D]">
           Departure Time
         </p>
-        <p className="text-[11px] text-gray-600 my-3 line-clamp-1">
+        <p className="my-3 line-clamp-1 rounded-lg bg-slate-50 px-2 py-1.5 text-center text-[11px] font-semibold text-slate-500">
           {formatTime(filters.departureRange[0])} -{" "}
           {formatTime(filters.departureRange[1])}
         </p>
@@ -312,11 +317,11 @@ const SideBarFilter: React.FC<Props> = ({
       </div>
 
       {/* Arrival Time */}
-      <div className="p-2 border-b border-gray-300">
-        <p className="text-[12px] font-semibold text-gray-700 mb-1 line-clamp-1">
+      <div className="border-b border-slate-100 p-4">
+        <p className="mb-1 line-clamp-1 text-xs font-bold text-[#12233D]">
           Arrival Time
         </p>
-        <p className="text-[11px] text-gray-600 my-3 line-clamp-1">
+        <p className="my-3 line-clamp-1 rounded-lg bg-slate-50 px-2 py-1.5 text-center text-[11px] font-semibold text-slate-500">
           {formatTime(filters.arrivalRange[0])} -{" "}
           {formatTime(filters.arrivalRange[1])}
         </p>
@@ -336,15 +341,15 @@ const SideBarFilter: React.FC<Props> = ({
       </div>
 
       {/* Actions */}
-      <div className="p-2 flex items-center justify-between">
-        <Button
-          className="bg-white text-red-500! hover:text-red-600! border border-gray-200 disabled:opacity-40"
-          type="reset"
+      <div className="p-4 lg:hidden">
+        <button
+          className="h-11 w-full rounded-xl border border-rose-200 bg-rose-50 text-sm font-bold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40"
+          type="button"
           onClick={handleReset}
           disabled={!hasActiveFilters}
         >
-          Reset
-        </Button>
+          Clear all filters
+        </button>
       </div>
     </>
   );

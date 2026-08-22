@@ -199,14 +199,15 @@ export default function SignIn({
       }
     },
   });
+  const setSignInFieldValue = formik.setFieldValue;
 
   useEffect(() => {
     const saved = loadSavedEmail();
     if (saved.rememberMe) {
-      formik.setFieldValue("email", saved.email);
-      formik.setFieldValue("rememberMe", true);
+      setSignInFieldValue("email", saved.email);
+      setSignInFieldValue("rememberMe", true);
     }
-  }, []);
+  }, [setSignInFieldValue]);
 
   const getError = (name: keyof SignInFormValues) =>
     formik.touched[name] ? formik.errors[name] : undefined;
@@ -216,7 +217,7 @@ export default function SignIn({
       className={
         compact
           ? "w-full"
-          : "flex min-h-[calc(100svh-4rem)] w-full items-center justify-center px-4 py-10"
+          : "flex w-full items-center justify-center"
       }
     >
       <div
@@ -376,25 +377,16 @@ export default function SignIn({
           }
         >
           {verifyEmail ? (
-            <div
-              role="form"
+            <form
               onSubmit={(e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 verifyFormik.submitForm();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  verifyFormik.submitForm();
-                }
               }}
               className="mx-auto w-full max-w-sm space-y-6"
             >
               <div>
                 <div className="mb-6 flex items-center gap-2 md:hidden">
-                  <FiSend className="rotate-45 text-white" size={18} />
+                  <FiSend className="rotate-45 text-brand" size={18} />
                   <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
                     NEC TRAVELS
                   </p>
@@ -434,8 +426,7 @@ export default function SignIn({
               </div>
 
               <button
-                type="button"
-                onClick={() => verifyFormik.submitForm()}
+                type="submit"
                 disabled={verifyFormik.isSubmitting}
                 className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
               >
@@ -463,27 +454,18 @@ export default function SignIn({
                   Back to sign in
                 </button>
               </p>
-            </div>
+            </form>
           ) : (
-            <div
-              role="form"
+            <form
               onSubmit={(e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 formik.submitForm();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  formik.submitForm();
-                }
               }}
               className="mx-auto w-full max-w-sm space-y-6"
             >
               <div>
                 <div className="mb-6 flex items-center gap-2 md:hidden">
-                  <FiSend className="rotate-45 text-white" size={18} />
+                  <FiSend className="rotate-45 text-brand" size={18} />
                   <p className="font-plex-mono text-xs tracking-[0.25em] text-[#12233D]">
                     NEC TRAVELS
                   </p>
@@ -561,8 +543,7 @@ export default function SignIn({
               </div>
 
               <button
-                type="button"
-                onClick={() => formik.submitForm()}
+                type="submit"
                 disabled={formik.isSubmitting || isPending}
                 className="h-12 w-full rounded-xl bg-brand text-white transition-colors duration-200 hover:bg-brand/70 disabled:opacity-50"
               >
@@ -578,7 +559,7 @@ export default function SignIn({
                   Sign up
                 </Link>
               </p>
-            </div>
+            </form>
           )}
         </div>
       </div>

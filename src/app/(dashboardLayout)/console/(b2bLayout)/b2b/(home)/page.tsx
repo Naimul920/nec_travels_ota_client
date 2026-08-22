@@ -4,10 +4,10 @@ import NoticeMarquee from "../../../../../../components/common/NoticeMarquee/Not
 
 export default function B2bHomePage() {
   return (
-    <>
+    <div className="min-w-0 space-y-2 pb-6">
       <NoticeMarquee />
-      <HomeTabs />
+      <HomeTabs variant="dashboard" />
       <HomeSlider />
-    </>
+    </div>
   );
 }

@@ -19,13 +19,7 @@ const MobileDeposit: React.FC<Props> = ({ data }) => {
       reference: "",
       file: null,
     },
-    onSubmit: (values) => {
-      console.log({
-        ...values,
-        accountId: data.id,
-        type: data.type,
-      });
-    },
+    onSubmit: () => {},
   });
 
   return (

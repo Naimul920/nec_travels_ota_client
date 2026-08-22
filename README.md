@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NEC Travels OTA Client
 
-## Getting Started
+Next.js 16 frontend for the NEC Travels online travel agency platform. The
+application contains public/B2C booking flows and protected B2B, admin, and
+super-admin consoles.
 
-First, run the development server:
+## Requirements
+
+- Node.js matching the version declared in `package.json`
+- Bun (the package scripts use Bun)
+- Access to the NEC Travels backend API
+
+Use one package manager consistently. `bun.lock` is the lockfile used by the
+current scripts; `pnpm-lock.yaml` is retained for environments that deploy with
+pnpm.
+
+## Environment
+
+Copy `.env.example` to `.env` and configure:
+
+- `API_BASE_URL`: server-only backend base URL used by server actions, Proxy,
+  rewrites, and authenticated media requests.
+- `NEXT_PUBLIC_API_URL`: browser-visible API base URL used by the geo lookup.
+
+Do not expose secrets through variables prefixed with `NEXT_PUBLIC_`.
+
+## Commands
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev
+bun run typecheck
+bun run lint
+bun run build
+bun run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The development server runs on port 3000. The production start script uses
+port 3027.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `src/app`: App Router pages, layouts, loading states, and route handlers.
+- `src/actions`: server actions that call the backend through the shared HTTP client.
+- `src/components`: reusable UI, shared layout, and business-domain modules.
+- `src/hooks`: React Query hooks and view-oriented data hooks.
+- `src/lib/axios/httpClient.ts`: server-only backend client and token refresh.
+- `src/proxy.ts`: route authentication, role checks, department checks, and expired-session refresh.
+- `src/store`: Zustand stores for client presentation state. Authentication tokens must never be stored here.
+- `src/utils/routes.ts`: route ownership, post-login destinations, and department access rules.
+- `src/utils/token.ts` and `src/utils/session.ts`: cookie helpers for tokens, role, departments, and absolute token expiry.
 
-## Learn More
+## Authentication
 
-To learn more about Next.js, take a look at the following resources:
+Authentication uses httpOnly cookies only. Access and refresh tokens are opaque
+custom tokens, not JWTs, and must never be decoded in the client.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The relevant cookies are `access_token`, `refresh_token`, `token_expires_at`,
+`user_role`, and `user_departments`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Proxy protects navigation and improves user experience, but the backend is the
+authoritative security boundary. Every protected backend operation must verify
+the authenticated user, role, department, and resource ownership independently
+of frontend cookies.
 
-## Deploy on Vercel
+## Main application areas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Public/B2C flight search, booking, registration, and profiles
+- B2B agency bookings, passengers, finance, bank deposits, and support
+- Admin ticket queues, transactions, agencies, users, and settings
+- Super-admin users, packages, commissions, deposits, and operational queues
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Quality checks
+
+Before merging changes, run:
+
+```bash
+bun run typecheck
+bun run lint
+bun run build
+```
+
+`next/font/google` downloads fonts during production builds. Build agents must
+have access to Google Fonts unless these fonts are changed to locally hosted assets.
+
+## Security conventions
+
+- Never place tokens in local storage, Redux, Zustand, browser headers, or URL parameters.
+- Never log passwords, passenger records, documents, booking payloads, or full backend responses.
+- Post-login redirect values must remain same-origin application paths.
+- Authenticated media responses must use private caching.
+- Add new protected routes to the role and department rules in `src/utils/routes.ts`.

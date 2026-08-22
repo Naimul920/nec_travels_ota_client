@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { IoIosAirplane } from "react-icons/io";
 import {
@@ -53,6 +53,7 @@ const BARCODE_BARS = [
 
 export function PopularDestinationsCarousal() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const [email, setEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
 
@@ -65,6 +66,16 @@ export function PopularDestinationsCarousal() {
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
   };
+
+  useEffect(() => {
+    if (isPaused || total <= 1) return;
+
+    const interval = window.setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % total);
+    }, 3000);
+
+    return () => window.clearInterval(interval);
+  }, [isPaused, total]);
 
   const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -119,12 +130,24 @@ export function PopularDestinationsCarousal() {
   return (
     <div className="w-full">
       {/* 3D Carousel Stack */}
-      <div className="relative z-10 mx-auto my-6 flex h-[350px] w-full max-w-[1580px] items-center justify-center md:h-[460px] xl:h-[520px]">
+      <div
+        className="relative z-10 mx-auto my-6 flex h-[340px] w-full max-w-7xl items-center justify-center px-4 sm:px-6 md:h-[440px] lg:px-8 xl:h-[500px]"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onFocusCapture={() => setIsPaused(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setIsPaused(false);
+          }
+        }}
+        aria-roledescription="carousel"
+        aria-label="Popular destinations"
+      >
         {/* Navigation Buttons */}
         <button
           onClick={handlePrev}
           aria-label="Previous destination"
-          className="absolute left-[4%] z-40 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-brand hover:bg-brand/10 hover:text-brand md:left-[10%] xl:left-[28%]"
+          className="absolute left-4 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-brand hover:text-brand sm:left-8 md:h-12 md:w-12 lg:left-[14%]"
         >
           <svg
             className="h-6 w-6 fill-none stroke-current"
@@ -138,7 +161,7 @@ export function PopularDestinationsCarousal() {
         <button
           onClick={handleNext}
           aria-label="Next destination"
-          className="absolute right-[4%] z-40 flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-brand hover:bg-brand/10 hover:text-brand md:right-[10%] xl:right-[28%]"
+          className="absolute right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-600 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-brand hover:text-brand sm:right-8 md:h-12 md:w-12 lg:right-[14%]"
         >
           <svg
             className="h-6 w-6 fill-none stroke-current"
@@ -193,7 +216,7 @@ export function PopularDestinationsCarousal() {
       </div>
 
       {/* Boarding Pass Newsletter Card */}
-      <div className="relative z-20 mx-auto mt-20 flex w-[1120px] max-w-[92%] flex-col overflow-hidden rounded-2xl border border-brand/20 bg-white shadow-[0_25px_60px_-15px_rgba(0,165,80,0.25)] lg:flex-row">
+      <div className="relative z-20 mx-auto mt-14 flex max-w-6xl flex-col overflow-hidden rounded-[28px] border border-brand/20 bg-white shadow-[0_25px_60px_-20px_rgba(0,165,80,0.25)] lg:mt-20 lg:flex-row">
         <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-80" />
 
         <div className="flex flex-1 flex-col justify-center gap-2 px-8 py-10 text-center lg:px-12 lg:text-left">

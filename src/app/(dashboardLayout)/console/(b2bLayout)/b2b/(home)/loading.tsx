@@ -1,3 +1,3 @@
-import { DashboardSkeleton } from "../_components/LoadingSkeletons";
+import { B2bHomeSkeleton } from "../_components/LoadingSkeletons";
 
-export default DashboardSkeleton;
+export default B2bHomeSkeleton;

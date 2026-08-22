@@ -19,6 +19,7 @@ interface Props {
   onClose: () => void;
   itinerary: Itinerary;
   values: BookingFormValues;
+  isDomestic?: boolean;
 }
 
 const LegHeader: React.FC<{ index: number }> = ({ index }) => (
@@ -63,6 +64,7 @@ const BookingPreviewModal: React.FC<Props> = ({
   onClose,
   itinerary,
   values,
+  isDomestic = false,
 }) => {
   const legs = getLegs(itinerary);
   const price = getPriceSummary(itinerary);
@@ -74,9 +76,9 @@ const BookingPreviewModal: React.FC<Props> = ({
     (values[type] ?? []).map((p) => ({
       type,
       name: `${p.title} ${p.firstname} ${p.lastname}`.trim(),
-      detail: `${p.gender || "--"} · ${p.date_of_birth || "--"} · ${
-        p.passport_number || "--"
-      }`,
+      detail: isDomestic
+        ? `${p.gender || "--"} · ${p.date_of_birth || "--"} · ${p.country || "--"}`
+        : `${p.gender || "--"} · ${p.date_of_birth || "--"} · Passport ${p.passport_number || "--"}`,
     })),
   );
 

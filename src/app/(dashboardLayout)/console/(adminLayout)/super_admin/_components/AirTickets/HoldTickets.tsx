@@ -60,10 +60,6 @@ const HoldTickets: React.FC = () => {
   // 4. Passed computed parameter sequence safely down to your search handler hook
   const filteredData = useSearch(holdTicketsData, searchString);
 
-  const handleDelete = (id: string) => {
-    console.log("deleted", id);
-  };
-
   return (
     <>
       <Table
@@ -92,7 +88,6 @@ const HoldTickets: React.FC = () => {
                     </div>
                   }
                   // Pass delete handler
-                  handleDelete={() => handleDelete(data.pnr)}
                 />
               )}
             </div>

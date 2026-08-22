@@ -10,7 +10,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const path = request.nextUrl.searchParams.get("path");
-  if (!path) {
+  if (
+    !path ||
+    path.includes("\\") ||
+    path.split("/").includes("..") ||
+    /[\u0000-\u001F\u007F]/.test(path)
+  ) {
     return new NextResponse("Invalid path", { status: 400 });
   }
 
@@ -38,7 +43,8 @@ export async function GET(request: NextRequest) {
   return new NextResponse(blob, {
     headers: {
       "Content-Type": response.headers.get("content-type") ?? "application/octet-stream",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "private, max-age=3600",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }

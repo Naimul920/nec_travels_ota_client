@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import * as Flags from "country-flag-icons/react/3x2";
@@ -68,7 +68,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
   placeholder = "Select country",
   name,
 }) => {
-  const allOptions = useMemo(buildCountryList, []);
+  const allOptions = useMemo(() => buildCountryList(), []);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
@@ -92,11 +92,11 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
 
   useEffect(() => setMounted(true), []);
 
-  const computePos = () => {
+  const computePos = useCallback(() => {
     const rect = buttonRef.current?.getBoundingClientRect();
     if (!rect) return;
     setPos({ top: rect.bottom + 6, left: rect.left, width: rect.width });
-  };
+  }, []);
 
   const openDropdown = () => {
     computePos();
@@ -105,11 +105,11 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
     setOpen(true);
   };
 
-  const closeDropdown = () => {
+  const closeDropdown = useCallback(() => {
     setOpen(false);
     setQuery("");
     onBlur?.();
-  };
+  }, [onBlur]);
 
   useEffect(() => {
     if (!open) return;
@@ -120,7 +120,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
       window.removeEventListener("resize", handleResizeOrScroll);
       window.removeEventListener("scroll", handleResizeOrScroll, true);
     };
-  }, [open]);
+  }, [computePos, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -135,7 +135,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  }, [closeDropdown, open]);
 
   useEffect(() => {
     if (open) {

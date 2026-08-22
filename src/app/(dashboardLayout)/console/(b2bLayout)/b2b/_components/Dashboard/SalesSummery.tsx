@@ -1,95 +1,65 @@
-import React from "react";
+"use client";
+
+import { useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
-import {
-  FaChartLine,
-  FaMoneyBillWave,
-  FaTicketAlt,
-  FaUsers,
-} from "react-icons/fa";
-import SalesSummaryCard from "./SalesSummeryCard";
+import { FaChartLine, FaMoneyBillWave, FaTicketAlt, FaUsers } from "react-icons/fa";
 import { Select } from "@/components/ui";
+import SalesSummaryCard from "./SalesSummeryCard";
 
-const salesSummaryData = [
-  {
-    id: 1,
-    title: "Total Booking",
-    total: 561,
-    summary: "+8% from yesterday",
-    icon: <FaTicketAlt size={18} />,
-    bgColor: "bg-red-100",
-    iconBg: "bg-red-500",
-    summaryColor: "text-green-600",
-  },
-  {
-    id: 2,
-    title: "Total Customers",
-    total: 1280,
-    summary: "+5% from last week",
-    icon: <FaUsers size={18} />,
-    bgColor: "bg-blue-100",
-    iconBg: "bg-blue-500",
-    summaryColor: "text-green-600",
-  },
-  {
-    id: 3,
-    title: "Total Revenue",
-    total: "৳ 2.4M",
-    summary: "+12% this month",
-    icon: <FaMoneyBillWave size={18} />,
-    bgColor: "bg-green-100",
-    iconBg: "bg-green-500",
-    summaryColor: "text-green-700",
-  },
-  {
-    id: 4,
-    title: "Growth Rate",
-    total: "18%",
-    summary: "-2% from last month",
-    icon: <FaChartLine size={18} />,
-    bgColor: "bg-purple-100",
-    iconBg: "bg-purple-500",
-    summaryColor: "text-red-500",
-  },
-  {
-    id: 5,
-    title: "Growth Rate",
-    total: "19%",
-    summary: "-3% from last month",
-    icon: <FaChartLine size={18} />,
-    bgColor: "bg-purple-200",
-    iconBg: "bg-purple-400",
-    summaryColor: "text-red-400",
-  },
-];
+type Period = "week" | "month" | "year";
 
-const SalesSummery: React.FC = () => {
+const SUMMARY_BY_PERIOD = {
+  week: [
+    { title: "Bookings", total: 38, summary: "+8% vs previous week", icon: <FaTicketAlt />, bgColor: "bg-rose-50/70", iconBg: "bg-rose-500", summaryColor: "text-emerald-700" },
+    { title: "Travelers", total: 74, summary: "+5% vs previous week", icon: <FaUsers />, bgColor: "bg-sky-50/70", iconBg: "bg-sky-500", summaryColor: "text-emerald-700" },
+    { title: "Gross sales", total: "৳186K", summary: "+12% vs previous week", icon: <FaMoneyBillWave />, bgColor: "bg-emerald-50/70", iconBg: "bg-emerald-600", summaryColor: "text-emerald-700" },
+    { title: "Conversion", total: "18.2%", summary: "-2% vs previous week", icon: <FaChartLine />, bgColor: "bg-violet-50/70", iconBg: "bg-violet-500", summaryColor: "text-rose-600" },
+  ],
+  month: [
+    { title: "Bookings", total: 156, summary: "+11% vs previous month", icon: <FaTicketAlt />, bgColor: "bg-rose-50/70", iconBg: "bg-rose-500", summaryColor: "text-emerald-700" },
+    { title: "Travelers", total: 312, summary: "+7% vs previous month", icon: <FaUsers />, bgColor: "bg-sky-50/70", iconBg: "bg-sky-500", summaryColor: "text-emerald-700" },
+    { title: "Gross sales", total: "৳742K", summary: "+9% vs previous month", icon: <FaMoneyBillWave />, bgColor: "bg-emerald-50/70", iconBg: "bg-emerald-600", summaryColor: "text-emerald-700" },
+    { title: "Conversion", total: "20.1%", summary: "+1.4% vs previous month", icon: <FaChartLine />, bgColor: "bg-violet-50/70", iconBg: "bg-violet-500", summaryColor: "text-emerald-700" },
+  ],
+  year: [
+    { title: "Bookings", total: 1842, summary: "+16% vs previous year", icon: <FaTicketAlt />, bgColor: "bg-rose-50/70", iconBg: "bg-rose-500", summaryColor: "text-emerald-700" },
+    { title: "Travelers", total: 3690, summary: "+13% vs previous year", icon: <FaUsers />, bgColor: "bg-sky-50/70", iconBg: "bg-sky-500", summaryColor: "text-emerald-700" },
+    { title: "Gross sales", total: "৳8.9M", summary: "+18% vs previous year", icon: <FaMoneyBillWave />, bgColor: "bg-emerald-50/70", iconBg: "bg-emerald-600", summaryColor: "text-emerald-700" },
+    { title: "Conversion", total: "21.4%", summary: "+2.1% vs previous year", icon: <FaChartLine />, bgColor: "bg-violet-50/70", iconBg: "bg-violet-500", summaryColor: "text-emerald-700" },
+  ],
+} satisfies Record<Period, Array<React.ComponentProps<typeof SalesSummaryCard>>>;
+
+export default function SalesSummery() {
+  const [period, setPeriod] = useState<Period>("month");
+
   return (
-    <div className="p-5 border border-primary bg-white rounded-lg my-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-primary md:text-2xl line-clamp-1 text-lg font-bold">
-          Sales Summery
-        </h1>
-        <div className="md:w-2/9">
+    <section aria-labelledby="sales-summary-heading" className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 sm:p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 id="sales-summary-heading" className="text-base font-bold text-[#12233D]">Traffic and sales</h2>
+          <p className="mt-0.5 text-xs text-slate-500">Commercial performance overview</p>
+        </div>
+        <div className="w-full sm:w-44">
           <Select
-            className="border-primary! rounded"
-            //   value={role}
-            //   onChange={(e) => setRole(e.target.value)}
+            aria-label="Sales summary period"
+            value={period}
+            onChange={(event) => setPeriod(event.target.value as Period)}
+            className="h-9! rounded-lg! border-slate-200! bg-white! text-xs! shadow-none!"
             options={[
-              { label: "Last Week", value: "week" },
-              { label: "Last Month", value: "month" },
-              { label: "Last Year", value: "year" },
+              { label: "Last week", value: "week" },
+              { label: "Last month", value: "month" },
+              { label: "Last year", value: "year" },
             ]}
             iconRight={<IoChevronDown />}
           />
         </div>
       </div>
-      <div className="grid md:grid-cols-5 gap-4 mt-5">
-        {salesSummaryData.map((item) => (
-          <SalesSummaryCard key={item.id} {...item} />
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {SUMMARY_BY_PERIOD[period].map((item) => (
+          <SalesSummaryCard key={item.title} {...item} bgColor="bg-white" />
         ))}
       </div>
-    </div>
+    </section>
   );
-};
-
-export default SalesSummery;
+}

@@ -26,9 +26,7 @@ const CreditRequest: React.FC<CreditRequestProps> = ({ pnr }) => {
       pnr: pnr || "",
       travelDate: null,
     },
-    onSubmit: (values) => {
-      console.log("Credit Request Submitted:", values);
-    },
+    onSubmit: () => {},
   });
 
   return (

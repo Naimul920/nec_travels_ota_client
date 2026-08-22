@@ -53,15 +53,6 @@ const BookingFlightInfo: React.FC<BookingFlightInfoProps> = ({ itinerary }) => {
     itinerary?.saleCurrencyAmount ?? {};
   const currency = itinerary?.passengerFareBreakDown?.[0]?.currency ?? "BDT";
   const displayTotal = Math.max(offerAmount, totalAmount);
-  console.log(
-    "BookingFlightInfo itinerary flightDetails:",
-    itinerary?.flightDetails?.[0],
-  );
-  console.log(
-    "BookingFlightInfo itinerary: schedules",
-    itinerary.flightDetails.at(0)?.schedules,
-  );
-
   if (!first) {
     return (
       <div className="text-sm text-gray-400">Flight details unavailable</div>

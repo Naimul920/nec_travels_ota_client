@@ -267,14 +267,12 @@ function TicketHeader({ booking }: { booking: BookingItem }) {
         </div>
 
         {agency?.logo_key ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={resolveImageSrc(agency.logo_key)}
             alt={agency.agency_name || "Agency Logo"}
             className="h-12 max-w-[160px] object-contain"
           />
         ) : (
-          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src="/assets/images/logo.png"
             alt="NEC Travels"
@@ -384,7 +382,6 @@ function FlightDetails({
               </div>
 
               <div className="flex items-center gap-2 px-2.5 py-1.5 text-[11px] border-b border-gray-200">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={resolveImageSrc(
                     `/api/v1/uploads/files/images/public/airlines_logo/${airlineCode}.svg`,
